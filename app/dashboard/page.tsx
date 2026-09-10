@@ -1,3 +1,21 @@
+"use client";
 import Link from "next/link";
-const assets=[["USDT","$12,480.32"],["BTC","0.0842 BTC"],["ETH","1.72 ETH"],["SOL","14.80 SOL"]];
-export default function Dashboard(){return <main className="app-shell"><header className="appbar"><Link className="brand" href="/">ARBITRAGE<span>.</span></Link><nav><Link href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></nav><Link className="btn" href="/">Sign out</Link></header><section className="app-content"><div className="page-title"><div><div className="eyebrow">OVERVIEW</div><h1>Dashboard</h1></div><div className="actions"><Link className="btn primary" href="/wallet">Deposit</Link><Link className="btn" href="/trade">Trade</Link></div></div><div className="stats"><div className="card"><div className="label">Total balance</div><div className="big">$12,480.32</div><div className="up">+2.84% today</div></div><div className="card"><div className="label">Spot wallet</div><div className="big">$9,860.32</div><div className="sub">Available for spot trading</div></div><div className="card"><div className="label">Futures wallet</div><div className="big">$2,620.00</div><div className="sub">Margin available</div></div></div><div className="two-col"><section className="panel"><div className="section-head"><h2>Assets</h2><Link href="/wallet">View wallet</Link></div>{assets.map(a=><div className="asset-row" key={a[0]}><div className="coin">{a[0]}</div><strong>{a[1]}</strong></div>)}</section><section className="panel"><div className="section-head"><h2>Quick actions</h2></div><div className="quick-grid"><Link href="/trade">Spot trading<span>Buy & sell</span></Link><Link href="/futures">Futures<span>Long & short</span></Link><Link href="/wallet">Transfer<span>Move funds</span></Link><Link href="/orders">History<span>Orders & trades</span></Link></div></section></div></section></main>}
+import {Search,Plus,ArrowDownToLine,ArrowUpFromLine,ArrowLeftRight,TrendingUp} from "lucide-react";
+import MobileNav from "../components/MobileNav";
+
+const assets=[["USDT","63.61196792","₹6,079.39"],["BTC","0.0842","₹5,245.12"],["ETH","1.72","₹4,106.80"],["SOL","14.80","₹2,982.44"]];
+const markets=[["BNB","712.34","-3.85%"],["BTC","77,154.49","-1.75%"],["ETH","4,521.80","+1.82%"],["SOL","241.16","+3.08%"]];
+
+export default function Dashboard(){
+ return <main className="exchange-mobile app-shell">
+  <header className="mobile-topbar"><button className="icon-btn"><span className="hamburger">☰</span></button><div className="mobile-brand">ARBITRAGE<span>.</span></div><div className="top-icons"><button className="icon-btn">◉</button><button className="icon-btn">♧</button></div></header>
+  <div className="mode-switch"><button className="selected">Exchange</button><button>Wallet</button></div>
+  <div className="mobile-search"><Search size={19}/><span>Search markets, coins</span></div>
+  <section className="balance-hero"><div className="balance-label">Est. Total Value <span>⌃</span></div><div className="balance-row"><div><strong>₹6,079.39</strong><div className="pnl">Today's PNL <b>+₹0.00 (+0.00%)</b></div></div><Link href="/wallet/deposit" className="add-funds">Add Funds</Link></div></section>
+  <section className="reward-card"><div><span className="muted">Get Rewards</span><strong>Trade and explore the exchange</strong></div><Link href="/trade">Go</Link></section>
+  <section className="mini-grid"><Link href="/wallet"><span>Wallet</span><strong>₹6,079.39</strong><small>View assets →</small></Link><Link href="/markets"><span>Markets</span><strong>Live prices</strong><small>Explore markets →</small></Link></section>
+  <section className="mobile-section"><div className="section-tabs"><b>Favorites</b><b className="active">Hot</b><b>New</b><b>Gainers</b></div><div className="market-head"><span>Name</span><span>Last Price</span><span>24h chg%</span></div>{markets.map(([name,price,chg])=><Link className="mobile-market" href="/trade" key={name}><div className="coin-icon">{name[0]}</div><strong>{name}</strong><span>{price}</span><em className={chg.startsWith("-")?"down":"up"}>{chg}</em></Link>)}</section>
+  <section className="quick-actions"><Link href="/wallet/deposit"><ArrowDownToLine/><span>Add Funds</span></Link><Link href="/wallet/withdraw"><ArrowUpFromLine/><span>Send</span></Link><Link href="/wallet/transfer"><ArrowLeftRight/><span>Transfer</span></Link><Link href="/markets"><TrendingUp/><span>Markets</span></Link></section>
+  <MobileNav/>
+ </main>
+}
