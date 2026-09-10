@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <main className="shell">
       <header className="topbar">
-        <div className="brand">ARBITRAGE<span>.</span></div>
+        <div className="brand">ORBITEX<span>.</span></div>
         <nav className="nav"><a href="#markets">Markets</a><a href="#spot">Spot</a><a href="#futures">Futures</a><a href="#security">Security</a></nav>
         <div className="actions"><a className="btn" href="/login">Log in</a><a className="btn primary" href="/signup">Create account</a></div>
       </header>
@@ -54,7 +54,7 @@ export default function Home() {
 
       <section className="security" id="security"><div><div className="eyebrow">SECURITY ARCHITECTURE</div><h2>Balances backed by a proper ledger.</h2></div><p>Account balances will be derived from server-side ledger entries rather than editable client-side values. Privileged wallet operations stay on the server, with audit trails and withdrawal controls.</p></section>
 
-      <footer>ARBITRAGE · Exchange foundation · <span>Testnet-first development</span></footer>
+      <footer>ORBITEX · Exchange foundation · <span>Testnet-first development</span></footer>
     </main>
   );
 }
