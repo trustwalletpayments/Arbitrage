@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {validateOrder} from "../../../../../lib/trading";
+import {validateOrder} from "../../../../lib/trading";
 
 export async function POST(request:Request){
   try{
