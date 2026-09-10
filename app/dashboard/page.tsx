@@ -8,7 +8,7 @@ const markets=[["BNB","712.34","-3.85%"],["BTC","77,154.49","-1.75%"],["ETH","4,
 
 export default function Dashboard(){
  return <main className="exchange-mobile app-shell">
-  <header className="mobile-topbar"><button className="icon-btn"><span className="hamburger">☰</span></button><div className="mobile-brand">ARBITRAGE<span>.</span></div><div className="top-icons"><button className="icon-btn">◉</button><button className="icon-btn">♧</button></div></header>
+  <header className="mobile-topbar"><button className="icon-btn"><span className="hamburger">☰</span></button><div className="mobile-brand">ORBITEX<span>.</span></div><div className="top-icons"><button className="icon-btn">◉</button><button className="icon-btn">♧</button></div></header>
   <div className="mode-switch"><button className="selected">Exchange</button><button>Wallet</button></div>
   <div className="mobile-search"><Search size={19}/><span>Search markets, coins</span></div>
   <section className="balance-hero"><div className="balance-label">Est. Total Value <span>⌃</span></div><div className="balance-row"><div><strong>₹6,079.39</strong><div className="pnl">Today's PNL <b>+₹0.00 (+0.00%)</b></div></div><Link href="/wallet/deposit" className="add-funds">Add Funds</Link></div></section>
