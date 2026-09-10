@@ -1,5 +1,5 @@
 export type WalletBalances={spot:number;futures:number};
-export type WalletTransaction={id:string;type:"DEPOSIT"|"WITHDRAWAL"|"TRANSFER";asset:string;amount:number;from?:string;to?:string;status:"PENDING"|"COMPLETED";createdAt:string};
+export type WalletTransaction={id:string;type:"DEPOSIT"|"WITHDRAWAL"|"TRANSFER"|"TRADE";asset:string;amount:number;from?:string;to?:string;side?:"BUY"|"SELL";symbol?:string;status:"PENDING"|"COMPLETED";createdAt:string};
 const BALANCES_KEY="exchange:testnet:balances";
 const TX_KEY="exchange:testnet:wallet-transactions";
 const INITIAL:WalletBalances={spot:9860.32,futures:2620};
