@@ -1,60 +1,61 @@
+import Link from "next/link";
+
 const markets = [
-  ["BTC/USDT", "$113,842.20", "+2.14%"],
-  ["ETH/USDT", "$4,521.80", "+1.82%"],
-  ["BNB/USDT", "$861.42", "+1.31%"],
-  ["SOL/USDT", "$241.16", "+3.08%"],
-  ["XRP/USDT", "$2.97", "+0.94%"],
-  ["DOGE/USDT", "$0.2431", "+1.67%"],
-  ["ADA/USDT", "$0.8842", "+0.71%"],
-  ["AVAX/USDT", "$28.42", "+2.45%"],
-  ["LINK/USDT", "$23.61", "+1.16%"],
-  ["TRX/USDT", "$0.3472", "+0.53%"],
+  ["BTC", "$77,154.49", "+2.32%"],
+  ["ETH", "$3,661.27", "+1.48%"],
+  ["BNB", "$712.34", "-3.85%"],
+  ["SOL", "$147.62", "+4.21%"],
 ];
 
 const features = [
-  ["01", "Spot trading", "Market and limit order infrastructure with balances, orders and trade history."],
-  ["02", "Futures trading", "Long and short positions, leverage, margin, TP/SL and liquidation logic."],
-  ["03", "Unified wallet", "Spot and futures wallets with deposits, withdrawals, transfers and ledger history."],
+  ["⚡", "Low fees", "More trading, more opportunity"],
+  ["◈", "Secure", "Your assets, our priority"],
+  ["◎", "Global access", "Trade anywhere, anytime"],
+  ["▥", "Advanced tools", "For beginners and professionals"],
 ];
 
 export default function Home() {
   return (
-    <main className="shell">
-      <header className="topbar">
-        <div className="brand">ORBITEX<span>.</span></div>
-        <nav className="nav"><a href="#markets">Markets</a><a href="#spot">Spot</a><a href="#futures">Futures</a><a href="#security">Security</a></nav>
-        <div className="actions"><a className="btn" href="/login">Log in</a><a className="btn primary" href="/signup">Create account</a></div>
+    <main className="orbitex-home">
+      <header className="orbitex-header">
+        <Link href="/" className="orbitex-logo"><span className="orbit-mark">◉</span>ORBIT<span>EX</span></Link>
+        <nav className="orbitex-nav"><a href="#markets">Markets</a><a href="#features">Features</a><a href="#security">Security</a><a href="/trade">Trade</a></nav>
+        <div className="orbitex-actions"><Link className="orbitex-login" href="/login">Log in</Link><Link className="orbitex-create" href="/signup">Create account</Link><button className="orbitex-menu" aria-label="Menu">☰</button></div>
       </header>
 
-      <section className="hero">
-        <div className="eyebrow">DIGITAL ASSET EXCHANGE</div>
-        <h1>A trading platform<br/>built for <span>control.</span></h1>
-        <p>Trade spot and futures markets from one account. Real-time market data, professional order tools and a unified wallet experience are being built into the platform.</p>
-        <div className="actions"><a className="btn primary" href="/signup">Start trading</a><a className="btn" href="#markets">Explore markets</a></div>
+      <section className="orbitex-hero">
+        <div className="orbit-glow orbit-glow-one" /><div className="orbit-glow orbit-glow-two" />
+        <div className="orbitex-hero-copy">
+          <div className="orbitex-eyebrow">TRADE WITHOUT LIMITS</div>
+          <h1>A TRADING<br/>PLATFORM<br/>BUILT FOR <strong>CONTROL.</strong></h1>
+          <p>Trade spot and futures markets from one account. Real-time market data, professional order tools and a unified wallet experience.</p>
+          <div className="orbitex-hero-buttons"><Link href="/signup" className="orbitex-primary">Start trading <span>→</span></Link><Link href="#markets" className="orbitex-secondary">Explore markets</Link></div>
+        </div>
+        <div className="orbit-phone-wrap" aria-hidden="true">
+          <div className="orbit-planet" />
+          <div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" />
+          <div className="orbit-phone">
+            <div className="phone-notch" />
+            <div className="phone-brand"><span className="orbit-mini-mark">◉</span> ORBITEX</div>
+            <div className="phone-label">Total Balance</div><div className="phone-balance">$6,079.39</div><div className="phone-gain">+2.45% (24h)</div>
+            <div className="phone-actions"><span>↓<small>Deposit</small></span><span>↑<small>Withdraw</small></span><span>⇄<small>Transfer</small></span><span>▣<small>Earn</small></span></div>
+            <div className="phone-tabs"><b>Favorites</b><b>Hot</b><b>Gainers</b><b>New</b></div>
+            {markets.map(([name,price,change])=><div className="phone-market" key={name}><i>{name[0]}</i><div><b>{name}</b><small>{name === "BTC" ? "Bitcoin" : name}</small></div><div><b>{price}</b><small className={change.startsWith("-") ? "phone-red" : "phone-green"}>{change}</small></div></div>)}
+          </div>
+        </div>
       </section>
 
-      <section className="grid">
-        <div className="card"><div className="label">Markets</div><div className="value">20+</div><div className="sub">Planned trading pairs</div></div>
-        <div className="card"><div className="label">Products</div><div className="value">Spot + Futures</div><div className="sub">One account</div></div>
-        <div className="card"><div className="label">Wallets</div><div className="value">Unified</div><div className="sub">Deposit · Withdraw · Transfer</div></div>
-        <div className="card"><div className="label">Status</div><div className="value">Building</div><div className="sub">Testnet-first development</div></div>
-      </section>
+      <section className="orbitex-features" id="features">{features.map(([icon,title,text])=><article key={title}><div className="feature-icon">{icon}</div><h3>{title}</h3><p>{text}</p></article>)}</section>
 
-      <section className="markets" id="markets">
-        <div className="section-head"><div><div className="eyebrow">MARKET OVERVIEW</div><h2>Popular markets</h2></div><span className="muted">UI preview</span></div>
-        <table className="table"><thead><tr><th>Pair</th><th>Last price</th><th>24h change</th></tr></thead><tbody>
-          {markets.map(([pair,price,change]) => <tr key={pair}><td>{pair}</td><td>{price}</td><td className="up">{change}</td></tr>)}
-        </tbody></table>
-        <p className="muted">These are interface placeholder values until the live market-data service is connected.</p>
-      </section>
+      <section className="orbitex-ticker" id="markets">{markets.map(([name,price,change])=><Link href="/trade" key={name}><span className="ticker-icon">{name[0]}</span><div><b>{name}</b><strong>{price}</strong><em className={change.startsWith("-") ? "phone-red" : "phone-green"}>{change}</em></div></Link>)}</section>
 
-      <section className="feature-grid" id="spot">
-        {features.map(([num,title,text]) => <article className="feature" key={num}><div className="feature-num">{num}</div><h3>{title}</h3><p>{text}</p></article>)}
-      </section>
+      <section className="orbitex-anywhere"><div><div className="orbitex-eyebrow">TRADE ANYTIME, ANYWHERE</div><h2>Powerful. Fast.<br/><span>Secure.</span></h2><p>The ORBITEX trading experience is designed for desktop and mobile, with spot and futures tools in one account.</p><div className="store-buttons"><span> App Store</span><span>▶ Google Play</span></div></div><div className="mini-devices"><div className="mini-phone">ORBITEX<br/><small>TRADE WITHOUT LIMITS</small></div><div className="mini-chart">↗<br/><small>LIVE MARKETS</small></div></div></section>
 
-      <section className="security" id="security"><div><div className="eyebrow">SECURITY ARCHITECTURE</div><h2>Balances backed by a proper ledger.</h2></div><p>Account balances will be derived from server-side ledger entries rather than editable client-side values. Privileged wallet operations stay on the server, with audit trails and withdrawal controls.</p></section>
+      <section className="orbitex-stats"><div><b>20+</b><span>Trading Pairs</span></div><div><b>99.9%</b><span>Target Uptime</span></div><div><b>24/7</b><span>Customer Support</span></div><div><b>1</b><span>Unified Account</span></div></section>
 
-      <footer>ORBITEX · Exchange foundation · <span>Testnet-first development</span></footer>
+      <section className="orbitex-security" id="security"><div className="orbit-shield">◇</div><div><div className="orbitex-eyebrow">SECURITY FIRST</div><h2>Built with control at every layer.</h2><p>Account balances, trading activity and privileged wallet operations are designed around server-side controls, audit trails and risk management.</p></div></section>
+
+      <footer className="orbitex-footer"><span>Trade Smarter. Trade Together.</span><b>ORBITEX.</b></footer>
     </main>
   );
 }
