@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {estimatedLiquidationPrice,initialMargin,notional,unrealizedPnl,validateOrder} from "../../../../../lib/trading";
+import {estimatedLiquidationPrice,initialMargin,notional,unrealizedPnl,validateOrder} from "../../../../lib/trading";
 
 export async function POST(request:Request){
   try{
