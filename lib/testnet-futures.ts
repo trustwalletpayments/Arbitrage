@@ -1,0 +1,3 @@
+import {getTestnetBalances,setTestnetBalances} from "./testnet-wallet";
+export function reserveFuturesMargin(margin:number){if(!Number.isFinite(margin)||margin<=0)throw new Error("Invalid margin");const balances=getTestnetBalances();const wallet=balances.find(x=>x.asset==="USDT");if(!wallet||wallet.futures<margin)throw new Error("Insufficient futures USDT balance");wallet.futures-=margin;setTestnetBalances(balances);return balances}
+export function settleFuturesPosition(margin:number,realizedPnl:number){const balances=getTestnetBalances();const wallet=balances.find(x=>x.asset==="USDT");if(!wallet)throw new Error("USDT wallet unavailable");wallet.futures+=Math.max(0,margin+realizedPnl);setTestnetBalances(balances);return balances}
