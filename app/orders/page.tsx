@@ -1,7 +1,8 @@
 "use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
-import {getTestnetOrders,getTestnetPositions,StoredOrder,StoredPosition} from "../../lib/testnet-store";
+import {getTestnetOrders,getTestnetPositions} from "../../lib/testnet-store";
+import type {StoredOrder,StoredPosition} from "../../lib/testnet-store";
 export default function Orders(){
   const [tab,setTab]=useState("Order history");
   const [orders,setOrders]=useState<StoredOrder[]>([]);
