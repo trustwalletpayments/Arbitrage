@@ -1,44 +1,5 @@
-/* ORBITEX branding: keep the ORBITEX wordmark visible and place the supplied blue orbital mark beside it. */
-.brand,
-.mobile-brand,
-.orbitex-logo,
-.phone-brand,
-.orbitex-footer b {
-  color: inherit !important;
-  font-size: inherit !important;
-  text-shadow: none !important;
-  display: inline-flex !important;
-  align-items: center;
-  flex: 0 0 auto;
-  background: none !important;
-}
-
-.brand::before,
-.mobile-brand::before,
-.orbitex-logo::before,
-.phone-brand::before,
-.orbitex-footer b::before {
-  content: "";
-  display: inline-block;
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  margin-right: 9px;
-  background: url('/orbitex-logo.svg') center / contain no-repeat;
-}
-
-.brand::before { width: 34px; height: 34px; }
-.auth-card .brand::before { width: 48px; height: 48px; margin-right: 12px; }
-.mobile-brand::before { width: 36px; height: 36px; }
-.orbitex-logo::before { width: 40px; height: 40px; margin-right: 9px; }
-.phone-brand::before { width: 32px; height: 32px; margin-right: 8px; }
-.orbitex-footer b::before { width: 34px; height: 34px; margin-right: 8px; }
-
-.orbit-mark,
-.orbit-mini-mark {
-  display: none !important;
-}
-
-@media (max-width: 520px) {
-  .orbitex-logo::before { width: 34px; height: 34px; }
-}
+/* Shared ORBITEX branding. Keep the wordmark visible; show the supplied orbital logo beside it. */
+.brand,.mobile-brand,.orbitex-logo,.phone-brand,.orbitex-footer b{color:inherit!important;font-size:inherit!important;text-shadow:none!important;display:inline-flex!important;align-items:center;flex:0 0 auto;background:none!important}
+.brand::before,.mobile-brand::before,.orbitex-logo::before,.phone-brand::before,.orbitex-footer b::before{content:"";display:inline-block;flex:0 0 auto;width:34px;height:34px;margin-right:9px;background:url('/orbitex-logo.svg') center/contain no-repeat}
+.brand::before{width:30px;height:30px}.auth-card .brand::before{width:48px;height:48px}.mobile-brand::before{width:34px;height:34px}.orbitex-logo::before{width:38px;height:38px}.phone-brand::before{width:30px;height:30px}.orbitex-footer b::before{width:32px;height:32px}
+.orbit-mark,.orbit-mini-mark{display:none!important}
