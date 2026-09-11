@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ORBITEX logo">
+<defs>
+ <radialGradient id="orb" cx="32%" cy="25%" r="78%"><stop offset="0" stop-color="#63f6ff"/><stop offset=".35" stop-color="#13a9ff"/><stop offset=".72" stop-color="#0759df"/><stop offset="1" stop-color="#07145c"/></radialGradient>
+ <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9fffff"/><stop offset=".35" stop-color="#00d9ff"/><stop offset=".72" stop-color="#0068ff"/><stop offset="1" stop-color="#0822a8"/></linearGradient>
+ <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#0b4cff"/><stop offset=".42" stop-color="#4fffff"/><stop offset=".58" stop-color="#fff"/><stop offset="1" stop-color="#006bff"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <clipPath id="orbclip"><circle cx="255" cy="256" r="150"/></clipPath>
+</defs>
+<ellipse cx="256" cy="300" rx="226" ry="83" fill="none" stroke="#003cff" stroke-width="15" opacity=".8" transform="rotate(-16 256 256)"/>
+<circle cx="256" cy="256" r="153" fill="url(#orb)" stroke="url(#rim)" stroke-width="7"/>
+<path d="M118 332c57-35 115-60 181-75 53-12 105-18 150-17" fill="none" stroke="#06177c" stroke-width="28" opacity=".9"/>
+<path d="M100 349c68-50 136-81 205-97 54-12 105-15 157-9" fill="none" stroke="#39f5ff" stroke-width="5" opacity=".85" filter="url(#glow)"/>
+<path d="M127 181c38-63 105-91 170-74 42 11 79 39 101 78-54-28-112-34-169-18-38 11-72 31-102 58z" fill="#55edff" opacity=".32" clip-path="url(#orbclip)"/>
+<path d="M310 142l-13 87 91-53 8 37-121 76-8-99z" fill="#04167d" opacity=".9"/>
+<path d="M198 352l18-84 106-63-11 88-83 55z" fill="#0629c9" opacity=".9"/>
+<ellipse cx="256" cy="300" rx="226" ry="83" fill="none" stroke="url(#orbit)" stroke-width="9" transform="rotate(-16 256 256)"/>
+<circle cx="462" cy="225" r="29" fill="url(#orb)" stroke="#55efff" stroke-width="4" filter="url(#glow)"/>
+</svg>
