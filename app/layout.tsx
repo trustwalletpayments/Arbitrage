@@ -21,10 +21,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => {
-              const enhanceDownloads = () => {
+              const enhancePage = () => {
+                try {
+                  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+                  window.scrollTo(0, 0);
+                } catch {}
+
+                if (window.innerWidth <= 850) {
+                  document.querySelectorAll('.premium-footer .footer-group[open]').forEach((group) => group.removeAttribute('open'));
+                }
+
                 const box = document.querySelector('.store-buttons');
-                if (!box) return false;
-                if (box.dataset.enhanced === '1') return true;
+                if (!box || box.dataset.enhanced === '1') return;
                 box.dataset.enhanced = '1';
                 box.innerHTML = '';
 
@@ -41,19 +49,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 apk.innerHTML = '<svg class="store-download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v11"/><path d="m7 9 5 5 5-5"/><path d="M5 21h14"/><path d="M5 17v4"/><path d="M19 17v4"/></svg><span class="store-download-copy"><small>DOWNLOAD</small><b>APK</b></span><span class="store-download-arrow">›</span>';
 
                 box.append(play, apk);
-                return true;
               };
 
               const tryEnhance = () => {
-                if (enhanceDownloads()) return;
+                enhancePage();
+                if (!document.querySelector('.premium-footer .footer-group[open]') || window.innerWidth > 850) return;
                 setTimeout(tryEnhance, 150);
               };
 
-              if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', tryEnhance, { once: true });
-              } else {
-                tryEnhance();
-              }
+              if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryEnhance, { once: true });
+              else tryEnhance();
             })();`,
           }}
         />
