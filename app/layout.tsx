@@ -23,7 +23,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             __html: `(() => {
               const enhanceDownloads = () => {
                 const box = document.querySelector('.store-buttons');
-                if (!box || box.dataset.enhanced === '1') return;
+                if (!box) return false;
+                if (box.dataset.enhanced === '1') return true;
                 box.dataset.enhanced = '1';
                 box.innerHTML = '';
 
@@ -40,9 +41,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 apk.innerHTML = '<svg class="store-download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v11"/><path d="m7 9 5 5 5-5"/><path d="M5 21h14"/><path d="M5 17v4"/><path d="M19 17v4"/></svg><span class="store-download-copy"><small>DOWNLOAD</small><b>APK</b></span><span class="store-download-arrow">›</span>';
 
                 box.append(play, apk);
+                return true;
               };
-              if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhanceDownloads, { once: true });
-              else enhanceDownloads();
+
+              const tryEnhance = () => {
+                if (enhanceDownloads()) return;
+                setTimeout(tryEnhance, 150);
+              };
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', tryEnhance, { once: true });
+              } else {
+                tryEnhance();
+              }
             })();`,
           }}
         />
