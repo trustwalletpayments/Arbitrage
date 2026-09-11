@@ -28,9 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   window.scrollTo(0, 0);
                 } catch {}
 
-                if (window.innerWidth <= 850) {
-                  document.querySelectorAll('.premium-footer .footer-group[open]').forEach((group) => group.removeAttribute('open'));
-                }
+                document.querySelectorAll('.premium-footer .footer-group[open]').forEach((group) => group.removeAttribute('open'));
 
                 const box = document.querySelector('.store-buttons');
                 if (!box || box.dataset.enhanced === '1') return;
@@ -54,7 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
               const tryEnhance = () => {
                 enhancePage();
-                if (!document.querySelector('.premium-footer .footer-group[open]') || window.innerWidth > 850) return;
+                if (!document.querySelector('.premium-footer .footer-group[open]')) return;
                 setTimeout(tryEnhance, 150);
               };
 
