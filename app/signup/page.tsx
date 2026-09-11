@@ -2,6 +2,7 @@
 import {FormEvent,useState} from "react";
 import Link from "next/link";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
+import "../auth.css";
 
 export default function Signup(){
  const [name,setName]=useState(""); const [email,setEmail]=useState(""); const [password,setPassword]=useState(""); const [message,setMessage]=useState(""); const [loading,setLoading]=useState(false);
