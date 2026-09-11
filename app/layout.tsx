@@ -5,6 +5,7 @@ import "./logo-overrides.css";
 import "./home-redesign.css";
 import "./store-badge-overrides.css";
 import "./footer-redesign.css";
+import "./footer-binance.css";
 
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
