@@ -1,0 +1,57 @@
+/* ORBITEX brand mark: use the supplied Orbitex symbol anywhere the site shows its brand/logo. */
+.brand,
+.mobile-brand,
+.orbitex-logo,
+.phone-brand,
+.orbitex-footer b {
+  background-image: url('/orbitex-logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  color: transparent !important;
+  font-size: 0 !important;
+  text-shadow: none !important;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.brand {
+  width: 38px;
+  height: 38px;
+}
+
+.auth-card .brand {
+  width: 54px;
+  height: 54px;
+}
+
+.mobile-brand {
+  width: 42px;
+  height: 42px;
+}
+
+.orbitex-logo {
+  width: 52px;
+  height: 52px;
+}
+
+.phone-brand {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 38px;
+}
+
+.orbitex-footer b {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto;
+}
+
+.orbit-mark,
+.orbit-mini-mark {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  .orbitex-logo { width: 46px; height: 46px; }
+}
