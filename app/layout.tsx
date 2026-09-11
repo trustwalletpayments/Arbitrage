@@ -3,6 +3,7 @@ import "./globals.css";
 import "./orbitex.css";
 import "./logo-overrides.css";
 import "./home-redesign.css";
+import "./store-badge-overrides.css";
 
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
