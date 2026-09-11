@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./orbitex.css";
+import "./logo-overrides.css";
 
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
