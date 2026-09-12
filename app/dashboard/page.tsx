@@ -41,25 +41,22 @@ export default function Dashboard() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     let mounted = true;
-    let redirectTimer: ReturnType<typeof setTimeout> | undefined;
 
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getUser();
       if (!mounted) return;
-      if (data.session?.user) {
-        setEmail(data.session.user.email || "");
-        setLoading(false);
+
+      if (error || !data.user) {
+        router.replace("/login?next=/dashboard");
         return;
       }
-      redirectTimer = setTimeout(async () => {
-        const latest = await supabase.auth.getSession();
-        if (mounted && !latest.data.session) {
-          router.replace("/login?next=/dashboard");
-        }
-      }, 1200);
+
+      setEmail(data.user.email || "");
+      setLoading(false);
     };
 
     load();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -67,12 +64,13 @@ export default function Dashboard() {
       if (session?.user) {
         setEmail(session.user.email || "");
         setLoading(false);
+      } else {
+        router.replace("/login?next=/dashboard");
       }
     });
 
     return () => {
       mounted = false;
-      if (redirectTimer) clearTimeout(redirectTimer);
       subscription.unsubscribe();
     };
   }, [router]);
@@ -80,13 +78,13 @@ export default function Dashboard() {
   const logout = async () => {
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
-    router.replace("/login");
+    router.replace("/login?next=/dashboard");
   };
 
   if (loading) {
     return (
       <main className="member-dashboard">
-        <div className="dashboard-loading">Loading your account…</div>
+        <div className="dashboard-loading">Checking your account…</div>
       </main>
     );
   }
@@ -97,9 +95,7 @@ export default function Dashboard() {
   return (
     <main className="member-dashboard">
       <header className="member-header">
-        <Link href="/dashboard" className="member-brand">
-          <span>ORBITEX</span>
-        </Link>
+        <Link href="/dashboard" className="member-brand"><span>ORBITEX</span></Link>
         <nav className="member-header-nav">
           <Link className="active" href="/dashboard">Overview</Link>
           <Link href="/trade">Spot</Link>
@@ -109,128 +105,42 @@ export default function Dashboard() {
         <div className="member-profile">
           <span className="member-email">{email}</span>
           <span className="member-avatar">{initials}</span>
-          <button onClick={logout} aria-label="Log out" className="member-logout">
-            <LogOut size={17} />
-          </button>
+          <button onClick={logout} aria-label="Log out" className="member-logout"><LogOut size={17} /></button>
         </div>
       </header>
 
       <div className="member-main">
         <section className="account-top">
-          <div className="account-title">
-            <div className="eyebrow">ACCOUNT OVERVIEW</div>
-            <h1>Good to see you</h1>
-          </div>
-          <button className="more-button" aria-label="More options">
-            <MoreHorizontal size={21} />
-          </button>
+          <div className="account-title"><div className="eyebrow">ACCOUNT OVERVIEW</div><h1>Good to see you</h1></div>
+          <button className="more-button" aria-label="More options"><MoreHorizontal size={21} /></button>
         </section>
 
         <section className="hero-balance">
           <div className="hero-left">
-            <div className="balance-heading">
-              <span>Estimated total value</span>
-              <button onClick={() => setHidden(!hidden)} aria-label={hidden ? "Show balance" : "Hide balance"}>
-                {hidden ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <div className="balance-number">
-              {money} <small>USD <ChevronRight size={16} /></small>
-            </div>
-            <div className="pnl-line">
-              <span>Today's P&amp;L</span>
-              <strong>+$0.00 (+0.00%)</strong>
-              <ChevronRight size={17} />
-            </div>
+            <div className="balance-heading"><span>Estimated total value</span><button onClick={() => setHidden(!hidden)} aria-label={hidden ? "Show balance" : "Hide balance"}>{hidden ? <EyeOff size={20} /> : <Eye size={20} />}</button></div>
+            <div className="balance-number">{money} <small>USD <ChevronRight size={16} /></small></div>
+            <div className="pnl-line"><span>Today's P&amp;L</span><strong>+$0.00 (+0.00%)</strong><ChevronRight size={17} /></div>
           </div>
-          <div className="hero-stats">
-            <div><span>Total assets</span><strong>{money}</strong></div>
-            <div><span>24h change</span><strong className="positive">0.00%</strong></div>
-            <div><span>Total profit</span><strong className="positive">$0.00</strong></div>
-            <div><span>Total orders</span><strong>0</strong></div>
-          </div>
+          <div className="hero-stats"><div><span>Total assets</span><strong>{money}</strong></div><div><span>24h change</span><strong className="positive">0.00%</strong></div><div><span>Total profit</span><strong className="positive">$0.00</strong></div><div><span>Total orders</span><strong>0</strong></div></div>
         </section>
 
         <section className="quick-actions" aria-label="Account actions">
-          <Link href="/wallet" className="quick-action">
-            <span className="quick-action-icon"><Wallet size={25} strokeWidth={1.8} /></span>
-            <b>Add funds</b>
-          </Link>
-          <Link href="/wallet" className="quick-action">
-            <span className="quick-action-icon"><Send size={25} strokeWidth={1.8} /></span>
-            <b>Send</b>
-          </Link>
-          <Link href="/wallet" className="quick-action">
-            <span className="quick-action-icon"><ArrowLeftRight size={25} strokeWidth={1.8} /></span>
-            <b>Transfer</b>
-          </Link>
-          <Link href="/trade" className="quick-action">
-            <span className="quick-action-icon"><CandlestickChart size={25} strokeWidth={1.8} /></span>
-            <b>Trade</b>
-          </Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><Wallet size={25} strokeWidth={1.8} /></span><b>Add funds</b></Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><Send size={25} strokeWidth={1.8} /></span><b>Send</b></Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><ArrowLeftRight size={25} strokeWidth={1.8} /></span><b>Transfer</b></Link>
+          <Link href="/trade" className="quick-action"><span className="quick-action-icon"><CandlestickChart size={25} strokeWidth={1.8} /></span><b>Trade</b></Link>
         </section>
 
-        <section className="market-highlight">
-          <div className="section-heading">
-            <div><span>Markets</span><strong>Trending now</strong></div>
-            <Link href="/markets">See all <ChevronRight size={16} /></Link>
-          </div>
-          <div className="market-strip">
-            {markets.slice(0, 3).map(([symbol, price, change]) => (
-              <Link href={`/trade?pair=${symbol}/USDT`} className="market-chip" key={symbol}>
-                <div><CoinIcon symbol={symbol} size={30} /><span>{symbol}/USDT</span></div>
-                <strong>${price}</strong>
-                <em className={change.startsWith("-") ? "down" : "up"}>{change}</em>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <section className="market-highlight"><div className="section-heading"><div><span>Markets</span><strong>Trending now</strong></div><Link href="/markets">See all <ChevronRight size={16} /></Link></div><div className="market-strip">{markets.slice(0, 3).map(([symbol, price, change]) => <Link href={`/trade?pair=${symbol}/USDT`} className="market-chip" key={symbol}><div><CoinIcon symbol={symbol} size={30} /><span>{symbol}/USDT</span></div><strong>${price}</strong><em className={change.startsWith("-") ? "down" : "up"}>{change}</em></Link>)}</div></section>
 
-        <div className="content-grid">
-          <section className="asset-card">
-            <div className="section-heading">
-              <div><span>Portfolio</span><strong>Your assets</strong></div>
-              <Link href="/wallet">View all <ChevronRight size={16} /></Link>
-            </div>
-            <div className="asset-total"><span>Total balance</span><strong>{money}</strong></div>
-            <div className="empty-activity asset-empty">
-              <div className="empty-icon"><WalletEmptyIcon /></div>
-              <strong>No assets yet</strong>
-              <span>Your deposited coins will appear here after funds are credited to your account.</span>
-              <Link href="/wallet">Add funds</Link>
-            </div>
-          </section>
+        <div className="content-grid"><section className="asset-card"><div className="section-heading"><div><span>Portfolio</span><strong>Your assets</strong></div><Link href="/wallet">View all <ChevronRight size={16} /></Link></div><div className="asset-total"><span>Total balance</span><strong>{money}</strong></div><div className="empty-activity asset-empty"><div className="empty-icon"><WalletEmptyIcon /></div><strong>No assets yet</strong><span>Your deposited coins will appear here after funds are credited to your account.</span><Link href="/wallet">Add funds</Link></div></section><section className="activity-card"><div className="section-heading"><div><span>Activity</span><strong>Recent activity</strong></div><Link href="/orders">View all <ChevronRight size={16} /></Link></div><div className="empty-activity"><div className="empty-icon"><Clock3 size={20} /></div><strong>No activity yet</strong><span>Your completed orders and transactions will appear here.</span><Link href="/markets">Explore markets</Link></div></section></div>
 
-          <section className="activity-card">
-            <div className="section-heading">
-              <div><span>Activity</span><strong>Recent activity</strong></div>
-              <Link href="/orders">View all <ChevronRight size={16} /></Link>
-            </div>
-            <div className="empty-activity">
-              <div className="empty-icon"><Clock3 size={20} /></div>
-              <strong>No activity yet</strong>
-              <span>Your completed orders and transactions will appear here.</span>
-              <Link href="/markets">Explore markets</Link>
-            </div>
-          </section>
-        </div>
-
-        <section className="product-row">
-          <Link href="/trade" className="product-card"><span className="product-icon"><Plus size={20} /></span><div><strong>Spot trading</strong><span>Trade crypto with live prices and charts.</span></div><ChevronRight /></Link>
-          <Link href="/futures" className="product-card"><span className="product-icon"><Activity size={20} /></span><div><strong>Futures</strong><span>Long, short and manage leverage.</span></div><ChevronRight /></Link>
-        </section>
-
-        <section className="security-strip">
-          <ShieldCheck size={19} />
-          <div><strong>Account security</strong><span>Authenticated session • Keep your credentials private.</span></div>
-          <Link href="/security">Manage</Link>
-        </section>
+        <section className="product-row"><Link href="/trade" className="product-card"><span className="product-icon"><Plus size={20} /></span><div><strong>Spot trading</strong><span>Trade crypto with live prices and charts.</span></div><ChevronRight /></Link><Link href="/futures" className="product-card"><span className="product-icon"><Activity size={20} /></span><div><strong>Futures</strong><span>Long, short and manage leverage.</span></div><ChevronRight /></Link></section>
+        <section className="security-strip"><ShieldCheck size={19} /><div><strong>Account security</strong><span>Authenticated session • Keep your credentials private.</span></div><Link href="/security">Manage</Link></section>
       </div>
       <MobileNav />
     </main>
   );
 }
 
-function WalletEmptyIcon() {
-  return <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>;
-}
+function WalletEmptyIcon() { return <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>; }
