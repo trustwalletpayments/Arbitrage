@@ -8,6 +8,7 @@ import {
   ArrowDown,
   ArrowLeftRight,
   ArrowUp,
+  BarChart3,
   ChevronRight,
   Clock3,
   Eye,
@@ -41,34 +42,19 @@ export default function Dashboard() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     let mounted = true;
-
     const load = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!mounted) return;
-      if (error || !data.user) {
-        router.replace("/login?next=/dashboard");
-        return;
-      }
-      setEmail(data.user.email || "");
-      setLoading(false);
+      if (error || !data.user) { router.replace("/login?next=/dashboard"); return; }
+      setEmail(data.user.email || ""); setLoading(false);
     };
-
     load();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
-      if (session?.user) {
-        setEmail(session.user.email || "");
-        setLoading(false);
-      } else {
-        router.replace("/login?next=/dashboard");
-      }
+      if (session?.user) { setEmail(session.user.email || ""); setLoading(false); }
+      else router.replace("/login?next=/dashboard");
     });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => { mounted = false; subscription.unsubscribe(); };
   }, [router]);
 
   const logout = async () => {
@@ -77,13 +63,7 @@ export default function Dashboard() {
     router.replace("/login?next=/dashboard");
   };
 
-  if (loading) {
-    return (
-      <main className="member-dashboard">
-        <div className="dashboard-loading">Checking your account…</div>
-      </main>
-    );
-  }
+  if (loading) return <main className="member-dashboard"><div className="dashboard-loading">Checking your account…</div></main>;
 
   const initials = (email.split("@")[0] || "U").slice(0, 1).toUpperCase();
   const money = hidden ? "••••••" : "$0.00";
@@ -92,45 +72,20 @@ export default function Dashboard() {
     <main className="member-dashboard">
       <header className="member-header">
         <Link href="/dashboard" className="member-brand"><span>ORBITEX</span></Link>
-        <nav className="member-header-nav">
-          <Link className="active" href="/dashboard">Overview</Link>
-          <Link href="/trade">Spot</Link>
-          <Link href="/wallet">Funding</Link>
-          <Link href="/futures">Futures</Link>
-        </nav>
-        <div className="member-profile">
-          <span className="member-email">{email}</span>
-          <span className="member-avatar">{initials}</span>
-          <button onClick={logout} aria-label="Log out" className="member-logout"><LogOut size={17} /></button>
-        </div>
+        <nav className="member-header-nav"><Link className="active" href="/dashboard">Overview</Link><Link href="/trade">Spot</Link><Link href="/wallet">Funding</Link><Link href="/futures">Futures</Link></nav>
+        <div className="member-profile"><span className="member-email">{email}</span><span className="member-avatar">{initials}</span><button onClick={logout} aria-label="Log out" className="member-logout"><LogOut size={17} /></button></div>
       </header>
-
       <div className="member-main">
-        <section className="account-top">
-          <div className="account-title"><div className="eyebrow">ACCOUNT OVERVIEW</div><h1>Good to see you</h1></div>
-          <button className="more-button" aria-label="More options"><MoreHorizontal size={21} /></button>
-        </section>
-
-        <section className="hero-balance">
-          <div className="hero-left">
-            <div className="balance-heading"><span>Estimated total value</span><button onClick={() => setHidden(!hidden)} aria-label={hidden ? "Show balance" : "Hide balance"}>{hidden ? <EyeOff size={20} /> : <Eye size={20} />}</button></div>
-            <div className="balance-number">{money} <small>USD <ChevronRight size={16} /></small></div>
-            <div className="pnl-line"><span>Today's P&amp;L</span><strong>+$0.00 (+0.00%)</strong><ChevronRight size={17} /></div>
-          </div>
-          <div className="hero-stats"><div><span>Total assets</span><strong>{money}</strong></div><div><span>24h change</span><strong className="positive">0.00%</strong></div><div><span>Total profit</span><strong className="positive">$0.00</strong></div><div><span>Total orders</span><strong>0</strong></div></div>
-        </section>
-
+        <section className="account-top"><div className="account-title"><div className="eyebrow">ACCOUNT OVERVIEW</div><h1>Good to see you</h1></div><button className="more-button" aria-label="More options"><MoreHorizontal size={21} /></button></section>
+        <section className="hero-balance"><div className="hero-left"><div className="balance-heading"><span>Estimated total value</span><button onClick={() => setHidden(!hidden)} aria-label={hidden ? "Show balance" : "Hide balance"}>{hidden ? <EyeOff size={20} /> : <Eye size={20} />}</button></div><div className="balance-number">{money} <small>USD <ChevronRight size={16} /></small></div><div className="pnl-line"><span>Today's P&amp;L</span><strong>+$0.00 (+0.00%)</strong><ChevronRight size={17} /></div></div><div className="hero-stats"><div><span>Total assets</span><strong>{money}</strong></div><div><span>24h change</span><strong className="positive">0.00%</strong></div><div><span>Total profit</span><strong className="positive">$0.00</strong></div><div><span>Total orders</span><strong>0</strong></div></div></section>
         <section className="quick-actions" aria-label="Account actions">
-          <Link href="/wallet" className="quick-action"><b>Add funds</b></Link>
-          <Link href="/wallet" className="quick-action"><b>Send</b></Link>
-          <Link href="/wallet" className="quick-action"><b>Transfer</b></Link>
-          <Link href="/trade" className="quick-action"><b>Trade</b></Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-sign"><ArrowDown size={21} /></span><b>Add funds</b></Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-sign"><ArrowUp size={21} /></span><b>Send</b></Link>
+          <Link href="/wallet" className="quick-action"><span className="quick-action-sign"><ArrowLeftRight size={21} /></span><b>Transfer</b></Link>
+          <Link href="/trade" className="quick-action"><span className="quick-action-sign"><BarChart3 size={21} /></span><b>Trade</b></Link>
         </section>
-
         <section className="market-highlight"><div className="section-heading"><div><span>Markets</span><strong>Trending now</strong></div><Link href="/markets">See all <ChevronRight size={16} /></Link></div><div className="market-strip">{markets.slice(0, 3).map(([symbol, price, change]) => <Link href={`/trade?pair=${symbol}/USDT`} className="market-chip" key={symbol}><div><CoinIcon symbol={symbol} size={30} /><span>{symbol}/USDT</span></div><strong>${price}</strong><em className={change.startsWith("-") ? "down" : "up"}>{change}</em></Link>)}</div></section>
-
         <div className="content-grid"><section className="asset-card"><div className="section-heading"><div><span>Portfolio</span><strong>Your assets</strong></div><Link href="/wallet">View all <ChevronRight size={16} /></Link></div><div className="asset-total"><span>Total balance</span><strong>{money}</strong></div><div className="empty-activity asset-empty"><div className="empty-icon"><WalletEmptyIcon /></div><strong>No assets yet</strong><span>Your deposited coins will appear here after funds are credited to your account.</span><Link href="/wallet">Add funds</Link></div></section><section className="activity-card"><div className="section-heading"><div><span>Activity</span><strong>Recent activity</strong></div><Link href="/orders">View all <ChevronRight size={16} /></Link></div><div className="empty-activity"><div className="empty-icon"><Clock3 size={20} /></div><strong>No activity yet</strong><span>Your completed orders and transactions will appear here.</span><Link href="/markets">Explore markets</Link></div></section></div>
-
         <section className="product-row"><Link href="/trade" className="product-card"><span className="product-icon"><Plus size={20} /></span><div><strong>Spot trading</strong><span>Trade crypto with live prices and charts.</span></div><ChevronRight /></Link><Link href="/futures" className="product-card"><span className="product-icon"><Activity size={20} /></span><div><strong>Futures</strong><span>Long, short and manage leverage.</span></div><ChevronRight /></Link></section>
         <section className="security-strip"><ShieldCheck size={19} /><div><strong>Account security</strong><span>Authenticated session • Keep your credentials private.</span></div><Link href="/security">Manage</Link></section>
       </div>
@@ -138,5 +93,4 @@ export default function Dashboard() {
     </main>
   );
 }
-
 function WalletEmptyIcon() { return <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>; }
