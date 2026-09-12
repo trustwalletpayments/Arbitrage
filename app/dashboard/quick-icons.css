@@ -1,1 +1,74 @@
-.quick-icon{display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;overflow:visible!important;position:relative!important;color:#67b5ff!important}.quick-icon svg{all:initial!important;display:block!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;max-width:34px!important;max-height:34px!important;overflow:visible!important;visibility:visible!important;opacity:1!important;stroke:currentColor!important;stroke-width:2.4!important;stroke-linecap:round!important;stroke-linejoin:round!important;fill:none!important;vector-effect:non-scaling-stroke!important}.quick-icon svg *{stroke:currentColor!important;stroke-width:2.4!important;stroke-linecap:round!important;stroke-linejoin:round!important;stroke-dasharray:none!important;stroke-dashoffset:0!important;fill:none!important;vector-effect:non-scaling-stroke!important}.quick-icon svg path,.quick-icon svg line,.quick-icon svg polyline,.quick-icon svg polygon,.quick-icon svg circle,.quick-icon svg rect{display:block!important;visibility:visible!important;opacity:1!important}.add-icon{color:#38bdf8!important}.send-icon{color:#a78bfa!important}.transfer-icon{color:#2dd4bf!important}.trade-icon{color:#fbbf24!important}
+.quick-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 72px !important;
+  min-height: 72px !important;
+  border-radius: 21px;
+  position: relative;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.quick-icon svg {
+  display: block !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.quick-icon svg * {
+  stroke: currentColor !important;
+  stroke-width: 2.2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: none !important;
+}
+
+.add-icon {
+  color: #38bdf8 !important;
+}
+
+.send-icon {
+  color: #a78bfa !important;
+}
+
+.transfer-icon {
+  color: #2dd4bf !important;
+}
+
+.trade-icon {
+  color: #fbbf24 !important;
+}
+
+@media (max-width: 600px) {
+  .quick-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+    border-radius: 17px;
+  }
+
+  .quick-icon svg {
+    width: 29px !important;
+    height: 29px !important;
+    min-width: 29px !important;
+    min-height: 29px !important;
+    max-width: 29px !important;
+    max-height: 29px !important;
+  }
+}
