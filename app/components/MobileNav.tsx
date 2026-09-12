@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {Home,Repeat2,ChartCandlestick,WalletCards} from "lucide-react";
-import "./mobile-nav.css";
 
 export default function MobileNav(){
  const pathname=usePathname();
