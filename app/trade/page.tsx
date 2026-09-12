@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 const referencePrice=113842.20;
 
-function validPair(value:string|null){
+function validPair(value:string|null): string{
   if(!value)return "BTC/USDT";
   const compact=value.toUpperCase().replace(/[^A-Z0-9]/g,"");
   const matched=MARKET_SYMBOLS.find(symbol=>symbol===compact);
@@ -20,7 +20,7 @@ function validPair(value:string|null){
 
 export default function Trade(){
  const searchParams=useSearchParams();
- const [pair,setPair]=useState(()=>validPair(searchParams.get("pair")));
+ const [pair,setPair]=useState<string>(()=>validPair(searchParams.get("pair")));
  const [side,setSide]=useState("Buy");const [type,setType]=useState("Limit");const [price,setPrice]=useState(String(referencePrice));const [livePrice,setLivePrice]=useState(referencePrice);const [change,setChange]=useState(0);const [amount,setAmount]=useState("");const [submitting,setSubmitting]=useState(false);const [message,setMessage]=useState("");const [available,setAvailable]=useState(0);const symbol=binanceSymbol(pair);const base=pair.split("/")[0];
 
  useEffect(()=>{setPair(validPair(searchParams.get("pair")))},[searchParams]);
