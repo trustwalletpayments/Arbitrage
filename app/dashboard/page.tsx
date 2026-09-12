@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
-import {Activity,ArrowLeftRight,BarChart3,ChevronRight,Clock3,Download,Eye,EyeOff,LogOut,MoreHorizontal,Plus,Send,ShieldCheck,TrendingUp} from "lucide-react";
+import {Activity,ArrowLeftRight,BarChart3,ChevronRight,Clock3,Eye,EyeOff,LogOut,MoreHorizontal,Plus,ShieldCheck,TrendingUp} from "lucide-react";
 import {useRouter} from "next/navigation";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
@@ -14,10 +14,11 @@ const assets=[["USDT","0.00","$0.00"],["BTC","0.00000000","$0.00"],["ETH","0.000
 
 type ActionType="add"|"send"|"transfer"|"trade";
 function ActionGlyph({type}:{type:ActionType}){
- if(type==="add") return <Download aria-hidden="true"/>;
- if(type==="send") return <Send aria-hidden="true"/>;
- if(type==="transfer") return <ArrowLeftRight aria-hidden="true"/>;
- return <TrendingUp aria-hidden="true"/>;
+ const common={width:34,height:34,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.9,strokeLinecap:"round" as const,strokeLinejoin:"round" as const,ariaHidden:true};
+ if(type==="add") return <svg {...common}><path d="M12 3v18M3 12h18"/><path d="M5 5h14v14H5z" opacity=".35"/></svg>;
+ if(type==="send") return <svg {...common}><path d="m4 12 16-8-4 16-4-6-8-2Z"/><path d="m12 14 4-4"/></svg>;
+ if(type==="transfer") return <svg {...common}><path d="M7 7h11l-3-3"/><path d="m18 7-3 3"/><path d="M17 17H6l3 3"/><path d="m6 17 3-3"/></svg>;
+ return <svg {...common}><path d="M4 17 10 11l4 3 6-7"/><path d="M15 7h5v5"/><path d="M4 20h16"/></svg>;
 }
 
 export default function Dashboard(){
