@@ -1,4 +1,4 @@
-import { createBrowserClient, type SupabaseClient } from "@supabase/ssr";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let browserClient: SupabaseClient | undefined;
 
@@ -12,11 +12,12 @@ export function createSupabaseBrowserClient() {
     throw new Error("Supabase environment variables are not configured.");
   }
 
-  browserClient = createBrowserClient(url, key, {
+  browserClient = createClient(url, key, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      storageKey: "orbitex-auth",
     },
   });
 
