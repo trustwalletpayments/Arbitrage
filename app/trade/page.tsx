@@ -34,39 +34,47 @@ export default function Trade(){
   const symbol=binanceSymbol(pair);
   const base=pair.split("/")[0];
 
-  useEffect(()=>{setPair(validPair(new URLSearchParams(window.location.search).get("pair")))},[]);
+  useEffect(()=>{
+    const requested=validPair(new URLSearchParams(window.location.search).get("pair"));
+    setPair(requested);
+  },[]);
 
   useEffect(()=>{
     let alive=true;
     async function loadMarkets(){
       try{
-        const [exchangeResponse,coinResponse]=await Promise.all([
-          fetch("https://api.binance.com/api/v3/exchangeInfo",{cache:"no-store"}),
-          fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=1000&page=1&sparkline=false",{cache:"no-store"})
-        ]);
-        if(!exchangeResponse.ok||!coinResponse.ok)throw new Error("Market data unavailable");
+        const exchangeResponse=await fetch("https://api.binance.com/api/v3/exchangeInfo",{cache:"no-store"});
+        if(!exchangeResponse.ok)throw new Error("Exchange data unavailable");
         const exchangeInfo=await exchangeResponse.json();
-        const coins=await coinResponse.json();
-        const binancePairs=new Map<string,any>();
-        (exchangeInfo?.symbols||[]).forEach((item:any)=>{
-          if(item.quoteAsset==="USDT"&&item.status==="TRADING"&&item.isSpotTradingAllowed!==false){
-            binancePairs.set(String(item.baseAsset).toUpperCase(),item);
-          }
-        });
-        const list=(Array.isArray(coins)?coins:[]).map((coin:any,index:number)=>{
+        const binancePairs=(exchangeInfo?.symbols||[]).filter((item:any)=>
+          item.quoteAsset==="USDT"&&item.status==="TRADING"&&item.isSpotTradingAllowed!==false
+        );
+        const pairMap=new Map<string,any>();
+        binancePairs.forEach((item:any)=>pairMap.set(String(item.baseAsset).toUpperCase(),item));
+
+        let ranked:any[]=[];
+        try{
+          const coinResponse=await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false",{cache:"no-store"});
+          if(coinResponse.ok)ranked=await coinResponse.json();
+        }catch{}
+
+        const rankedBases=new Set<string>();
+        const rankedList=(Array.isArray(ranked)?ranked:[]).map((coin:any,index:number)=>{
           const baseAsset=String(coin.symbol||"").toUpperCase();
-          const pairInfo=binancePairs.get(baseAsset);
-          return {
-            symbol:pairInfo?.symbol||`${baseAsset}USDT`,
-            baseAsset,
-            quoteAsset:"USDT",
-            marketCapRank:Number(coin.market_cap_rank||index+1),
-            coinId:coin.id,
-            logo:coin.image
-          };
-        }).filter((item:MarketItem)=>item.baseAsset&&item.marketCapRank<=1000);
+          const pairInfo=pairMap.get(baseAsset);
+          if(!pairInfo)return null;
+          rankedBases.add(baseAsset);
+          return {symbol:pairInfo.symbol,baseAsset,quoteAsset:"USDT",marketCapRank:Number(coin.market_cap_rank||index+1),coinId:coin.id,logo:coin.image};
+        }).filter(Boolean) as MarketItem[];
+
+        const fallback=binancePairs.filter((item:any)=>!rankedBases.has(String(item.baseAsset).toUpperCase())).map((item:any,index:number)=>({
+          symbol:item.symbol,baseAsset:String(item.baseAsset).toUpperCase(),quoteAsset:"USDT",marketCapRank:rankedList.length+index+1
+        }));
+        const list=[...rankedList,...fallback].slice(0,1000);
         if(alive)setMarkets(list);
-      }catch{if(alive)setMarkets([])}
+      }catch{
+        if(alive)setMarkets([]);
+      }
     }
     loadMarkets();
     return()=>{alive=false};
@@ -81,12 +89,15 @@ export default function Trade(){
   useEffect(()=>{
     let alive=true;
     setMessage("");
-    fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`).then(r=>r.json()).then(r=>{
+    fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${encodeURIComponent(symbol)}`).then(r=>r.json()).then(r=>{
       if(alive&&r.lastPrice){const p=Number(r.lastPrice);setLivePrice(p);setPrice(String(p));setChange(Number(r.priceChangePercent||0));}
     }).catch(()=>{});
-    const ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`);
-    ws.onmessage=e=>{try{const r=JSON.parse(e.data);if(alive){setLivePrice(Number(r.c));setChange(Number(r.P));}}catch{}};
-    return()=>{alive=false;ws.close()};
+    let ws:WebSocket|undefined;
+    try{
+      ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`);
+      ws.onmessage=e=>{try{const r=JSON.parse(e.data);if(alive&&r.c){setLivePrice(Number(r.c));setChange(Number(r.P||0));}}catch{}};
+    }catch{}
+    return()=>{alive=false;ws?.close()};
   },[symbol]);
 
   useEffect(()=>{setPrice(String(livePrice));setMessage("")},[pair]);
@@ -109,5 +120,5 @@ export default function Trade(){
     try{const res=await fetch("/api/testnet/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symbol:pair,side:side.toUpperCase(),type:type.toUpperCase(),price:orderPrice,quantity,clientOrderId:crypto.randomUUID()})});const data=await res.json();if(!res.ok||!data.ok)throw new Error(data.error||"Order rejected");await refreshBalance();setMessage(`Testnet order filled: ${data.order?.side||side.toUpperCase()} ${data.order?.quantity||quantity} ${base} @ ${formatPrice(orderPrice)}`);setAmount("")}catch(error){setMessage(error instanceof Error?error.message:"Order failed")}finally{setSubmitting(false)}
   }
 
-  return <main className="app-shell"><header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></nav><Link className="btn" href="/dashboard">Account</Link></header><div className="trade-layout"><aside className="market-list"><div className="label">MARKETS</div><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins..." aria-label="Search coins" style={{width:"100%",margin:"12px 0",padding:"10px 11px",borderRadius:8,border:"1px solid #263244",background:"#080d14",color:"#fff",outline:"none"}}/><div className="market-count" style={{color:"#687589",fontSize:11,marginBottom:8}}>{markets.length} coins · Market cap</div>{filteredMarkets.map(m=>{const p=displayPair(m.symbol);return <button className={p===pair?"selected":""} onClick={()=>setPair(p)} key={`${m.coinId||m.symbol}-${m.marketCapRank}`}><span style={{display:"inline-flex",alignItems:"center",gap:8,minWidth:0,overflow:"hidden"}}>{m.logo?<img src={m.logo} alt="" width={24} height={24} style={{borderRadius:"50%",flex:"0 0 auto"}}/>:<CoinIcon symbol={m.baseAsset} size={24}/>}<span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.baseAsset}/USDT</span></span><small style={{flex:"0 0 auto",marginLeft:6}}>{`#${m.marketCapRank}`}</small></button>})}</aside><section className="chart-area"><div className="trade-head"><div><div className="pair">{pair}</div><div className="price">{formatPrice(livePrice)} <span className={change<0?"danger":"up"}>{change>=0?"+":""}{change.toFixed(2)}%</span></div><div className="muted tiny">Live public market price</div></div><Link className="btn" href="/futures">Open Futures</Link></div><MarketChart pair={pair}/></section><section className="order-panel"><div className="tabs"><button className={side==="Buy"?"on":""} onClick={()=>setSide("Buy")}>Buy</button><button className={side==="Sell"?"on":""} onClick={()=>setSide("Sell")}>Sell</button></div><div className="order-types">{["Limit","Market"].map(t=><button className={type===t?"on":""} onClick={()=>setType(t)} key={t}>{t}</button>)}</div><label>Price<input value={type==="Market"?formatPrice(livePrice):price} disabled={type==="Market"} onChange={e=>setPrice(e.target.value)} placeholder="USDT"/></label><label>Amount<input value={amount} onChange={e=>setAmount(e.target.value)} inputMode="decimal" placeholder="0.00"/></label><label>Size<input value={`${size} USDT`} readOnly/></label><div className="order-info"><span>Available</span><span>{available.toFixed(2)} USDT</span></div>{message&&<div className="notice">{message}</div>}<button className="btn primary full" disabled={submitting} onClick={submit}>{submitting?"Submitting…":`${side} ${base}`}</button><p className="muted tiny">Testnet only. Orders are authenticated and settled through the server-side exchange ledger; no real funds are submitted.</p><Link className="muted tiny" href="/orders">View testnet order history →</Link></section></div></main>;
+  return <main className="app-shell"><header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></nav><Link className="btn" href="/dashboard">Account</Link></header><div className="trade-layout"><aside className="market-list"><div className="label">MARKETS</div><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins..." aria-label="Search coins" style={{width:"100%",margin:"12px 0",padding:"10px 11px",borderRadius:8,border:"1px solid #263244",background:"#080d14",color:"#fff",outline:"none"}}/><div className="market-count" style={{color:"#687589",fontSize:11,marginBottom:8}}>{markets.length} coins · Market cap</div><div className="market-scroll">{filteredMarkets.map(m=>{const p=displayPair(m.symbol);return <button className={p===pair?"selected":""} onClick={()=>{setPair(p);window.history.replaceState(null,"",`/trade?pair=${encodeURIComponent(m.symbol)}`)}} key={`${m.coinId||m.symbol}-${m.marketCapRank}`}><span style={{display:"inline-flex",alignItems:"center",gap:8,minWidth:0,overflow:"hidden"}}>{m.logo?<img src={m.logo} alt="" width={24} height={24} style={{borderRadius:"50%",flex:"0 0 auto"}}/>:<CoinIcon symbol={m.baseAsset} size={24}/>}<span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.baseAsset}/USDT</span></span><small style={{flex:"0 0 auto",marginLeft:6}}>{`#${m.marketCapRank}`}</small></button>})}</div></aside><section className="chart-area"><div className="trade-head"><div><div className="pair">{pair}</div><div className="price">{formatPrice(livePrice)} <span className={change<0?"danger":"up"}>{change>=0?"+":""}{change.toFixed(2)}%</span></div><div className="muted tiny">Live public market price</div></div><Link className="btn" href="/futures">Open Futures</Link></div><MarketChart pair={pair}/></section><section className="order-panel"><div className="tabs"><button className={side==="Buy"?"on":""} onClick={()=>setSide("Buy")}>Buy</button><button className={side==="Sell"?"on":""} onClick={()=>setSide("Sell")}>Sell</button></div><div className="order-types">{["Limit","Market"].map(t=><button className={type===t?"on":""} onClick={()=>setType(t)} key={t}>{t}</button>)}</div><label>Price<input value={type==="Market"?formatPrice(livePrice):price} disabled={type==="Market"} onChange={e=>setPrice(e.target.value)} placeholder="USDT"/></label><label>Amount<input value={amount} onChange={e=>setAmount(e.target.value)} inputMode="decimal" placeholder="0.00"/></label><label>Size<input value={`${size} USDT`} readOnly/></label><div className="order-info"><span>Available</span><span>{available.toFixed(2)} USDT</span></div>{message&&<div className="notice">{message}</div>}<button className="btn primary full" disabled={submitting} onClick={submit}>{submitting?"Submitting…":`${side} ${base}`}</button><p className="muted tiny">Testnet only. Orders are authenticated and settled through the server-side exchange ledger; no real funds are submitted.</p><Link className="muted tiny" href="/orders">View testnet order history →</Link></section></div></main>;
 }
