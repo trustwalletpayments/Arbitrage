@@ -13,7 +13,7 @@ const assets=[["USDT","0.00","$0.00"],["BTC","0.00000000","$0.00"],["ETH","0.000
 
 type ActionType="add"|"send"|"transfer"|"trade";
 function ActionGlyph({type}:{type:ActionType}){
- const props={size:34,strokeWidth:1.8,absoluteStrokeWidth:true};
+ const props={size:36,strokeWidth:2.2,absoluteStrokeWidth:true,fill:"none",stroke:"currentColor"};
  if(type==="add") return <Plus {...props}/>;
  if(type==="send") return <Send {...props}/>;
  if(type==="transfer") return <ArrowLeftRight {...props}/>;
