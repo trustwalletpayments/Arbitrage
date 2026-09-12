@@ -6,6 +6,9 @@ import MarketChart from "../components/MarketChart";
 import CoinIcon from "../components/CoinIcon";
 import {MARKET_SYMBOLS,binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
+
+export const dynamic = "force-dynamic";
+
 const referencePrice=113842.20;
 
 function validPair(value:string|null){
