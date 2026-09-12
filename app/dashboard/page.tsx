@@ -7,6 +7,7 @@ import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
 import "./dashboard.css";
+import "./compact.css";
 
 const markets=[["BTC","77,154.49","+2.32%"],["ETH","3,661.27","+1.48%"],["SOL","147.62","+4.21%"],["BNB","712.34","-3.85%"],["XRP","2.81","+0.92%"]] as const;
 const assets=[["USDT","0.00","$0.00"],["BTC","0.00000000","$0.00"],["ETH","0.00000000","$0.00"],["SOL","0.00000000","$0.00"]] as const;
