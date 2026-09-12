@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Activity,
+  ArrowLeftRight,
+  CandlestickChart,
   ChevronRight,
   Clock3,
   Eye,
@@ -12,7 +14,9 @@ import {
   LogOut,
   MoreHorizontal,
   Plus,
+  Send,
   ShieldCheck,
+  Wallet,
 } from "lucide-react";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
@@ -148,10 +152,22 @@ export default function Dashboard() {
         </section>
 
         <section className="quick-actions" aria-label="Account actions">
-          <Link href="/wallet" className="quick-action"><b>Add funds</b></Link>
-          <Link href="/wallet" className="quick-action"><b>Send</b></Link>
-          <Link href="/wallet" className="quick-action"><b>Transfer</b></Link>
-          <Link href="/trade" className="quick-action"><b>Trade</b></Link>
+          <Link href="/wallet" className="quick-action">
+            <span className="quick-action-icon"><Wallet size={25} strokeWidth={1.8} /></span>
+            <b>Add funds</b>
+          </Link>
+          <Link href="/wallet" className="quick-action">
+            <span className="quick-action-icon"><Send size={25} strokeWidth={1.8} /></span>
+            <b>Send</b>
+          </Link>
+          <Link href="/wallet" className="quick-action">
+            <span className="quick-action-icon"><ArrowLeftRight size={25} strokeWidth={1.8} /></span>
+            <b>Transfer</b>
+          </Link>
+          <Link href="/trade" className="quick-action">
+            <span className="quick-action-icon"><CandlestickChart size={25} strokeWidth={1.8} /></span>
+            <b>Trade</b>
+          </Link>
         </section>
 
         <section className="market-highlight">
@@ -216,9 +232,5 @@ export default function Dashboard() {
 }
 
 function WalletEmptyIcon() {
-  return <WalletCardsIcon />;
-}
-
-function WalletCardsIcon() {
   return <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>;
 }
