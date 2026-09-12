@@ -2,8 +2,11 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: 100%;
+  max-height: none;
   overflow: hidden;
   scrollbar-width: none;
+  background: #060b12;
 }
 
 .market-list::-webkit-scrollbar {
@@ -24,12 +27,14 @@
 .market-scroll {
   flex: 1 1 auto;
   min-height: 0;
+  height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 4px;
+  padding: 4px 5px 24px 0;
   scrollbar-width: thin;
   scrollbar-color: #315d91 transparent;
   overscroll-behavior: contain;
+  scroll-behavior: smooth;
 }
 
 .market-scroll::-webkit-scrollbar {
@@ -43,7 +48,7 @@
 
 .market-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #60a5fa, #2563eb);
-  border: 2px solid #06090e;
+  border: 2px solid #060b12;
   border-radius: 999px;
   min-height: 42px;
 }
@@ -54,6 +59,46 @@
 
 .market-scroll::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+.market-list button {
+  min-height: 50px;
+  margin: 2px 0;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.market-list button:hover {
+  background: #0d1928;
+  color: #fff;
+}
+
+.market-list button.selected {
+  background: linear-gradient(90deg, #10243b, #0d1827);
+  box-shadow: inset 3px 0 0 #3b9cff;
+}
+
+.trade-layout {
+  min-height: 0;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.chart-area,
+.order-panel {
+  min-width: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .trade-layout {
+    height: auto;
+    min-height: calc(100vh - 64px);
+    overflow: visible;
+  }
+
+  .market-list {
+    height: calc(100vh - 64px);
+  }
 }
 
 @media (max-width: 760px) {
