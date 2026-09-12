@@ -12,7 +12,6 @@ import {
   Clock3,
   Eye,
   EyeOff,
-  Gift,
   LogOut,
   MoreHorizontal,
   Plus,
@@ -46,21 +45,17 @@ export default function Dashboard() {
     const load = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!mounted) return;
-
       if (error || !data.user) {
         router.replace("/login?next=/dashboard");
         return;
       }
-
       setEmail(data.user.email || "");
       setLoading(false);
     };
 
     load();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       if (session?.user) {
         setEmail(session.user.email || "");
@@ -126,10 +121,10 @@ export default function Dashboard() {
         </section>
 
         <section className="quick-actions" aria-label="Account actions">
-          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><ArrowDown size={34} strokeWidth={2.2} /></span><b>Add funds</b></Link>
-          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><ArrowUp size={34} strokeWidth={2.2} /></span><b>Send</b></Link>
-          <Link href="/wallet" className="quick-action"><span className="quick-action-icon"><ArrowLeftRight size={34} strokeWidth={2.2} /></span><b>Transfer</b></Link>
-          <Link href="/trade" className="quick-action"><span className="quick-action-icon"><Gift size={34} strokeWidth={2.2} /></span><b>Earn</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Add funds</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Send</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Transfer</b></Link>
+          <Link href="/trade" className="quick-action"><b>Trade</b></Link>
         </section>
 
         <section className="market-highlight"><div className="section-heading"><div><span>Markets</span><strong>Trending now</strong></div><Link href="/markets">See all <ChevronRight size={16} /></Link></div><div className="market-strip">{markets.slice(0, 3).map(([symbol, price, change]) => <Link href={`/trade?pair=${symbol}/USDT`} className="market-chip" key={symbol}><div><CoinIcon symbol={symbol} size={30} /><span>{symbol}/USDT</span></div><strong>${price}</strong><em className={change.startsWith("-") ? "down" : "up"}>{change}</em></Link>)}</div></section>
