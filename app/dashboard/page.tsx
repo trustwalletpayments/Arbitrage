@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Activity,
-  ArrowLeftRight,
   ChevronRight,
   Clock3,
   Eye,
@@ -13,9 +12,7 @@ import {
   LogOut,
   MoreHorizontal,
   Plus,
-  Send,
   ShieldCheck,
-  TrendingUp,
 } from "lucide-react";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
@@ -30,22 +27,6 @@ const markets = [
   ["BNB", "712.34", "-3.85%"],
   ["XRP", "2.81", "+0.92%"],
 ] as const;
-
-type ActionType = "add" | "send" | "transfer" | "trade";
-
-function ActionGlyph({ type }: { type: ActionType }) {
-  const props = {
-    size: 36,
-    strokeWidth: 2.2,
-    absoluteStrokeWidth: true,
-    fill: "none",
-    stroke: "currentColor",
-  };
-  if (type === "add") return <Plus {...props} />;
-  if (type === "send") return <Send {...props} />;
-  if (type === "transfer") return <ArrowLeftRight {...props} />;
-  return <TrendingUp {...props} />;
-}
 
 export default function Dashboard() {
   const router = useRouter();
@@ -167,10 +148,10 @@ export default function Dashboard() {
         </section>
 
         <section className="quick-actions" aria-label="Account actions">
-          <Link href="/wallet" className="quick-action"><div className="quick-icon add-icon"><ActionGlyph type="add" /></div><b>Add funds</b></Link>
-          <Link href="/wallet" className="quick-action"><div className="quick-icon send-icon"><ActionGlyph type="send" /></div><b>Send</b></Link>
-          <Link href="/wallet" className="quick-action"><div className="quick-icon transfer-icon"><ActionGlyph type="transfer" /></div><b>Transfer</b></Link>
-          <Link href="/trade" className="quick-action"><div className="quick-icon trade-icon"><ActionGlyph type="trade" /></div><b>Trade</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Add funds</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Send</b></Link>
+          <Link href="/wallet" className="quick-action"><b>Transfer</b></Link>
+          <Link href="/trade" className="quick-action"><b>Trade</b></Link>
         </section>
 
         <section className="market-highlight">
