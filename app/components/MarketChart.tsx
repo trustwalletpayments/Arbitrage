@@ -4,6 +4,21 @@ import {binanceSymbol,formatPrice} from "../../lib/market-data";
 
 type Candle={time:number;open:number;high:number;low:number;close:number};
 
+const BINANCE_API_HOSTS=[
+  "https://api.binance.com",
+  "https://api1.binance.com",
+  "https://api2.binance.com",
+  "https://api3.binance.com",
+];
+
+function parseCandle(row:unknown):Candle|null{
+  if(!Array.isArray(row)||row.length<6)return null;
+  const [time,open,high,low,close]=row;
+  const values=[Number(time),Number(open),Number(high),Number(low),Number(close)];
+  if(values.some(value=>!Number.isFinite(value)))return null;
+  return {time:values[0],open:values[1],high:values[2],low:values[3],close:values[4]};
+}
+
 export default function MarketChart({pair}:{pair:string}){
   const [candles,setCandles]=useState<Candle[]>([]);
   const [error,setError]=useState("");
@@ -11,16 +26,68 @@ export default function MarketChart({pair}:{pair:string}){
 
   useEffect(()=>{
     let alive=true;
+    let socket:WebSocket|null=null;
+    let reconnectTimer:ReturnType<typeof setTimeout>|undefined;
+    let reconnectAttempts=0;
+
     setError("");
     setCandles([]);
-    fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=90`)
-      .then(r=>{if(!r.ok)throw new Error("Market data unavailable");return r.json()})
-      .then(rows=>{if(!alive)return;setCandles(rows.map((r:number[])=>({time:r[0],open:Number(r[1]),high:Number(r[2]),low:Number(r[3]),close:Number(r[4])})))})
-      .catch(()=>alive&&setError("Live chart feed unavailable"));
-    const ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_1m`);
-    ws.onmessage=e=>{try{const k=JSON.parse(e.data).k as {t:number;o:string;h:string;l:string;c:string};const next={time:k.t,open:Number(k.o),high:Number(k.h),low:Number(k.l),close:Number(k.c)};setCandles(prev=>{const copy=[...prev];const i=copy.findIndex(x=>x.time===next.time);if(i>=0)copy[i]=next;else copy.push(next);return copy.slice(-90)})}catch{}}
-    ws.onerror=()=>alive&&setError("Live chart feed unavailable");
-    return()=>{alive=false;ws.close()}
+
+    async function loadHistory(){
+      for(const host of BINANCE_API_HOSTS){
+        try{
+          const response=await fetch(`${host}/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=1m&limit=100`,{cache:"no-store"});
+          if(!response.ok)continue;
+          const rows=await response.json();
+          const parsed=Array.isArray(rows)?rows.map(parseCandle).filter((c):c is Candle=>Boolean(c)):[];
+          if(parsed.length){
+            if(alive)setCandles(parsed);
+            return true;
+          }
+        }catch{}
+      }
+      if(alive)setError("Unable to load this coin's chart");
+      return false;
+    }
+
+    function connect(){
+      if(!alive)return;
+      try{
+        socket=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_1m`);
+        socket.onopen=()=>{reconnectAttempts=0;setError("")};
+        socket.onmessage=event=>{
+          try{
+            const payload=JSON.parse(event.data);
+            const k=payload?.k;
+            const next: Candle={time:Number(k?.t),open:Number(k?.o),high:Number(k?.h),low:Number(k?.l),close:Number(k?.c)};
+            if(!Number.isFinite(next.time)||[next.open,next.high,next.low,next.close].some(value=>!Number.isFinite(value)))return;
+            setCandles(previous=>{
+              const copy=[...previous];
+              const index=copy.findIndex(item=>item.time===next.time);
+              if(index>=0)copy[index]=next;else copy.push(next);
+              return copy.slice(-100);
+            });
+          }catch{}
+        };
+        socket.onerror=()=>socket?.close();
+        socket.onclose=()=>{
+          if(!alive)return;
+          reconnectAttempts+=1;
+          reconnectTimer=setTimeout(connect,Math.min(1000*reconnectAttempts,10000));
+        };
+      }catch{
+        reconnectTimer=setTimeout(connect,5000);
+      }
+    }
+
+    loadHistory();
+    connect();
+
+    return()=>{
+      alive=false;
+      if(reconnectTimer)clearTimeout(reconnectTimer);
+      socket?.close();
+    };
   },[symbol]);
 
   const view=useMemo(()=>{
