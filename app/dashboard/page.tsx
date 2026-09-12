@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
-import {Activity,ArrowDownToLine,ArrowLeftRight,ArrowUpFromLine,ChevronRight,Clock3,Eye,EyeOff,LogOut,MoreHorizontal,Plus,ShieldCheck,TrendingUp,WalletCards} from "lucide-react";
+import {Activity,ArrowDownToLine,ArrowLeftRight,ArrowUpFromLine,BarChart3,ChevronRight,Clock3,Eye,EyeOff,LogOut,MoreHorizontal,Plus,ShieldCheck,WalletCards} from "lucide-react";
 import {useRouter} from "next/navigation";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
@@ -51,11 +51,11 @@ export default function Dashboard(){
     <div className="hero-curve"><span/><i/><b/></div>
    </section>
 
-   <section className="quick-actions">
-    <Link href="/wallet" className="quick-action"><span><ArrowDownToLine/></span><b>Add funds</b></Link>
-    <Link href="/wallet" className="quick-action"><span><ArrowUpFromLine/></span><b>Send</b></Link>
-    <Link href="/wallet" className="quick-action"><span><ArrowLeftRight/></span><b>Transfer</b></Link>
-    <Link href="/trade" className="quick-action"><span><TrendingUp/></span><b>Trade</b></Link>
+   <section className="quick-actions" aria-label="Account actions">
+    <Link href="/wallet" className="quick-action"><div className="quick-icon add-icon"><ArrowDownToLine size={25}/></div><b>Add funds</b></Link>
+    <Link href="/wallet" className="quick-action"><div className="quick-icon send-icon"><ArrowUpFromLine size={25}/></div><b>Send</b></Link>
+    <Link href="/wallet" className="quick-action"><div className="quick-icon transfer-icon"><ArrowLeftRight size={25}/></div><b>Transfer</b></Link>
+    <Link href="/trade" className="quick-action"><div className="quick-icon trade-icon"><BarChart3 size={25}/></div><b>Trade</b></Link>
    </section>
 
    <section className="market-highlight">
