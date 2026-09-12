@@ -79,11 +79,11 @@ export default function MarketChart({pair}:{pair:string}){
 
   const intervals:ChartInterval[]=["1m","15m","1h","4h","1d"];
   return <div className="chart live-chart">
-    <div className="chart-toolbar">
-      <div className="chart-intervals" role="tablist" aria-label="Chart timeframe">
-        {intervals.map(value=><button key={value} type="button" className={interval===value?"active":""} onClick={()=>setInterval(value)}>{value}</button>)}
+    <div className="chart-toolbar" style={{height:58,padding:"0 18px",gap:16,background:"#0b111a"}}>
+      <div className="chart-intervals" role="tablist" aria-label="Chart timeframe" style={{display:"flex",alignItems:"center",gap:6}}>
+        {intervals.map(value=><button key={value} type="button" className={interval===value?"active":""} onClick={()=>setInterval(value)} style={{appearance:"none",border:"1px solid",borderColor:interval===value?"#3b82f6":"#263244",background:interval===value?"#2563eb":"#111a27",color:interval===value?"#fff":"#91a0b5",borderRadius:7,padding:"7px 12px",fontSize:12,fontWeight:600,lineHeight:1,cursor:"pointer",transition:"all .2s"}}>{value}</button>)}
       </div>
-      <strong>{candles.length?formatPrice(candles[candles.length-1].close):"—"}</strong>
+      <strong style={{fontSize:14,color:"#e8eef7",fontVariantNumeric:"tabular-nums"}}>{candles.length?formatPrice(candles[candles.length-1].close):"—"}</strong>
     </div>
     {view&&<svg viewBox={`0 0 ${view.width} ${view.height}`} preserveAspectRatio="none" role="img" aria-label={`${pair} live candlestick chart`}>{[0.25,0.5,0.75].map(v=><line key={v} x1="0" x2={view.width} y1={view.height*v} y2={view.height*v} className="chart-grid-line"/>)}{candles.map((c,i)=>{const up=c.close>=c.open;const cx=view.x(i);const bodyTop=view.y(Math.max(c.open,c.close));const bodyBottom=view.y(Math.min(c.open,c.close));const bodyHeight=Math.max(1,bodyBottom-bodyTop);return <g key={c.time} className={up?"candle-up":"candle-down"}><line x1={cx} x2={cx} y1={view.y(c.high)} y2={view.y(c.low)}/><rect x={cx-3.2} y={bodyTop} width="6.4" height={bodyHeight} rx="1"/></g>})}</svg>}
     {!candles.length&&<div className="chart-placeholder">{error||"Loading live market data…"}</div>}
