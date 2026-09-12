@@ -5,7 +5,7 @@ import {Activity,ArrowLeftRight,BarChart3,ChevronRight,Clock3,Download,Eye,EyeOf
 import {useRouter} from "next/navigation";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
-import {createSupabaseBrowserClient} from "../lib/supabase-browser";
+import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
 import "./dashboard.css";
 import "./quick-icons.css";
 
@@ -25,7 +25,33 @@ export default function Dashboard(){
  const [email,setEmail]=useState("");
  const [loading,setLoading]=useState(true);
  const [hidden,setHidden]=useState(false);
- useEffect(()=>{let active=true;const supabase=createSupabaseBrowserClient();supabase.auth.getUser().then(({data})=>{if(!active)return;if(!data.user){router.replace("/login?next=/dashboard");return}setEmail(data.user.email||"");setLoading(false)});return()=>{active=false}},[router]);
+ useEffect(()=>{
+  const supabase=createSupabaseBrowserClient();
+  let mounted=true;
+  let redirectTimer:ReturnType<typeof setTimeout>|undefined;
+  const load=async()=>{
+   const {data}=await supabase.auth.getSession();
+   if(!mounted)return;
+   if(data.session?.user){
+    setEmail(data.session.user.email||"");
+    setLoading(false);
+    return;
+   }
+   redirectTimer=setTimeout(async()=>{
+    const latest=await supabase.auth.getSession();
+    if(mounted&&!latest.data.session) router.replace("/login?next=/dashboard");
+   },1200);
+  };
+  load();
+  const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{
+   if(!mounted)return;
+   if(session?.user){
+    setEmail(session.user.email||"");
+    setLoading(false);
+   }
+  });
+  return()=>{mounted=false;if(redirectTimer)clearTimeout(redirectTimer);subscription.unsubscribe()};
+ },[router]);
  const logout=async()=>{const supabase=createSupabaseBrowserClient();await supabase.auth.signOut();router.replace("/login")};
  if(loading)return <main className="member-dashboard"><div className="dashboard-loading">Loading your account…</div></main>;
  const initials=(email.split("@")[0]||"U").slice(0,1).toUpperCase();
