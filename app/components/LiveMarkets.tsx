@@ -1,70 +1,164 @@
 "use client";
-import {useEffect,useMemo,useState} from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import {MARKET_SYMBOLS,displayPair,formatPrice,formatVolume} from "../../lib/market-data";
+import { formatPrice, formatVolume } from "../../lib/market-data";
 import CoinIcon from "./CoinIcon";
 
-type Row={price:number;change:number;volume:number};
+type Coin = {
+  id: string;
+  name: string;
+  symbol: string;
+  current_price: number | null;
+  price_change_percentage_24h: number | null;
+  total_volume: number | null;
+  market_cap_rank: number | null;
+};
 
-export default function LiveMarkets(){
- const [data,setData]=useState<Record<string,Row>>({});
- const [connected,setConnected]=useState(false);
- const [search,setSearch]=useState("");
+export default function LiveMarkets() {
+  const [coins, setCoins] = useState<Coin[]>([]);
+  const [query, setQuery] = useState("");
+  const [connected, setConnected] = useState(false);
+  const [loading, setLoading] = useState(true);
 
- useEffect(()=>{
-  let alive=true;
-  const symbols=MARKET_SYMBOLS.map(s=>s.toLowerCase());
-  fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(MARKET_SYMBOLS))}`)
-   .then(r=>r.json())
-   .then(rows=>{
-    if(!alive||!Array.isArray(rows))return;
-    const next:Record<string,Row>={};
-    rows.forEach((r:{symbol:string,lastPrice:string,priceChangePercent:string,quoteVolume:string})=>{
-     next[r.symbol]={price:Number(r.lastPrice),change:Number(r.priceChangePercent),volume:Number(r.quoteVolume)};
-    });
-    setData(next);
-   })
-   .catch(()=>{});
+  useEffect(() => {
+    let alive = true;
 
-  const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${symbols.map(s=>`${s}@ticker`).join("/")}`);
-  ws.onopen=()=>alive&&setConnected(true);
-  ws.onclose=()=>alive&&setConnected(false);
-  ws.onmessage=e=>{
-   try{
-    const r=JSON.parse(e.data).data as {s:string,c:string,P:string,q:string};
-    setData(prev=>({...prev,[r.s]:{price:Number(r.c),change:Number(r.P),volume:Number(r.q)}}));
-   }catch{}
-  };
-  return()=>{alive=false;ws.close()};
- },[]);
+    async function loadMarkets() {
+      try {
+        setLoading(true);
+        const pages = await Promise.all(
+          [1, 2, 3, 4].map((page) =>
+            fetch(
+              `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false&price_change_percentage=24h&locale=en`,
+            ).then((response) => {
+              if (!response.ok) throw new Error("Market request failed");
+              return response.json() as Promise<Coin[]>;
+            }),
+          ),
+        );
 
- const filteredSymbols=useMemo(()=>{
-  const query=search.trim().toLowerCase();
-  if(!query)return MARKET_SYMBOLS;
-  return MARKET_SYMBOLS.filter(symbol=>{
-   const pair=displayPair(symbol).toLowerCase();
-   const coin=symbol.replace("USDT","").toLowerCase();
-   return pair.includes(query)||coin.includes(query)||symbol.toLowerCase().includes(query);
-  });
- },[search]);
+        if (!alive) return;
+        setCoins(pages.flat().slice(0, 1000));
+        setConnected(true);
+      } catch {
+        if (alive) setConnected(false);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
 
- return <div className="panel">
-  <div className="live-status"><span className={connected?"status-dot":"status-dot offline"}></span>{connected?"Live market feed":"Connecting to market feed…"}</div>
-  <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
-   <input
-    aria-label="Search coins"
-    value={search}
-    onChange={e=>setSearch(e.target.value)}
-    placeholder="Search coins..."
-    style={{width:"min(320px,100%)",padding:"12px 14px",borderRadius:10,border:"1px solid #243b55",background:"#0b1624",color:"#fff",outline:"none"}}
-   />
-  </div>
-  <table className="table"><thead><tr><th>Pair</th><th>Last price</th><th>24h change</th><th>24h volume</th><th></th></tr></thead><tbody>
-   {filteredSymbols.map(symbol=>{
-    const r=data[symbol],base=symbol.replace("USDT","");
-    return <tr key={symbol}><td><span style={{display:"inline-flex",alignItems:"center",gap:10}}><CoinIcon symbol={base} size={30}/><strong>{displayPair(symbol)}</strong></span></td><td>{r?formatPrice(r.price):"—"}</td><td className={r&&r.change<0?"danger":"up"}>{r?`${r.change>=0?"+":""}${r.change.toFixed(2)}%`:"—"}</td><td>{r?formatVolume(r.volume):"—"}</td><td><Link className="btn" href={`/trade?pair=${encodeURIComponent(symbol)}`}>Trade</Link></td></tr>;
-   })}
-   {filteredSymbols.length===0&&<tr><td colSpan={5} style={{textAlign:"center",padding:"28px"}}>No coins found</td></tr>}
-  </tbody></table>
- </div>;
+    loadMarkets();
+    const timer = window.setInterval(loadMarkets, 60_000);
+
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const filteredCoins = useMemo(() => {
+    const value = query.trim().toLowerCase();
+    if (!value) return coins;
+    return coins.filter(
+      (coin) =>
+        coin.name.toLowerCase().includes(value) ||
+        coin.symbol.toLowerCase().includes(value) ||
+        coin.id.toLowerCase().includes(value),
+    );
+  }, [coins, query]);
+
+  return (
+    <div className="panel">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+          marginBottom: 18,
+        }}
+      >
+        <div className="live-status" style={{ marginBottom: 0 }}>
+          <span className={connected ? "status-dot" : "status-dot offline"} />
+          {loading ? "Loading market data…" : connected ? "Live market feed" : "Market feed unavailable"}
+        </div>
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search coins or symbols…"
+          aria-label="Search coins or symbols"
+          style={{
+            width: "min(360px, 100%)",
+            border: "1px solid #24415f",
+            borderRadius: 12,
+            background: "#0b1725",
+            color: "#f4f7fb",
+            padding: "12px 14px",
+            outline: "none",
+            fontSize: 14,
+          }}
+        />
+      </div>
+
+      <div style={{ color: "#8da0b8", fontSize: 13, marginBottom: 12 }}>
+        Showing {filteredCoins.length.toLocaleString()} of {coins.length.toLocaleString()} top coins by market cap
+      </div>
+
+      <div style={{ overflowX: "auto" }}>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pair</th>
+              <th>Last price</th>
+              <th>24h change</th>
+              <th>24h volume</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {filteredCoins.map((coin) => {
+              const symbol = coin.symbol.toUpperCase();
+              const pair = `${symbol}USDT`;
+              const change = coin.price_change_percentage_24h ?? 0;
+
+              return (
+                <tr key={coin.id}>
+                  <td>{coin.market_cap_rank ?? "—"}</td>
+                  <td>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                      <CoinIcon symbol={symbol} size={30} />
+                      <span>
+                        <strong>{symbol}/USDT</strong>
+                        <small style={{ display: "block", color: "#71849d", marginTop: 3 }}>{coin.name}</small>
+                      </span>
+                    </span>
+                  </td>
+                  <td>{coin.current_price == null ? "—" : formatPrice(coin.current_price)}</td>
+                  <td className={change < 0 ? "danger" : "up"}>
+                    {coin.price_change_percentage_24h == null ? "—" : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`}
+                  </td>
+                  <td>{coin.total_volume == null ? "—" : formatVolume(coin.total_volume)}</td>
+                  <td>
+                    <Link className="btn" href={`/trade?pair=${encodeURIComponent(pair)}`}>
+                      Trade
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+            {!loading && filteredCoins.length === 0 && (
+              <tr>
+                <td colSpan={6} style={{ textAlign: "center", padding: 30, color: "#8da0b8" }}>
+                  No coins found. Try another name or symbol.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
