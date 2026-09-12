@@ -185,7 +185,7 @@ export default function Dashboard() {
           <section className="asset-card">
             <div className="section-heading"><div><span>Portfolio</span><strong>Your assets</strong></div><Link href="/wallet">View all <ChevronRight size={16} /></Link></div>
             <div className="asset-total"><span>Total balance</span><strong>{money}</strong></div>
-            <div className="empty-activity asset-empty"><div className="empty-icon"><WalletEmptyIcon /></div><strong>No assets yet</strong><span>Your deposited coins will appear here after funds are credited to your account.</span><Link href="/wallet">Add funds</Link></div>
+            <div className="empty-activity asset-empty"><Link href="/wallet" className="empty-icon" aria-label="Add funds"><WalletEmptyIcon /></Link><strong>No assets yet</strong><span>Your deposited coins will appear here after funds are credited to your account.</span><Link href="/wallet">Add funds</Link></div>
           </section>
           <section className="activity-card">
             <div className="section-heading"><div><span>Activity</span><strong>Recent activity</strong></div><Link href="/orders">View all <ChevronRight size={16} /></Link></div>
