@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowDownToLine, ArrowUpFromLine, ArrowLeftRight, Gift, Zap, ShieldCheck,
@@ -6,6 +9,7 @@ import {
 } from "lucide-react";
 import CoinIcon from "./components/CoinIcon";
 import AuthGateMarketCard from "./components/AuthGateMarketCard";
+import { createSupabaseBrowserClient } from "../lib/supabase-browser";
 
 const markets = [
   ["BTC", "Bitcoin", "$77,154.49", "+2.32%"], ["ETH", "Ethereum", "$3,661.27", "+1.48%"], ["SOL", "Solana", "$147.62", "+4.21%"], ["BNB", "BNB", "$712.34", "-3.85%"], ["XRP", "XRP", "$2.91", "+1.92%"], ["DOGE", "Dogecoin", "$0.24", "+3.18%"], ["ADA", "Cardano", "$0.88", "+1.12%"], ["AVAX", "Avalanche", "$24.61", "+2.73%"], ["LINK", "Chainlink", "$18.42", "+3.06%"], ["TRX", "TRON", "$0.34", "+0.64%"], ["DOT", "Polkadot", "$4.21", "-1.08%"], ["LTC", "Litecoin", "$96.31", "+1.55%"], ["BCH", "Bitcoin Cash", "$521.74", "+0.91%"], ["NEAR", "NEAR Protocol", "$3.42", "+2.45%"], ["APT", "Aptos", "$4.81", "+2.11%"], ["ATOM", "Cosmos", "$4.72", "-0.32%"], ["FIL", "Filecoin", "$2.61", "+1.72%"], ["ARB", "Arbitrum", "$0.47", "+3.84%"], ["OP", "Optimism", "$0.58", "+2.04%"], ["SUI", "Sui", "$3.51", "+5.14%"], ["PEPE", "Pepe", "$0.000009", "+4.62%"], ["SHIB", "Shiba Inu", "$0.000013", "+1.26%"], ["ETC", "Ethereum Classic", "$18.72", "-0.76%"], ["UNI", "Uniswap", "$8.21", "+2.88%"], ["AAVE", "Aave", "$312.40", "+3.42%"], ["MATIC", "Polygon", "$0.38", "-1.14%"],
@@ -23,12 +27,38 @@ const footerGroups = [
 
 export default function Home() {
   const featured = markets.slice(0, 4);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    let unsubscribe = () => {};
+    try {
+      const supabase = createSupabaseBrowserClient();
+      supabase.auth.getUser().then(({ data }) => {
+        if (mounted) setUserId(data.user?.id ?? null);
+      });
+      const subscription = supabase.auth.onAuthStateChange((_event, session) => {
+        if (mounted) setUserId(session?.user?.id ?? null);
+      });
+      unsubscribe = () => subscription.data.subscription.unsubscribe();
+    } catch {
+      if (mounted) setUserId(null);
+    }
+    return () => { mounted = false; unsubscribe(); };
+  }, []);
+
+  const accountLabel = userId ? `ID: ${userId.slice(0, 8)}…` : "Log in";
+
   return (
     <main className="orbitex-home redesign-home">
       <header className="orbitex-header redesign-header">
         <Link href="/" className="orbitex-logo brand-logo"><img src="/orbitex-logo.svg" alt="ORBITEX" /><span>ORBITEX</span></Link>
         <nav className="orbitex-nav"><a href="#markets">Markets</a><a href="#features">Features</a><a href="/trade">Spot</a><a href="/futures">Futures</a><a href="#security">Security</a></nav>
-        <div className="orbitex-actions"><Link className="orbitex-login" href="/login">Log in</Link><Link className="orbitex-create" href="/signup">Create account</Link><button className="orbitex-menu" aria-label="Menu">☰</button></div>
+        <div className="orbitex-actions">
+          {userId ? <Link className="orbitex-login logged-in-account" href="/dashboard" title={`User ID: ${userId}`}>{accountLabel}</Link> : <Link className="orbitex-login" href="/login">Log in</Link>}
+          {userId ? <Link className="orbitex-create" href="/dashboard">Dashboard</Link> : <Link className="orbitex-create" href="/signup">Create account</Link>}
+          <button className="orbitex-menu" aria-label="Menu">☰</button>
+        </div>
       </header>
 
       <section className="redesign-hero"><div className="hero-orbit-bg" /><div className="hero-copy"><div className="orbitex-eyebrow">THE NEXT GENERATION EXCHANGE</div><h1>TRADE CRYPTO.<br /><span>YOUR WAY.</span></h1><p>Spot &amp; Futures trading from one powerful account. Real-time market data, professional tools and a unified wallet experience.</p><div className="orbitex-hero-buttons"><Link href="/signup" className="orbitex-primary">Start Trading <span>→</span></Link><Link href="#markets" className="orbitex-secondary">Explore Markets</Link></div><div className="hero-stats"><div><b>20+</b><small>Trading Markets</small></div><div><b>24/7</b><small>Always Available</small></div><div><b>Secure</b><small>Multi-Layer Protection</small></div></div></div>
