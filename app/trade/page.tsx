@@ -10,8 +10,9 @@ const referencePrice=113842.20;
 
 function validPair(value:string|null){
   if(!value)return "BTC/USDT";
-  const normalized=value.toUpperCase();
-  return MARKET_SYMBOLS.includes(normalized.replace("/","")) ? normalized : "BTC/USDT";
+  const compact=value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  const matched=MARKET_SYMBOLS.find(symbol=>symbol===compact);
+  return matched?displayPair(matched):"BTC/USDT";
 }
 
 export default function Trade(){
