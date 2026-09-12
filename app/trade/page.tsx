@@ -14,7 +14,23 @@ function validPair(value:string|null):string{if(!value)return "BTC/USDT";const c
 export default function Trade(){
  const [pair,setPair]=useState("BTC/USDT");const [markets,setMarkets]=useState<MarketItem[]>([]);const [search,setSearch]=useState("");const [side,setSide]=useState("Buy");const [type,setType]=useState("Limit");const [price,setPrice]=useState(String(referencePrice));const [livePrice,setLivePrice]=useState(referencePrice);const [change,setChange]=useState(0);const [amount,setAmount]=useState("");const [submitting,setSubmitting]=useState(false);const [message,setMessage]=useState("");const [available,setAvailable]=useState(0);const symbol=binanceSymbol(pair);const base=pair.split("/")[0];
  useEffect(()=>{const params=new URLSearchParams(window.location.search);setPair(validPair(params.get("pair")))},[]);
- useEffect(()=>{let alive=true;Promise.all([fetch("https://api.binance.com/api/v3/exchangeInfo",{cache:"no-store"}).then(response=>response.json()),...Array.from({length:4},(_,index)=>fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${index+1}&sparkline=false`,{cache:"no-store"}).then(response=>response.ok?response.json():[]))]).then(([exchangeInfo,...rankPages])=>{if(!alive)return;const rankMap=new Map<string,number>();rankPages.flat().forEach((coin:any)=>{if(coin?.symbol&&coin?.market_cap_rank)rankMap.set(String(coin.symbol).toUpperCase(),Number(coin.market_cap_rank))});const list=(Array.isArray(exchangeInfo?.symbols)?exchangeInfo.symbols:[]).filter((item:any)=>item.quoteAsset==="USDT"&&item.status==="TRADING"&&item.isSpotTradingAllowed!==false).map((item:any)=>({symbol:item.symbol,baseAsset:item.baseAsset,quoteAsset:item.quoteAsset,marketCapRank:rankMap.get(String(item.baseAsset).toUpperCase())||999999})).sort((a:MarketItem,b:MarketItem)=>a.marketCapRank-b.marketCapRank||a.baseAsset.localeCompare(b.baseAsset));setMarkets(list)}).catch(()=>setMarkets([]));return()=>{alive=false}},[]);
+ useEffect(()=>{
+  let alive=true;
+  async function loadMarkets(){
+   try{
+    const exchangeResponse=await fetch("https://api.binance.com/api/v3/exchangeInfo",{cache:"no-store"});
+    if(!exchangeResponse.ok)throw new Error("Unable to load exchange markets");
+    const exchangeInfo=await exchangeResponse.json();
+    const rankMap=new Map<string,number>();
+    const pages=await Promise.allSettled(Array.from({length:4},(_,index)=>fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${index+1}&sparkline=false`,{cache:"no-store"}).then(response=>response.ok?response.json():[])));
+    pages.forEach(result=>{if(result.status==="fulfilled"&&Array.isArray(result.value)){result.value.forEach((coin:any)=>{if(coin?.symbol&&coin?.market_cap_rank)rankMap.set(String(coin.symbol).toUpperCase(),Number(coin.market_cap_rank))})}});
+    const list=(Array.isArray(exchangeInfo?.symbols)?exchangeInfo.symbols:[]).filter((item:any)=>item.quoteAsset==="USDT"&&item.status==="TRADING"&&item.isSpotTradingAllowed!==false).map((item:any)=>({symbol:item.symbol,baseAsset:item.baseAsset,quoteAsset:item.quoteAsset,marketCapRank:rankMap.get(String(item.baseAsset).toUpperCase())||999999})).sort((a:MarketItem,b:MarketItem)=>a.marketCapRank-b.marketCapRank||a.baseAsset.localeCompare(b.baseAsset));
+    if(alive)setMarkets(list);
+   }catch{if(alive)setMarkets([])}
+  }
+  loadMarkets();
+  return()=>{alive=false}
+ },[]);
  const filteredMarkets=useMemo(()=>{const query=search.trim().toUpperCase();if(!query)return markets;return markets.filter(item=>item.symbol.includes(query)||item.baseAsset.includes(query))},[markets,search]);
  useEffect(()=>{let alive=true;setMessage("");fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`).then(r=>r.json()).then(r=>{if(alive&&r.lastPrice){const p=Number(r.lastPrice);setLivePrice(p);setPrice(String(p));setChange(Number(r.priceChangePercent||0))}}).catch(()=>{});const ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`);ws.onmessage=e=>{try{const r=JSON.parse(e.data);if(alive){setLivePrice(Number(r.c));setChange(Number(r.P))}}catch{}};return()=>{alive=false;ws.close()}},[symbol]);
  useEffect(()=>{setPrice(String(livePrice));setMessage("")},[pair]);
