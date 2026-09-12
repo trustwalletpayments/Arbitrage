@@ -1,13 +1,10 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
-import {useSearchParams} from "next/navigation";
 import MarketChart from "../components/MarketChart";
 import CoinIcon from "../components/CoinIcon";
 import {MARKET_SYMBOLS,binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
-
-export const dynamic = "force-dynamic";
 
 const referencePrice=113842.20;
 
@@ -19,11 +16,13 @@ function validPair(value:string|null): string{
 }
 
 export default function Trade(){
- const searchParams=useSearchParams();
- const [pair,setPair]=useState<string>(()=>validPair(searchParams.get("pair")));
+ const [pair,setPair]=useState<string>("BTC/USDT");
  const [side,setSide]=useState("Buy");const [type,setType]=useState("Limit");const [price,setPrice]=useState(String(referencePrice));const [livePrice,setLivePrice]=useState(referencePrice);const [change,setChange]=useState(0);const [amount,setAmount]=useState("");const [submitting,setSubmitting]=useState(false);const [message,setMessage]=useState("");const [available,setAvailable]=useState(0);const symbol=binanceSymbol(pair);const base=pair.split("/")[0];
 
- useEffect(()=>{setPair(validPair(searchParams.get("pair")))},[searchParams]);
+ useEffect(()=>{
+   const params=new URLSearchParams(window.location.search);
+   setPair(validPair(params.get("pair")));
+ },[]);
  useEffect(()=>{let alive=true;fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`).then(r=>r.json()).then(r=>{if(alive&&r.lastPrice){const p=Number(r.lastPrice);setLivePrice(p);setPrice(String(p));setChange(Number(r.priceChangePercent||0))}}).catch(()=>{});const ws=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`);ws.onmessage=e=>{try{const r=JSON.parse(e.data);if(alive){setLivePrice(Number(r.c));setChange(Number(r.P));}}catch{}};return()=>{alive=false;ws.close()}},[symbol]);
  useEffect(()=>{setPrice(String(livePrice));setMessage("")},[pair]);
  async function refreshBalance(){const supabase=createSupabaseBrowserClient();const {data:{user}}=await supabase.auth.getUser();if(!user){setAvailable(0);return}const {data}=await supabase.from("account_balances").select("available").eq("user_id",user.id).eq("asset","USDT").eq("wallet","SPOT").maybeSingle();setAvailable(Number(data?.available||0))}
