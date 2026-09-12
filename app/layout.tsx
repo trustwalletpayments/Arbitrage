@@ -9,6 +9,7 @@ import "./footer-redesign.css";
 import "./footer-binance.css";
 import "./download-buttons.css";
 import "./security-icon.css";
+import "./market-scroll.css";
 import "./components/mobile-nav.css";
 
 export const metadata: Metadata = { title: "ORBITEX Exchange", description: "ORBITEX crypto exchange platform" };
