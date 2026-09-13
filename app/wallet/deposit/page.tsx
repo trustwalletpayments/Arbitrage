@@ -110,7 +110,6 @@ const DEMO_ADDRESSES: Record<string, string> = {
   xrp: "rORBITEXDemoXrpAddress",
   cardano: "addr1orbitexdemocardanoaddress",
   dogecoin: "DORBITEXDemoDogecoinAddress",
-  dogecoin: "DORBITEXDemoDogecoinAddress",
   polkadot: "1ORBITEXDemoPolkadotAddress",
   litecoin: "ltc1orbitexdemolitecoinaddress",
   bitcoincash: "bitcoincash:qorbitexdemoaddress",
@@ -119,20 +118,11 @@ const DEMO_ADDRESSES: Record<string, string> = {
 };
 
 function AssetLogo({ asset }: { asset: Asset }) {
-  return (
-    <span className="deposit-asset-logo" style={{ background: asset.color }}>
-      <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={`${asset.name} logo`} />
-    </span>
-  );
+  return <span className="deposit-asset-logo" style={{ background: asset.color }}><img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={`${asset.name} logo`} /></span>;
 }
 
 function NetworkLogo({ network }: { network: Network }) {
-  return (
-    <span className="deposit-network-logo">
-      <img src={`https://assets.coincap.io/assets/icons/${network.logo}@2x.png`} alt={`${network.name} logo`} />
-      <span>{network.short.slice(0, 2)}</span>
-    </span>
-  );
+  return <span className="deposit-network-logo"><img src={`https://assets.coincap.io/assets/icons/${network.logo}@2x.png`} alt={`${network.name} logo`} /><span>{network.short.slice(0, 2)}</span></span>;
 }
 
 export default function DepositPage() {
@@ -140,84 +130,17 @@ export default function DepositPage() {
   const [selected, setSelected] = useState<Asset>(ASSETS[0]);
   const [networkId, setNetworkId] = useState("bsc");
   const [copied, setCopied] = useState(false);
-
-  const filteredAssets = useMemo(() => {
-    const value = query.trim().toLowerCase();
-    if (!value) return ASSETS;
-    return ASSETS.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(value));
-  }, [query]);
-
+  const filteredAssets = useMemo(() => { const value = query.trim().toLowerCase(); return value ? ASSETS.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(value)) : ASSETS; }, [query]);
   const selectedNetworks = NETWORKS[selected.symbol] ?? [];
   const selectedNetwork = selectedNetworks.find((item) => item.id === networkId) ?? selectedNetworks[0];
   const depositAddress = DEMO_ADDRESSES[selectedNetwork?.id ?? ""] ?? "ORBITEX-DEMO-DEPOSIT-ADDRESS";
+  function selectAsset(asset: Asset) { setSelected(asset); setNetworkId(NETWORKS[asset.symbol]?.[0]?.id ?? ""); setCopied(false); }
+  async function copyAddress() { try { await navigator.clipboard.writeText(depositAddress); } catch {} setCopied(true); window.setTimeout(() => setCopied(false), 1800); }
 
-  function selectAsset(asset: Asset) {
-    setSelected(asset);
-    setNetworkId(NETWORKS[asset.symbol]?.[0]?.id ?? "");
-    setCopied(false);
-  }
-
-  async function copyAddress() {
-    try { await navigator.clipboard.writeText(depositAddress); } catch {}
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  }
-
-  return (
-    <main className="wallet-page">
-      <header className="wallet-header">
-        <Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link>
-        <Link href="/wallet" className="history-link"><ArrowLeft size={18} /> Back to Wallet</Link>
-      </header>
-
-      <div className="wallet-content deposit-content">
-        <div className="wallet-heading">
-          <div>
-            <span className="wallet-kicker">FUND YOUR ACCOUNT</span>
-            <h1>Deposit</h1>
-            <p>Choose a crypto and the network you want to use for your deposit.</p>
-          </div>
-        </div>
-
-        <section className="deposit-shell">
-          <div className="deposit-selector">
-            <div className="deposit-section-heading">
-              <div><span className="wallet-kicker">SELECT ASSET</span><h2>Choose a deposit asset</h2></div>
-              <span className="supported-count">20 supported assets</span>
-            </div>
-            <label className="deposit-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by coin name or symbol" /></label>
-            <div className="deposit-asset-grid">
-              {filteredAssets.map((asset) => (
-                <button key={asset.symbol} type="button" className={`deposit-asset-option ${selected.symbol === asset.symbol ? "selected" : ""}`} onClick={() => selectAsset(asset)}>
-                  <AssetLogo asset={asset} />
-                  <span><strong>{asset.symbol}</strong><small>{asset.name}</small></span>
-                  {selected.symbol === asset.symbol && <Check size={17} className="asset-selected-check" />}
-                </button>
-              ))}
-            </div>
-            {filteredAssets.length === 0 && <div className="deposit-no-results">No supported asset matches your search.</div>}
-          </div>
-
-          <div className="deposit-details">
-            <div className="selected-asset-heading"><AssetLogo asset={selected} /><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{selected.name} <em>{selected.symbol}</em></h2></div></div>
-            <p className="deposit-helper">Select the network that matches the wallet or exchange you are sending from. Sending through the wrong network can permanently lose funds.</p>
-            <label className="deposit-field-label">Choose network</label>
-            <div className="deposit-network-list">
-              {selectedNetworks.map((item) => (
-                <button key={item.id} type="button" className={`deposit-network-option ${selectedNetwork?.id === item.id ? "selected" : ""}`} onClick={() => { setNetworkId(item.id); setCopied(false); }}>
-                  <NetworkLogo network={item} />
-                  <span><strong>{item.name}</strong><small>{item.short}</small></span>
-                  {selectedNetwork?.id === item.id && <Check size={17} className="asset-selected-check" />}
-                </button>
-              ))}
-            </div>
-            <div className="deposit-address-box"><span>{selectedNetwork?.name} deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div>
-            <button className="primary-action deposit-continue" type="button"><ArrowDownToLine size={18} /> Deposit {selected.symbol}</button>
-            <div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Demo mode</strong> This address is for interface testing only. Live deposit addresses will be connected after the exchange wallet infrastructure is enabled.</span></div>
-          </div>
-        </section>
-      </div>
-      <MobileNav />
-    </main>
-  );
+  return <main className="wallet-page">
+    <header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet" className="history-link"><ArrowLeft size={18} /> Back to Wallet</Link></header>
+    <div className="wallet-content deposit-content"><div className="wallet-heading"><div><span className="wallet-kicker">FUND YOUR ACCOUNT</span><h1>Deposit</h1><p>Choose a crypto and the network you want to use for your deposit.</p></div></div>
+      <section className="deposit-shell"><div className="deposit-selector"><div className="deposit-section-heading"><div><span className="wallet-kicker">SELECT ASSET</span><h2>Choose a deposit asset</h2></div><span className="supported-count">20 supported assets</span></div><label className="deposit-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by coin name or symbol" /></label><div className="deposit-asset-grid">{filteredAssets.map((asset) => <button key={asset.symbol} type="button" className={`deposit-asset-option ${selected.symbol === asset.symbol ? "selected" : ""}`} onClick={() => selectAsset(asset)}><AssetLogo asset={asset} /><span><strong>{asset.symbol}</strong><small>{asset.name}</small></span>{selected.symbol === asset.symbol && <Check size={17} className="asset-selected-check" />}</button>)}</div>{filteredAssets.length === 0 && <div className="deposit-no-results">No supported asset matches your search.</div>}</div>
+        <div className="deposit-details"><div className="selected-asset-heading"><AssetLogo asset={selected} /><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{selected.name} <em>{selected.symbol}</em></h2></div></div><p className="deposit-helper">Select the network that matches the wallet or exchange you are sending from. Sending through the wrong network can permanently lose funds.</p><label className="deposit-field-label">Choose network</label><div className="deposit-network-list">{selectedNetworks.map((item) => <button key={item.id} type="button" className={`deposit-network-option ${selectedNetwork?.id === item.id ? "selected" : ""}`} onClick={() => { setNetworkId(item.id); setCopied(false); }}><NetworkLogo network={item} /><span><strong>{item.name}</strong><small>{item.short}</small></span>{selectedNetwork?.id === item.id && <Check size={17} className="asset-selected-check" />}</button>)}</div><div className="deposit-address-box"><span>{selectedNetwork?.name} deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div><button className="primary-action deposit-continue" type="button"><ArrowDownToLine size={18} /> Deposit {selected.symbol}</button><div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Demo mode</strong> This address is for interface testing only. Live deposit addresses will be connected after the exchange wallet infrastructure is enabled.</span></div></div>
+      </section></div><MobileNav /></main>;
 }
