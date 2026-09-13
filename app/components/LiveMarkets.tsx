@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatPrice, formatVolume } from "../../lib/market-data";
 import CoinIcon from "./CoinIcon";
 
@@ -16,6 +17,7 @@ type Coin = {
 };
 
 export default function LiveMarkets() {
+  const router = useRouter();
   const [coins, setCoins] = useState<Coin[]>([]);
   const [query, setQuery] = useState("");
   const [connected, setConnected] = useState(false);
@@ -68,6 +70,11 @@ export default function LiveMarkets() {
     );
   }, [coins, query]);
 
+  function openTrade(coin: Coin) {
+    const pair = `${coin.symbol.toUpperCase()}USDT`;
+    router.push(`/trade?pair=${encodeURIComponent(pair)}`);
+  }
+
   return (
     <div className="panel">
       <div
@@ -106,8 +113,8 @@ export default function LiveMarkets() {
         Showing {filteredCoins.length.toLocaleString()} of {coins.length.toLocaleString()} top coins by market cap
       </div>
 
-      <div style={{ overflowX: "auto" }}>
-        <table className="table">
+      <div className="markets-table-wrap" style={{ overflowX: "auto" }}>
+        <table className="table markets-table">
           <thead>
             <tr>
               <th>#</th>
@@ -125,7 +132,20 @@ export default function LiveMarkets() {
               const change = coin.price_change_percentage_24h ?? 0;
 
               return (
-                <tr key={coin.id}>
+                <tr
+                  key={coin.id}
+                  className="market-row-clickable"
+                  onClick={() => openTrade(coin)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openTrade(coin);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="link"
+                  aria-label={`Trade ${symbol} USDT`}
+                >
                   <td>{coin.market_cap_rank ?? "—"}</td>
                   <td>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
@@ -142,7 +162,11 @@ export default function LiveMarkets() {
                   </td>
                   <td>{coin.total_volume == null ? "—" : formatVolume(coin.total_volume)}</td>
                   <td>
-                    <Link className="btn" href={`/trade?pair=${encodeURIComponent(pair)}`}>
+                    <Link
+                      className="btn market-trade-button"
+                      href={`/trade?pair=${encodeURIComponent(pair)}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
                       Trade
                     </Link>
                   </td>
