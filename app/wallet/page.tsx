@@ -2,30 +2,60 @@
 
 import Link from "next/link";
 import { ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Eye, EyeOff, History, Search, WalletCards } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
+import { getTestnetBalances, type TestnetWallet } from "../../lib/testnet-wallet";
 import "./wallet.css";
 
-type Asset = { symbol: string; name: string; balance: string; value: string; change: string };
+type WalletTab = "overview" | "spot" | "futures";
 
-const assets: Asset[] = [
-  { symbol: "USDT", name: "TetherUS", balance: "0.00", value: "$0.00", change: "0.00%" },
-  { symbol: "BTC", name: "Bitcoin", balance: "0.000000", value: "$0.00", change: "0.00%" },
-  { symbol: "ETH", name: "Ethereum", balance: "0.000000", value: "$0.00", change: "0.00%" },
-  { symbol: "BNB", name: "BNB", balance: "0.000000", value: "$0.00", change: "0.00%" },
-  { symbol: "SOL", name: "Solana", balance: "0.000000", value: "$0.00", change: "0.00%" },
-  { symbol: "XRP", name: "XRP", balance: "0.000000", value: "$0.00", change: "0.00%" },
-];
+const assetNames: Record<string, string> = {
+  USDT: "TetherUS",
+  BTC: "Bitcoin",
+  ETH: "Ethereum",
+  BNB: "BNB",
+  SOL: "Solana",
+  XRP: "XRP",
+  DOGE: "Dogecoin",
+};
 
 export default function WalletPage() {
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const tab: WalletTab = requestedTab === "spot" || requestedTab === "futures" ? requestedTab : "overview";
   const [hidden, setHidden] = useState(false);
   const [query, setQuery] = useState("");
-  const filtered = useMemo(
-    () => assets.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(query.toLowerCase())),
-    [query]
-  );
-  const amount = hidden ? "••••••" : "0.00 USDT";
+  const [balances, setBalances] = useState<TestnetWallet[]>([]);
+
+  useEffect(() => {
+    setBalances(getTestnetBalances());
+    const refresh = () => setBalances(getTestnetBalances());
+    window.addEventListener("storage", refresh);
+    window.addEventListener("wallet-balances-updated", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("wallet-balances-updated", refresh);
+    };
+  }, []);
+
+  const totalSpot = balances.reduce((sum, item) => sum + item.spot, 0);
+  const totalFutures = balances.reduce((sum, item) => sum + item.futures, 0);
+  const total = totalSpot + totalFutures;
+
+  const visibleAssets = useMemo(() => {
+    const filtered = balances.filter((asset) => {
+      const balance = tab === "spot" ? asset.spot : tab === "futures" ? asset.futures : asset.spot + asset.futures;
+      const matchesQuery = `${asset.asset} ${assetNames[asset.asset] || asset.asset}`.toLowerCase().includes(query.toLowerCase());
+      return balance > 0 && matchesQuery;
+    });
+    return filtered;
+  }, [balances, tab, query]);
+
+  const formatAmount = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 8 });
+  const displayedTotal = tab === "spot" ? totalSpot : tab === "futures" ? totalFutures : total;
+  const walletLabel = tab === "spot" ? "Spot Wallet" : tab === "futures" ? "Futures Wallet" : "Total Wallet Balance";
 
   return (
     <main className="wallet-page">
@@ -51,24 +81,28 @@ export default function WalletPage() {
         </div>
 
         <section className="wallet-balance-card">
-          <div className="balance-copy"><span>Total wallet balance <button onClick={() => setHidden(!hidden)} aria-label="Toggle balance visibility">{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button></span><strong>{amount}</strong><small>≈ {hidden ? "••••" : "$0.00"}</small></div>
+          <div className="balance-copy"><span>{walletLabel} <button onClick={() => setHidden(!hidden)} aria-label="Toggle balance visibility">{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button></span><strong>{hidden ? "••••••" : `${formatAmount(displayedTotal)} USDT`}</strong><small>≈ {hidden ? "••••" : `$${formatAmount(displayedTotal)}`}</small></div>
           <div className="balance-side"><span>Today’s PNL</span><strong>+0.00 USDT</strong><small>+0.00%</small></div>
         </section>
 
-        <div className="wallet-tabs"><Link className="active" href="/wallet">Overview</Link><Link href="/trade">Spot Wallet</Link><Link href="/futures">Futures Wallet</Link><Link href="/wallet/history">History</Link></div>
+        <div className="wallet-tabs">
+          <Link className={tab === "overview" ? "active" : ""} href="/wallet">Overview</Link>
+          <Link className={tab === "spot" ? "active" : ""} href="/wallet?tab=spot">Spot Wallet</Link>
+          <Link className={tab === "futures" ? "active" : ""} href="/wallet?tab=futures">Futures Wallet</Link>
+          <Link href="/wallet/history">History</Link>
+        </div>
 
         <section className="wallet-panel">
-          <div className="panel-top"><div><span className="wallet-kicker">BALANCES</span><h2>Your assets</h2></div><label className="asset-search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets" /></label></div>
-          <div className="asset-table-head"><span>Asset</span><span>Balance</span><span>Value</span><span>24h change</span><span></span></div>
-          <div className="asset-list">{filtered.map((asset) => <div className="asset-row" key={asset.symbol}><div className="asset-identity"><CoinIcon symbol={asset.symbol} size={38} /><div><strong>{asset.symbol}</strong><span>{asset.name}</span></div></div><strong>{hidden ? "••••" : asset.balance}</strong><strong>{hidden ? "••••" : asset.value}</strong><span className="asset-change">{asset.change}</span><Link href={`/wallet/${asset.symbol.toLowerCase()}`} className="asset-arrow">›</Link></div>)}</div>
-          {filtered.length === 0 && <div className="empty-assets">No assets found.</div>}
+          <div className="panel-top"><div><span className="wallet-kicker">{tab === "overview" ? "OWNED ASSETS" : tab === "spot" ? "SPOT BALANCES" : "FUTURES BALANCES"}</span><h2>{visibleAssets.length ? "Your assets" : "No assets yet"}</h2></div><label className="asset-search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets" /></label></div>
+          {visibleAssets.length > 0 ? <>
+            <div className="asset-table-head"><span>Asset</span><span>Balance</span><span>Value</span><span>24h change</span><span></span></div>
+            <div className="asset-list">{visibleAssets.map((asset) => { const amount = tab === "spot" ? asset.spot : tab === "futures" ? asset.futures : asset.spot + asset.futures; return <div className="asset-row" key={asset.asset}><div className="asset-identity"><CoinIcon symbol={asset.asset} size={38} /><div><strong>{asset.asset}</strong><span>{assetNames[asset.asset] || asset.asset}</span></div></div><strong>{hidden ? "••••" : formatAmount(amount)}</strong><strong>{hidden ? "••••" : `$${formatAmount(amount)}`}</strong><span className="asset-change">0.00%</span><span className="asset-arrow">›</span></div>; })}</div>
+          </> : <div className="empty-assets"><WalletCards size={28} /><strong>No assets in this wallet</strong><span>Buy or deposit an asset to see it here.</span></div>}
         </section>
 
-        <div className="wallet-notice"><WalletCards size={19} /><div><strong>Your wallet is ready</strong><span>Deposit supported assets to start trading. Deposits and withdrawals are processed through the selected network.</span></div></div>
+        <div className="wallet-notice"><WalletCards size={19} /><div><strong>Only owned assets are displayed</strong><span>This wallet shows balances from completed purchases, deposits, and transfers. Empty assets are hidden.</span></div></div>
       </div>
       <MobileNav />
     </main>
   );
 }
-
-// Wallet UI rebuilt and ready for deployment.
