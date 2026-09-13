@@ -4,3 +4,23 @@
 /* Compact exchange-style transaction history */
 .funding-history-panel{padding:0;overflow:hidden;background:#080f18}.funding-history-heading{padding:24px 25px 20px;align-items:center}.funding-history-heading h2{font-size:20px;margin:6px 0}.funding-history-heading p{font-size:13px}.funding-history-actions{display:flex;gap:10px;margin:0}.funding-history-actions a{padding:10px 14px;border-radius:9px;font-size:13px}.history-deposit{background:#173b2d;border:1px solid #286947;color:#55d993}.history-withdraw{background:#301b23;border:1px solid #63313d;color:#ff7f8b}.funding-history-tabs{display:flex;align-items:stretch;gap:24px;border-bottom:1px solid #17283a;margin:0;padding:0 25px;background:#0a131e;overflow-x:auto}.funding-history-tabs button{appearance:none;-webkit-appearance:none;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:#8192a8;padding:15px 0;cursor:pointer;white-space:nowrap;font:inherit;font-size:13px;font-weight:600;line-height:1.2}.funding-history-tabs button:hover{color:#dbe7f5}.funding-history-tabs button.active{color:#fff;border-bottom-color:#2d8cff}.funding-history-table{min-height:210px}.funding-history-table-head{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.2fr 1fr 1.4fr;gap:16px;padding:15px 25px;border-bottom:1px solid #17283a;color:#647890;font-size:11px;text-transform:uppercase;letter-spacing:.06em}.funding-history-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:175px;padding:25px;color:#8091a8}.funding-history-empty strong{display:block;color:#dce5f1;font-size:15px;margin:12px 0 6px}.funding-history-empty span{font-size:13px}.funding-empty-icon{width:42px;height:42px;border-radius:50%;background:#101c2b;color:#6d829d;display:grid;place-items:center;margin:0 auto}.funding-history-panel .funding-history-actions{justify-content:flex-end}
 @media(max-width:800px){.wallet-header{padding:0 18px}.wallet-header nav{display:none}.wallet-content{padding:28px 16px 70px}.wallet-heading,.funding-history-heading,.wallet-balance-card,.wallet-trading-section{display:block}.wallet-actions{margin-top:22px}.balance-side{text-align:left;margin-top:22px}.asset-table-head{display:none}.asset-row{grid-template-columns:1fr auto}.asset-row>:nth-child(3),.asset-row>:nth-child(4){display:none}.panel-top{display:block}.asset-search input{width:100%;margin-top:15px}.wallet-trading-actions{min-width:0;margin-top:22px}.funding-history-heading{padding:20px}.funding-history-actions{margin-top:18px;justify-content:flex-start}.funding-history-tabs{padding:0 20px;gap:20px}.funding-history-table{overflow-x:auto}.funding-history-table-head{min-width:720px;padding:14px 20px}.funding-history-empty{min-width:720px}}
+
+/* Compact mobile assets card */
+@media(max-width:560px){
+  .wallet-panel{margin-top:18px;padding:16px 14px;border-radius:16px}
+  .panel-top{gap:8px}
+  .panel-top h2{font-size:20px;margin:4px 0}
+  .wallet-panel .wallet-kicker{font-size:10px}
+  .asset-search input{margin-top:10px;padding:9px 11px;font-size:13px;height:40px}
+  .empty-assets{padding:18px 10px 16px}
+  .empty-wallet-art{height:70px;max-width:130px}
+  .empty-wallet-icon{left:44px;top:15px}
+  .empty-wallet-icon svg{width:42px;height:42px}
+  .empty-coin{width:32px;height:32px}
+  .empty-bitcoin{left:3px;top:2px}.empty-ethereum{right:2px;top:6px}.empty-usdt{right:18px;bottom:0}
+  .empty-coin svg{width:17px;height:17px}
+  .empty-assets strong{font-size:17px;margin:8px 0 5px}
+  .empty-assets>span{font-size:13px;line-height:1.4;max-width:330px}
+  .empty-actions{margin-top:14px;gap:8px}
+  .empty-actions a{padding:9px 12px;font-size:13px;border-radius:10px}
+}
