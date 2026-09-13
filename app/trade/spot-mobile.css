@@ -6,6 +6,7 @@
 .market-list .market-scroll{max-height:0;overflow:hidden;transition:max-height .25s ease}
 .market-list.expanded .market-scroll{max-height:520px;overflow-y:auto}
 .market-list .market-scroll button{padding:12px 10px}
+.desktop-market-search{display:none!important}
 .spot-expand-button{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:12px;border:1px solid #263b54;border-radius:10px;background:#101d2d;color:#75b5ff;font-weight:700;font-size:14px;cursor:pointer}
 .spot-mobile-search{display:block;width:100%;margin:0 0 12px;padding:13px 14px;border:1px solid #263244;border-radius:10px;background:#070c13;color:#fff;outline:none;font-size:15px}
 .market-count{margin-bottom:0!important}
@@ -17,4 +18,4 @@
 .live-chart svg{height:300px}
 .order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
 }
-@media (min-width:761px){.market-list .market-scroll{max-height:none}}
+@media (min-width:761px){.market-list .market-scroll{max-height:none}.spot-mobile-search{display:none}.spot-expand-button{display:none}}
