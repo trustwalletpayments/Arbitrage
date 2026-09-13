@@ -13,10 +13,13 @@ import {
   Clock3,
   Eye,
   EyeOff,
+  Gift,
   LogOut,
   MoreHorizontal,
   Plus,
+  Settings,
   ShieldCheck,
+  UserRound,
   Wallet,
 } from "lucide-react";
 import MobileNav from "../components/MobileNav";
@@ -39,6 +42,7 @@ export default function Dashboard() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [hidden, setHidden] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
 
   useEffect(() => {
@@ -105,7 +109,35 @@ export default function Dashboard() {
           <Link href="/wallet">Funding</Link>
           <Link href="/futures">Futures</Link>
         </nav>
-        <div className="member-profile"><span className="member-email">{email}</span><span className="member-avatar">{initials}</span><button onClick={logout} aria-label="Log out" className="member-logout"><LogOut size={17} /></button></div>
+        <div className="member-profile" style={{ position: "relative" }}>
+          <span className="member-email">{email}</span>
+          <button
+            type="button"
+            className="member-avatar"
+            aria-label="Open account menu"
+            aria-expanded={profileOpen}
+            onClick={() => setProfileOpen((open) => !open)}
+            style={{ cursor: "pointer", border: "1px solid #315c91" }}
+          >
+            {initials}
+          </button>
+          <button onClick={logout} aria-label="Log out" className="member-logout"><LogOut size={17} /></button>
+          {profileOpen && (
+            <div style={{ position: "absolute", top: "calc(100% + 12px)", right: 0, width: 250, padding: 10, borderRadius: 16, border: "1px solid #263b56", background: "#0b1420", boxShadow: "0 18px 50px rgba(0,0,0,.45)", zIndex: 100 }}>
+              <div style={{ padding: "8px 10px 12px", borderBottom: "1px solid #1d2b3d", marginBottom: 6 }}>
+                <div style={{ color: "#f1f5fb", fontWeight: 750, fontSize: 14 }}>My account</div>
+                <div style={{ color: "#7f90a5", fontSize: 11, marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email}</div>
+              </div>
+              <ProfileMenuLink href="/profile" icon={<UserRound size={16} />} label="Personal information" onClick={() => setProfileOpen(false)} />
+              <ProfileMenuLink href="/security" icon={<ShieldCheck size={16} />} label="Security" onClick={() => setProfileOpen(false)} />
+              <ProfileMenuLink href="/settings" icon={<Settings size={16} />} label="Settings" onClick={() => setProfileOpen(false)} />
+              <ProfileMenuLink href="/referral" icon={<Gift size={16} />} label="Referral program" onClick={() => setProfileOpen(false)} />
+              <button type="button" onClick={logout} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "11px 10px", border: 0, borderRadius: 10, background: "transparent", color: "#ff7184", cursor: "pointer", fontSize: 13, textAlign: "left" }}>
+                <LogOut size={16} /> Log out
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="member-main">
@@ -132,6 +164,10 @@ export default function Dashboard() {
       <MobileNav />
     </main>
   );
+}
+
+function ProfileMenuLink({ href, icon, label, onClick }: { href: string; icon: React.ReactNode; label: string; onClick: () => void }) {
+  return <Link href={href} onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 10px", borderRadius: 10, color: "#dce6f3", textDecoration: "none", fontSize: 13 }}>{icon}<span>{label}</span></Link>;
 }
 
 function WalletEmptyIcon() { return <span style={{ fontSize: 20, lineHeight: 1 }}>＋</span>; }
