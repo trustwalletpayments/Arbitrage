@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import { ArrowLeft, Copy, QrCode, ShieldCheck } from "lucide-react";
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import MobileNav from "../../../components/MobileNav";
 import "../../wallet.css";
 import "../deposit.css";
-
-export const dynamic = "force-dynamic";
 
 const ADDRESSES: Record<string, string> = {
   bsc: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
@@ -26,15 +23,29 @@ const ADDRESSES: Record<string, string> = {
   avalanche: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
 };
 
-function DepositAddressContent() {
-  const params = useSearchParams();
-  const asset = params.get("asset") || "USDT";
-  const assetName = params.get("assetName") || "Tether";
-  const network = params.get("network") || "BNB Smart Chain";
-  const networkShort = params.get("networkShort") || "BEP-20";
-  const networkId = params.get("networkId") || "bsc";
-  const address = ADDRESSES[networkId] || ADDRESSES.bsc;
+export default function DepositAddressPage() {
+  const [details, setDetails] = useState({
+    asset: "USDT",
+    assetName: "Tether",
+    network: "BNB Smart Chain",
+    networkShort: "BEP-20",
+    networkId: "bsc",
+  });
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setDetails({
+      asset: params.get("asset") || "USDT",
+      assetName: params.get("assetName") || "Tether",
+      network: params.get("network") || "BNB Smart Chain",
+      networkShort: params.get("networkShort") || "BEP-20",
+      networkId: params.get("networkId") || "bsc",
+    });
+  }, []);
+
+  const { asset, assetName, network, networkShort, networkId } = details;
+  const address = ADDRESSES[networkId] || ADDRESSES.bsc;
 
   async function copyAddress() {
     try {
@@ -99,13 +110,5 @@ function DepositAddressContent() {
       </div>
       <MobileNav />
     </main>
-  );
-}
-
-export default function DepositAddressPage() {
-  return (
-    <Suspense fallback={<main className="wallet-page"><div className="wallet-content deposit-content">Loading deposit address…</div></main>}>
-      <DepositAddressContent />
-    </Suspense>
   );
 }
