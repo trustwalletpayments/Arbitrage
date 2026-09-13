@@ -5,12 +5,84 @@
   height: 100%;
   max-height: none;
   overflow: hidden;
-  scrollbar-width: none;
   background: #060b12;
 }
 
-.market-list::-webkit-scrollbar {
-  display: none;
+/* Premium slim scrollbar styling across the complete exchange UI */
+html,
+body,
+.app-shell,
+.trade-layout,
+.chart-area,
+.order-panel,
+.market-list,
+.market-scroll,
+.futures-wrap,
+.futures-grid,
+.panel {
+  scrollbar-width: thin;
+  scrollbar-color: #315d91 #080d14;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.app-shell::-webkit-scrollbar,
+.trade-layout::-webkit-scrollbar,
+.chart-area::-webkit-scrollbar,
+.order-panel::-webkit-scrollbar,
+.market-list::-webkit-scrollbar,
+.market-scroll::-webkit-scrollbar,
+.futures-wrap::-webkit-scrollbar,
+.futures-grid::-webkit-scrollbar,
+.panel::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.app-shell::-webkit-scrollbar-track,
+.trade-layout::-webkit-scrollbar-track,
+.chart-area::-webkit-scrollbar-track,
+.order-panel::-webkit-scrollbar-track,
+.market-list::-webkit-scrollbar-track,
+.market-scroll::-webkit-scrollbar-track,
+.futures-wrap::-webkit-scrollbar-track,
+.futures-grid::-webkit-scrollbar-track,
+.panel::-webkit-scrollbar-track {
+  background: #080d14;
+  border-radius: 999px;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.app-shell::-webkit-scrollbar-thumb,
+.trade-layout::-webkit-scrollbar-thumb,
+.chart-area::-webkit-scrollbar-thumb,
+.order-panel::-webkit-scrollbar-thumb,
+.market-list::-webkit-scrollbar-thumb,
+.market-scroll::-webkit-scrollbar-thumb,
+.futures-wrap::-webkit-scrollbar-thumb,
+.futures-grid::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5b9be8 0%, #24558d 100%);
+  border: 2px solid #080d14;
+  border-radius: 999px;
+  min-height: 42px;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+.app-shell::-webkit-scrollbar-thumb:hover,
+.trade-layout::-webkit-scrollbar-thumb:hover,
+.chart-area::-webkit-scrollbar-thumb:hover,
+.order-panel::-webkit-scrollbar-thumb:hover,
+.market-list::-webkit-scrollbar-thumb:hover,
+.market-scroll::-webkit-scrollbar-thumb:hover,
+.futures-wrap::-webkit-scrollbar-thumb:hover,
+.futures-grid::-webkit-scrollbar-thumb:hover,
+.panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8bc1ff 0%, #3478c4 100%);
 }
 
 .market-list > .label,
@@ -31,34 +103,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 4px 5px 24px 0;
-  scrollbar-width: thin;
-  scrollbar-color: #315d91 transparent;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
-}
-
-.market-scroll::-webkit-scrollbar {
-  width: 7px;
-}
-
-.market-scroll::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 999px;
-}
-
-.market-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
-  border: 2px solid #060b12;
-  border-radius: 999px;
-  min-height: 42px;
-}
-
-.market-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #93c5fd, #3b82f6);
-}
-
-.market-scroll::-webkit-scrollbar-corner {
-  background: transparent;
 }
 
 .market-list button {
