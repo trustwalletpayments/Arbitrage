@@ -1,5 +1,10 @@
-/* ORBITEX branding: JSX now supplies the logo image, so do not add a second pseudo-element logo. */
-.brand,.mobile-brand,.orbitex-logo,.phone-brand,.orbitex-footer b{color:inherit!important;font-size:inherit!important;text-shadow:none!important;display:inline-flex!important;align-items:center;flex:0 0 auto;background:none!important}
-.brand,.mobile-brand,.orbitex-logo,.phone-brand,.orbitex-footer b{gap:8px}
-.brand img,.mobile-brand img,.orbitex-logo img,.phone-brand img,.orbitex-footer b img{width:30px;height:30px;object-fit:contain;flex:0 0 auto}
+/* ORBITEX branding: use the real logo asset consistently across every page. */
+.brand,.mobile-brand,.orbitex-logo,.phone-brand,.orbitex-footer b,.member-brand,.wallet-brand,.profile-brand,.appbar .brand,.transfer-brand,.auth-brand,.auth-logo,.page-brand{color:inherit!important;font-size:inherit!important;text-shadow:none!important;display:inline-flex!important;align-items:center;flex:0 0 auto;background:none!important;text-decoration:none!important;gap:9px}
+
+.brand::before,.mobile-brand::before,.orbitex-logo::before,.phone-brand::before,.orbitex-footer b::before,.member-brand::before,.wallet-brand::before,.profile-brand::before,.appbar .brand::before,.transfer-brand::before,.auth-brand::before,.auth-logo::before,.page-brand::before{content:"";display:inline-block;width:30px;height:30px;flex:0 0 30px;background:url('/orbitex-logo.svg') center/contain no-repeat}
+
+.brand img,.mobile-brand img,.orbitex-logo img,.phone-brand img,.orbitex-footer b img,.member-brand img,.wallet-brand img,.profile-brand img,.appbar .brand img,.transfer-brand img,.auth-brand img,.auth-logo img,.page-brand img{width:30px;height:30px;object-fit:contain;flex:0 0 auto}
+
+/* Remove placeholder dots/marks that previously appeared beside ORBITEX. */
+.wallet-brand .brand-mark,.brand>span,.appbar .brand>span,.profile-brand>span,.transfer-brand>span{font-size:0!important;line-height:0!important;width:0!important;margin:0!important;padding:0!important;display:none!important}
 .orbit-mark,.orbit-mini-mark{display:none!important}
