@@ -153,12 +153,6 @@ export default function Dashboard() {
             <div className="balance-number">{money} <small>USD <ChevronRight size={16} /></small></div>
             <div className="pnl-line"><span>Today's P&amp;L</span><strong>+$0.00 (+0.00%)</strong><ChevronRight size={17} /></div>
           </div>
-          <div className="hero-stats">
-            <div><span>Total assets</span><strong>{money}</strong></div>
-            <div><span>24h change</span><strong className="positive">0.00%</strong></div>
-            <div><span>Total profit</span><strong className="positive">$0.00</strong></div>
-            <div><span>Total orders</span><strong>0</strong></div>
-          </div>
         </section>
 
         <section className="quick-actions" aria-label="Account actions">
