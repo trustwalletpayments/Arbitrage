@@ -6,6 +6,7 @@ import MarketChart from "../components/MarketChart";
 import CoinIcon from "../components/CoinIcon";
 import {binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
+import "./spot-mobile.css";
 
 type MarketItem={symbol:string;baseAsset:string;quoteAsset:string;marketCapRank:number;coinId?:string;logo?:string};
 
@@ -21,6 +22,7 @@ export default function SpotPage(){
   const [pair,setPair]=useState("BTC/USDT");
   const [markets,setMarkets]=useState<MarketItem[]>([]);
   const [search,setSearch]=useState("");
+  const [expanded,setExpanded]=useState(false);
   const [side,setSide]=useState<"Buy"|"Sell">("Buy");
   const [type,setType]=useState<"Limit"|"Market">("Limit");
   const [price,setPrice]=useState("");
@@ -120,11 +122,13 @@ export default function SpotPage(){
       <Link className="btn" href="/dashboard">Account</Link>
     </header>
     <div className="trade-layout">
-      <aside className="market-list">
+      <aside className={`market-list ${expanded?"expanded":""}`}>
         <div className="label">SPOT MARKETS</div>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins..." aria-label="Search spot markets" style={{width:"100%",margin:"12px 0",padding:"11px 12px",borderRadius:10,border:"1px solid #263244",background:"#080d14",color:"#fff",outline:"none",boxSizing:"border-box"}}/>
+        <input className="spot-mobile-search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins or symbols..." aria-label="Search spot markets"/>
+        <input className="desktop-market-search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins..." aria-label="Search spot markets" style={{width:"100%",margin:"12px 0",padding:"11px 12px",borderRadius:10,border:"1px solid #263244",background:"#080d14",color:"#fff",outline:"none",boxSizing:"border-box"}}/>
         <div className="market-count" style={{color:"#687589",fontSize:11,marginBottom:8}}>{filteredMarkets.length} spot pairs</div>
         <div className="market-scroll">{filteredMarkets.map(item=>{const selected=displayPair(item.symbol)===pair;return <button key={`${item.symbol}-${item.marketCapRank}`} className={selected?"selected":""} onClick={()=>{const next=displayPair(item.symbol);setPair(next);window.history.replaceState(null,"",`/trade?pair=${encodeURIComponent(item.symbol)}`)}}><span style={{display:"inline-flex",alignItems:"center",gap:8,minWidth:0,overflow:"hidden"}}>{item.logo?<img src={item.logo} alt="" width={24} height={24} style={{borderRadius:"50%"}}/>:<CoinIcon symbol={item.baseAsset} size={24}/>}<span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.baseAsset}/USDT</span></span><small>#{item.marketCapRank}</small></button>})}</div>
+        <button type="button" className="spot-expand-button" onClick={()=>setExpanded(value=>!value)}>{expanded?"Collapse coins":"Expand all coins"}<span aria-hidden="true">{expanded?"⌃":"⌄"}</span></button>
       </aside>
       <section className="chart-area">
         <div className="trade-head"><div><div className="pair">{pair}</div><div className="price">{livePrice?formatPrice(livePrice):"—"} <span className={change<0?"danger":"up"}>{change>=0?"+":""}{change.toFixed(2)}%</span></div><div className="muted tiny">Live Binance spot market data</div></div><Link className="btn" href="/futures">Open Futures</Link></div>
