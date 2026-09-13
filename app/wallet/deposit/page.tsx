@@ -8,6 +8,7 @@ import "../wallet.css";
 import "./deposit.css";
 
 type Asset = { symbol: string; name: string; color: string };
+type Network = { id: string; name: string; short: string; logo: string };
 
 const ASSETS: Asset[] = [
   { symbol: "USDT", name: "Tether", color: "#26a17b" },
@@ -32,45 +33,89 @@ const ASSETS: Asset[] = [
   { symbol: "XLM", name: "Stellar", color: "#8b93a7" },
 ];
 
-const NETWORKS: Record<string, string[]> = {
-  USDT: ["BNB Smart Chain (BEP-20)", "Ethereum (ERC-20)", "Tron (TRC-20)"],
-  USDC: ["Ethereum (ERC-20)", "BNB Smart Chain (BEP-20)", "Solana"],
-  BTC: ["Bitcoin"],
-  ETH: ["Ethereum (ERC-20)"],
-  BNB: ["BNB Smart Chain (BEP-20)"],
-  SOL: ["Solana"],
-  XRP: ["XRP Ledger"],
-  ADA: ["Cardano"],
-  DOGE: ["Dogecoin"],
-  TRX: ["Tron (TRC-20)"],
-  AVAX: ["Avalanche C-Chain"],
-  LINK: ["Ethereum (ERC-20)"],
-  DOT: ["Polkadot"],
-  POL: ["Polygon"],
-  LTC: ["Litecoin"],
-  SHIB: ["Ethereum (ERC-20)"],
-  UNI: ["Ethereum (ERC-20)"],
-  BCH: ["Bitcoin Cash"],
-  ATOM: ["Cosmos"],
-  XLM: ["Stellar"],
+const NETWORKS: Record<string, Network[]> = {
+  USDT: [
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "tron", name: "Tron", short: "TRC-20", logo: "trx" },
+    { id: "aptos", name: "Aptos", short: "Aptos", logo: "apt" },
+    { id: "solana", name: "Solana", short: "Solana", logo: "sol" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "ton", name: "TON", short: "TON", logo: "ton" },
+    { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
+    { id: "near", name: "NEAR Protocol", short: "NEAR", logo: "near" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
+    { id: "sui", name: "Sui", short: "Sui", logo: "sui" },
+    { id: "base", name: "Base", short: "Base", logo: "base" },
+  ],
+  BTC: [
+    { id: "bitcoin", name: "Bitcoin", short: "BTC", logo: "btc" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+  ],
+  ETH: [
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
+    { id: "base", name: "Base", short: "Base", logo: "base" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "linea", name: "Linea", short: "Linea", logo: "linea" },
+  ],
+  BNB: [{ id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" }],
+  SOL: [{ id: "solana", name: "Solana", short: "Solana", logo: "sol" }],
+  XRP: [{ id: "xrp", name: "XRP Ledger", short: "XRP", logo: "xrp" }],
+  USDC: [
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "solana", name: "Solana", short: "Solana", logo: "sol" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "base", name: "Base", short: "Base", logo: "base" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
+  ],
+  ADA: [{ id: "cardano", name: "Cardano", short: "Cardano", logo: "ada" }],
+  DOGE: [{ id: "dogecoin", name: "Dogecoin", short: "DOGE", logo: "doge" }],
+  TRX: [{ id: "tron", name: "Tron", short: "TRC-20", logo: "trx" }],
+  AVAX: [{ id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" }],
+  LINK: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
+  DOT: [{ id: "polkadot", name: "Polkadot", short: "DOT", logo: "dot" }],
+  POL: [{ id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" }],
+  LTC: [{ id: "litecoin", name: "Litecoin", short: "LTC", logo: "ltc" }],
+  SHIB: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
+  UNI: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
+  BCH: [{ id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", logo: "bch" }],
+  ATOM: [{ id: "cosmos", name: "Cosmos", short: "ATOM", logo: "atom" }],
+  XLM: [{ id: "stellar", name: "Stellar", short: "XLM", logo: "xlm" }],
 };
 
 const DEMO_ADDRESSES: Record<string, string> = {
-  "BNB Smart Chain (BEP-20)": "0xORBITEX-DEMO-BEP20-ADDRESS",
-  "Ethereum (ERC-20)": "0xORBITEX-DEMO-ERC20-ADDRESS",
-  "Tron (TRC-20)": "T ORBITEX-DEMO-TRC20-ADDRESS".replace(" ", ""),
-  Bitcoin: "bc1qorbitexdemobitcoinaddress",
-  Solana: "ORBITEX-DEMO-SOLANA-ADDRESS",
-  "XRP Ledger": "rORBITEXDemoXrpAddress",
-  Cardano: "addr1orbitexdemocardanoaddress",
-  Dogecoin: "DORBITEXDemoDogecoinAddress",
-  "Avalanche C-Chain": "0xORBITEX-DEMO-AVAX-ADDRESS",
-  Polygon: "0xORBITEX-DEMO-POLYGON-ADDRESS",
-  Polkadot: "1ORBITEXDemoPolkadotAddress",
-  Litecoin: "ltc1orbitexdemolitecoinaddress",
-  "Bitcoin Cash": "bitcoincash:qorbitexdemoaddress",
-  Cosmos: "cosmos1orbitexdemocosmosaddress",
-  Stellar: "GORBITEXDEMOSTELLARADDRESS",
+  bsc: "0xORBITEX-DEMO-BEP20-ADDRESS",
+  eth: "0xORBITEX-DEMO-ERC20-ADDRESS",
+  tron: "TORBITEXDEMO-TRC20-ADDRESS",
+  aptos: "0xORBITEX-DEMO-APTOS-ADDRESS",
+  solana: "ORBITEX-DEMO-SOLANA-ADDRESS",
+  arbitrum: "0xORBITEX-DEMO-ARBITRUM-ADDRESS",
+  ton: "EQORBITEXDEMO-TON-ADDRESS",
+  optimism: "0xORBITEX-DEMO-OPTIMISM-ADDRESS",
+  near: "orbitex-demo.near",
+  polygon: "0xORBITEX-DEMO-POLYGON-ADDRESS",
+  avalanche: "0xORBITEX-DEMO-AVAX-ADDRESS",
+  sui: "0xORBITEX-DEMO-SUI-ADDRESS",
+  base: "0xORBITEX-DEMO-BASE-ADDRESS",
+  bitcoin: "bc1qorbitexdemobitcoinaddress",
+  linea: "0xORBITEX-DEMO-LINEA-ADDRESS",
+  xrp: "rORBITEXDemoXrpAddress",
+  cardano: "addr1orbitexdemocardanoaddress",
+  dogecoin: "DORBITEXDemoDogecoinAddress",
+  dogecoin: "DORBITEXDemoDogecoinAddress",
+  polkadot: "1ORBITEXDemoPolkadotAddress",
+  litecoin: "ltc1orbitexdemolitecoinaddress",
+  bitcoincash: "bitcoincash:qorbitexdemoaddress",
+  cosmos: "cosmos1orbitexdemocosmosaddress",
+  stellar: "GORBITEXDEMOSTELLARADDRESS",
 };
 
 function AssetLogo({ asset }: { asset: Asset }) {
@@ -81,10 +126,19 @@ function AssetLogo({ asset }: { asset: Asset }) {
   );
 }
 
+function NetworkLogo({ network }: { network: Network }) {
+  return (
+    <span className="deposit-network-logo">
+      <img src={`https://assets.coincap.io/assets/icons/${network.logo}@2x.png`} alt={`${network.name} logo`} />
+      <span>{network.short.slice(0, 2)}</span>
+    </span>
+  );
+}
+
 export default function DepositPage() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Asset>(ASSETS[0]);
-  const [network, setNetwork] = useState(NETWORKS.USDT[0]);
+  const [networkId, setNetworkId] = useState("bsc");
   const [copied, setCopied] = useState(false);
 
   const filteredAssets = useMemo(() => {
@@ -93,12 +147,13 @@ export default function DepositPage() {
     return ASSETS.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(value));
   }, [query]);
 
-  const selectedNetworks = NETWORKS[selected.symbol] ?? ["Network unavailable"];
-  const depositAddress = DEMO_ADDRESSES[network] ?? "ORBITEX-DEMO-DEPOSIT-ADDRESS";
+  const selectedNetworks = NETWORKS[selected.symbol] ?? [];
+  const selectedNetwork = selectedNetworks.find((item) => item.id === networkId) ?? selectedNetworks[0];
+  const depositAddress = DEMO_ADDRESSES[selectedNetwork?.id ?? ""] ?? "ORBITEX-DEMO-DEPOSIT-ADDRESS";
 
   function selectAsset(asset: Asset) {
     setSelected(asset);
-    setNetwork(NETWORKS[asset.symbol]?.[0] ?? "Network unavailable");
+    setNetworkId(NETWORKS[asset.symbol]?.[0]?.id ?? "");
     setCopied(false);
   }
 
@@ -120,7 +175,7 @@ export default function DepositPage() {
           <div>
             <span className="wallet-kicker">FUND YOUR ACCOUNT</span>
             <h1>Deposit</h1>
-            <p>Choose a supported asset and network to add funds to your Orbitex wallet.</p>
+            <p>Choose a crypto and the network you want to use for your deposit.</p>
           </div>
         </div>
 
@@ -145,14 +200,20 @@ export default function DepositPage() {
 
           <div className="deposit-details">
             <div className="selected-asset-heading"><AssetLogo asset={selected} /><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{selected.name} <em>{selected.symbol}</em></h2></div></div>
-            <p className="deposit-helper">Select the correct network before sending funds. Depositing through an unsupported network may permanently lose your funds.</p>
-            <label className="deposit-field-label" htmlFor="deposit-network">Network</label>
-            <select id="deposit-network" value={network} onChange={(event) => setNetwork(event.target.value)} className="deposit-network-select">
-              {selectedNetworks.map((item) => <option key={item}>{item}</option>)}
-            </select>
-            <div className="deposit-address-box"><span>Demo deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div>
+            <p className="deposit-helper">Select the network that matches the wallet or exchange you are sending from. Sending through the wrong network can permanently lose funds.</p>
+            <label className="deposit-field-label">Choose network</label>
+            <div className="deposit-network-list">
+              {selectedNetworks.map((item) => (
+                <button key={item.id} type="button" className={`deposit-network-option ${selectedNetwork?.id === item.id ? "selected" : ""}`} onClick={() => { setNetworkId(item.id); setCopied(false); }}>
+                  <NetworkLogo network={item} />
+                  <span><strong>{item.name}</strong><small>{item.short}</small></span>
+                  {selectedNetwork?.id === item.id && <Check size={17} className="asset-selected-check" />}
+                </button>
+              ))}
+            </div>
+            <div className="deposit-address-box"><span>{selectedNetwork?.name} deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div>
             <button className="primary-action deposit-continue" type="button"><ArrowDownToLine size={18} /> Deposit {selected.symbol}</button>
-            <div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Demo mode</strong> This address is for interface testing only. Do not send real funds until live deposit infrastructure is enabled.</span></div>
+            <div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Demo mode</strong> This address is for interface testing only. Live deposit addresses will be connected after the exchange wallet infrastructure is enabled.</span></div>
           </div>
         </section>
       </div>
