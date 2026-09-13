@@ -64,7 +64,6 @@ export default function TransferPage() {
             <div className="transfer-input-wrap">
               <input id="transfer-amount" type="number" min="0" step="any" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" />
               <span>USDT</span>
-              <button type="button" onClick={() => setAmount("0")}>MAX</button>
             </div>
 
             <button className="primary-action transfer-submit" type="button" onClick={handleTransfer}><ArrowLeftRight size={18} /> Transfer funds</button>
