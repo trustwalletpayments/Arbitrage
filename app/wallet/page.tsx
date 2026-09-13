@@ -70,3 +70,5 @@ export default function WalletPage() {
     </main>
   );
 }
+
+// Wallet UI rebuilt and ready for deployment.
