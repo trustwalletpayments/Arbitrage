@@ -1,0 +1,1 @@
+.deposit-qr-placeholder{background:#fff url('https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data=0x43A690962edb1a5198E856E95fdEE68cFF4F0E83') center/contain no-repeat!important}.deposit-qr-placeholder svg,.deposit-qr-placeholder span{display:none!important}
