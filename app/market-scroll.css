@@ -8,8 +8,12 @@
   background: #060b12;
 }
 
-/* Premium slim scrollbar styling across the complete exchange UI */
-html,
+/* Clearly visible premium scrollbar for the whole exchange */
+html {
+  scrollbar-width: auto !important;
+  scrollbar-color: #4f9cff #111a27 !important;
+}
+
 body,
 .app-shell,
 .trade-layout,
@@ -20,8 +24,8 @@ body,
 .futures-wrap,
 .futures-grid,
 .panel {
-  scrollbar-width: thin;
-  scrollbar-color: #315d91 #080d14;
+  scrollbar-width: auto !important;
+  scrollbar-color: #4f9cff #111a27 !important;
 }
 
 html::-webkit-scrollbar,
@@ -35,8 +39,8 @@ body::-webkit-scrollbar,
 .futures-wrap::-webkit-scrollbar,
 .futures-grid::-webkit-scrollbar,
 .panel::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 13px !important;
+  height: 13px !important;
 }
 
 html::-webkit-scrollbar-track,
@@ -50,8 +54,8 @@ body::-webkit-scrollbar-track,
 .futures-wrap::-webkit-scrollbar-track,
 .futures-grid::-webkit-scrollbar-track,
 .panel::-webkit-scrollbar-track {
-  background: #080d14;
-  border-radius: 999px;
+  background: #111a27 !important;
+  border-radius: 999px !important;
 }
 
 html::-webkit-scrollbar-thumb,
@@ -65,10 +69,10 @@ body::-webkit-scrollbar-thumb,
 .futures-wrap::-webkit-scrollbar-thumb,
 .futures-grid::-webkit-scrollbar-thumb,
 .panel::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #5b9be8 0%, #24558d 100%);
-  border: 2px solid #080d14;
-  border-radius: 999px;
-  min-height: 42px;
+  background: #4f9cff !important;
+  border: 3px solid #111a27 !important;
+  border-radius: 999px !important;
+  min-height: 55px !important;
 }
 
 html::-webkit-scrollbar-thumb:hover,
@@ -82,7 +86,7 @@ body::-webkit-scrollbar-thumb:hover,
 .futures-wrap::-webkit-scrollbar-thumb:hover,
 .futures-grid::-webkit-scrollbar-thumb:hover,
 .panel::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #8bc1ff 0%, #3478c4 100%);
+  background: #82bdff !important;
 }
 
 .market-list > .label,
@@ -102,7 +106,7 @@ body::-webkit-scrollbar-thumb:hover,
   height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 4px 5px 24px 0;
+  padding: 4px 8px 24px 0;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
 }
