@@ -1,0 +1,65 @@
+@media (max-width: 600px) {
+  .member-dashboard {
+    padding-bottom: 118px !important;
+  }
+
+  .member-main {
+    padding-bottom: 132px !important;
+  }
+
+  .content-grid {
+    gap: 12px !important;
+  }
+
+  .content-grid .asset-card,
+  .content-grid .activity-card {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .asset-card .section-heading,
+  .activity-card .section-heading {
+    padding-bottom: 10px !important;
+  }
+
+  .asset-card .asset-total {
+    padding: 14px 0 !important;
+  }
+
+  .asset-card .asset-total strong {
+    font-size: 28px !important;
+  }
+
+  .asset-card .asset-empty {
+    min-height: 0 !important;
+    padding: 22px 8px 20px !important;
+    gap: 8px !important;
+  }
+
+  .asset-card .asset-empty .empty-icon {
+    width: 44px !important;
+    height: 44px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .asset-card .asset-empty strong {
+    font-size: 17px !important;
+  }
+
+  .asset-card .asset-empty span {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    max-width: 270px !important;
+  }
+
+  .asset-card .asset-empty > a:last-child {
+    margin-top: 4px !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+  }
+
+  .activity-card .empty-activity {
+    min-height: 220px !important;
+    padding: 22px 10px !important;
+  }
+}
