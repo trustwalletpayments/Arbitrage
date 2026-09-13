@@ -64,9 +64,21 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "linea", name: "Linea", short: "Linea", logo: "linea" },
   ],
-  BNB: [{ id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" }],
-  SOL: [{ id: "solana", name: "Solana", short: "Solana", logo: "sol" }],
-  XRP: [{ id: "xrp", name: "XRP Ledger", short: "XRP", logo: "xrp" }],
+  BNB: [
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+  ],
+  SOL: [
+    { id: "solana", name: "Solana", short: "Solana", logo: "sol" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+  ],
+  XRP: [
+    { id: "xrp", name: "XRP Ledger", short: "XRP", logo: "xrp" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
   USDC: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
@@ -76,19 +88,78 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
   ],
-  ADA: [{ id: "cardano", name: "Cardano", short: "Cardano", logo: "ada" }],
-  DOGE: [{ id: "dogecoin", name: "Dogecoin", short: "DOGE", logo: "doge" }],
-  TRX: [{ id: "tron", name: "Tron", short: "TRC-20", logo: "trx" }],
-  AVAX: [{ id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" }],
-  LINK: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
-  DOT: [{ id: "polkadot", name: "Polkadot", short: "DOT", logo: "dot" }],
-  POL: [{ id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" }],
-  LTC: [{ id: "litecoin", name: "Litecoin", short: "LTC", logo: "ltc" }],
-  SHIB: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
-  UNI: [{ id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" }],
-  BCH: [{ id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", logo: "bch" }],
-  ATOM: [{ id: "cosmos", name: "Cosmos", short: "ATOM", logo: "atom" }],
-  XLM: [{ id: "stellar", name: "Stellar", short: "XLM", logo: "xlm" }],
+  ADA: [
+    { id: "cardano", name: "Cardano", short: "Cardano", logo: "ada" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  DOGE: [
+    { id: "dogecoin", name: "Dogecoin", short: "DOGE", logo: "doge" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  TRX: [
+    { id: "tron", name: "Tron", short: "TRC-20", logo: "trx" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  AVAX: [
+    { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+  ],
+  LINK: [
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
+    { id: "base", name: "Base", short: "Base", logo: "base" },
+  ],
+  DOT: [
+    { id: "polkadot", name: "Polkadot", short: "DOT", logo: "dot" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  POL: [
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+  ],
+  LTC: [
+    { id: "litecoin", name: "Litecoin", short: "LTC", logo: "ltc" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  SHIB: [
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+  ],
+  UNI: [
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
+    { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
+    { id: "base", name: "Base", short: "Base", logo: "base" },
+  ],
+  BCH: [
+    { id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", logo: "bch" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+  ],
+  ATOM: [
+    { id: "cosmos", name: "Cosmos Hub", short: "ATOM", logo: "atom" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+  ],
+  XLM: [
+    { id: "stellar", name: "Stellar", short: "XLM", logo: "xlm" },
+    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
+    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
+  ],
 };
 
 const DEMO_ADDRESSES: Record<string, string> = {
@@ -113,7 +184,7 @@ const DEMO_ADDRESSES: Record<string, string> = {
   polkadot: "1ORBITEXDemoPolkadotAddress",
   litecoin: "ltc1orbitexdemolitecoinaddress",
   bitcoincash: "bitcoincash:qorbitexdemoaddress",
-  cosmos: "cosmos1orbitexdemocosmosaddress",
+  cosmos: "cosmos1orbitexdemoaddress",
   stellar: "GORBITEXDEMOSTELLARADDRESS",
 };
 
