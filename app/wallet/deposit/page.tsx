@@ -35,7 +35,7 @@ const ASSETS: Asset[] = [
 function AssetLogo({ asset }: { asset: Asset }) {
   return (
     <span className="deposit-asset-logo" style={{ background: asset.color }}>
-      {asset.symbol === "BTC" ? "₿" : asset.symbol === "ETH" ? "◆" : asset.symbol.slice(0, 1)}
+      <img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={`${asset.name} logo`} />
     </span>
   );
 }
