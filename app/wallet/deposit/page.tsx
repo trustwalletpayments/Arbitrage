@@ -48,13 +48,13 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
     { id: "sui", name: "Sui", short: "Sui", logo: "sui" },
     { id: "base", name: "Base", short: "Base", logo: "base" },
+    { id: "linea", name: "Linea", short: "Linea", logo: "linea" },
+    { id: "fantom", name: "Fantom", short: "Fantom", logo: "ftm" },
+    { id: "celo", name: "Celo", short: "Celo", logo: "celo" },
+    { id: "mantle", name: "Mantle", short: "Mantle", logo: "mnt" },
+    { id: "zksync", name: "zkSync Era", short: "zkSync", logo: "zksync" },
   ],
-  BTC: [
-    { id: "bitcoin", name: "Bitcoin", short: "BTC", logo: "btc" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
-  ],
+  BTC: [{ id: "bitcoin", name: "Bitcoin Network", short: "BTC", logo: "btc" }],
   ETH: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
@@ -63,22 +63,12 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "base", name: "Base", short: "Base", logo: "base" },
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "linea", name: "Linea", short: "Linea", logo: "linea" },
+    { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
+    { id: "zksync", name: "zkSync Era", short: "zkSync", logo: "zksync" },
   ],
-  BNB: [
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
-  ],
-  SOL: [
-    { id: "solana", name: "Solana", short: "Solana", logo: "sol" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-  ],
-  XRP: [
-    { id: "xrp", name: "XRP Ledger", short: "XRP", logo: "xrp" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
+  BNB: [{ id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" }],
+  SOL: [{ id: "solana", name: "Solana", short: "Solana", logo: "sol" }],
+  XRP: [{ id: "xrp", name: "XRP Ledger", short: "XRP", logo: "xrp" }],
   USDC: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
@@ -87,28 +77,12 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "base", name: "Base", short: "Base", logo: "base" },
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
-  ],
-  ADA: [
-    { id: "cardano", name: "Cardano", short: "Cardano", logo: "ada" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
-  DOGE: [
-    { id: "dogecoin", name: "Dogecoin", short: "DOGE", logo: "doge" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
-  TRX: [
-    { id: "tron", name: "Tron", short: "TRC-20", logo: "trx" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
-  AVAX: [
     { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
   ],
+  ADA: [{ id: "cardano", name: "Cardano", short: "Cardano", logo: "ada" }],
+  DOGE: [{ id: "dogecoin", name: "Dogecoin", short: "DOGE", logo: "doge" }],
+  TRX: [{ id: "tron", name: "Tron", short: "TRC-20", logo: "trx" }],
+  AVAX: [{ id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" }],
   LINK: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
@@ -116,26 +90,20 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
     { id: "base", name: "Base", short: "Base", logo: "base" },
+    { id: "avalanche", name: "Avalanche C-Chain", short: "AVAX", logo: "avax" },
   ],
-  DOT: [
-    { id: "polkadot", name: "Polkadot", short: "DOT", logo: "dot" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
+  DOT: [{ id: "polkadot", name: "Polkadot", short: "DOT", logo: "dot" }],
   POL: [
     { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
   ],
-  LTC: [
-    { id: "litecoin", name: "Litecoin", short: "LTC", logo: "ltc" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
+  LTC: [{ id: "litecoin", name: "Litecoin", short: "LTC", logo: "ltc" }],
   SHIB: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
     { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
     { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", logo: "arb" },
+    { id: "polygon", name: "Polygon", short: "Polygon", logo: "pol" },
   ],
   UNI: [
     { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
@@ -145,21 +113,9 @@ const NETWORKS: Record<string, Network[]> = {
     { id: "optimism", name: "Optimism", short: "OP", logo: "op" },
     { id: "base", name: "Base", short: "Base", logo: "base" },
   ],
-  BCH: [
-    { id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", logo: "bch" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-  ],
-  ATOM: [
-    { id: "cosmos", name: "Cosmos Hub", short: "ATOM", logo: "atom" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-  ],
-  XLM: [
-    { id: "stellar", name: "Stellar", short: "XLM", logo: "xlm" },
-    { id: "eth", name: "Ethereum", short: "ERC-20", logo: "eth" },
-    { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", logo: "bnb" },
-  ],
+  BCH: [{ id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", logo: "bch" }],
+  ATOM: [{ id: "cosmos", name: "Cosmos Hub", short: "ATOM", logo: "atom" }],
+  XLM: [{ id: "stellar", name: "Stellar", short: "XLM", logo: "xlm" }],
 };
 
 const DEMO_ADDRESSES: Record<string, string> = {
