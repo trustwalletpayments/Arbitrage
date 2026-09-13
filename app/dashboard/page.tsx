@@ -24,6 +24,7 @@ import CoinIcon from "../components/CoinIcon";
 import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 import "./dashboard.css";
 import "./compact.css";
+import "./mobile-fix.css";
 
 type Market = { symbol: string; price: number; change: number };
 
