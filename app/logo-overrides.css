@@ -1,8 +1,8 @@
 /* ORBITEX branding: use the real logo asset consistently across every page. */
 .brand,.mobile-brand,.orbitex-logo,.phone-brand,.orbitex-footer b,.member-brand,.wallet-brand,.profile-brand,.appbar .brand,.transfer-brand,.auth-brand,.auth-logo,.page-brand{color:inherit!important;font-size:inherit!important;text-shadow:none!important;display:inline-flex!important;align-items:center;flex:0 0 auto;background:none!important;text-decoration:none!important;gap:9px}
 
-/* Text-only brand elements receive the shared logo image. */
-.brand::before,.mobile-brand::before,.member-brand::before,.wallet-brand::before,.profile-brand::before,.appbar .brand::before,.transfer-brand::before,.auth-brand::before,.auth-logo::before,.page-brand::before{content:"";display:inline-block;width:30px;height:30px;flex:0 0 30px;background:url('/orbitex-logo.svg') center/contain no-repeat}
+/* Text-only brand elements receive the shared logo image. Existing <img> logos are left untouched. */
+.brand:not(:has(img))::before,.mobile-brand:not(:has(img))::before,.member-brand:not(:has(img))::before,.wallet-brand:not(:has(img))::before,.profile-brand:not(:has(img))::before,.appbar .brand:not(:has(img))::before,.transfer-brand:not(:has(img))::before,.auth-brand:not(:has(img))::before,.auth-logo:not(:has(img))::before,.page-brand:not(:has(img))::before{content:"";display:inline-block;width:30px;height:30px;flex:0 0 30px;background:url('/orbitex-logo.svg') center/contain no-repeat}
 
 .brand img,.mobile-brand img,.orbitex-logo img,.phone-brand img,.orbitex-footer b img,.member-brand img,.wallet-brand img,.profile-brand img,.appbar .brand img,.transfer-brand img,.auth-brand img,.auth-logo img,.page-brand img{width:30px;height:30px;object-fit:contain;flex:0 0 auto}
 
