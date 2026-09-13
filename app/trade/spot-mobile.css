@@ -1,21 +1,21 @@
 .spot-mobile-search{display:none}
 .spot-expand-button{display:none}
 @media (max-width:760px){
-.trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
-.market-list{order:1;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;max-height:none;overflow:visible;background:#080d14}
-.market-list .market-scroll{max-height:0;overflow:hidden;transition:max-height .25s ease}
-.market-list.expanded .market-scroll{max-height:520px;overflow-y:auto}
-.market-list .market-scroll button{padding:12px 10px}
-.desktop-market-search{display:none!important}
-.spot-expand-button{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:12px;border:1px solid #263b54;border-radius:10px;background:#101d2d;color:#75b5ff;font-weight:700;font-size:14px;cursor:pointer}
-.spot-mobile-search{display:block;width:100%;margin:0 0 12px;padding:13px 14px;border:1px solid #263244;border-radius:10px;background:#070c13;color:#fff;outline:none;font-size:15px}
-.market-count{margin-bottom:0!important}
-.chart-area{order:2;padding:18px 14px 0}
-.chart-area .trade-head{align-items:flex-start;gap:12px}
-.chart-area .trade-head .btn{white-space:nowrap;padding:9px 10px;font-size:12px}
-.chart{min-height:360px;margin-top:14px}
-.live-chart{min-height:360px}
-.live-chart svg{height:300px}
-.order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
+  .trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
+  .market-list{order:1;display:block;width:100%;height:auto;min-height:0;max-height:none;box-sizing:border-box;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;overflow:visible;background:#080d14}
+  .market-list .market-scroll{display:none;height:auto;max-height:0;min-height:0;overflow:hidden;transition:max-height .25s ease}
+  .market-list.expanded .market-scroll{display:block;max-height:520px;overflow-y:auto}
+  .market-list .market-scroll button{padding:12px 10px}
+  .desktop-market-search{display:none!important}
+  .spot-expand-button{display:flex;width:100%;height:44px;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:12px 14px;border:1px solid #263b54;border-radius:10px;background:#101d2d;color:#75b5ff;font-weight:700;font-size:14px;cursor:pointer}
+  .spot-mobile-search{display:block;width:100%;height:44px;box-sizing:border-box;margin:0 0 12px;padding:13px 14px;border:1px solid #263244;border-radius:10px;background:#070c13;color:#fff;outline:none;font-size:15px}
+  .market-count{margin-bottom:0!important}
+  .chart-area{order:2;width:100%;box-sizing:border-box;padding:18px 14px 0}
+  .chart-area .trade-head{align-items:flex-start;gap:12px}
+  .chart-area .trade-head .btn{white-space:nowrap;padding:9px 10px;font-size:12px}
+  .chart{min-height:360px;margin-top:14px}
+  .live-chart{min-height:360px}
+  .live-chart svg{height:300px}
+  .order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
 }
 @media (min-width:761px){.market-list .market-scroll{max-height:none}.spot-mobile-search{display:none}.spot-expand-button{display:none}}
