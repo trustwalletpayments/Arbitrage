@@ -8,6 +8,8 @@ import MobileNav from "../../../components/MobileNav";
 import "../../wallet.css";
 import "../deposit.css";
 
+export const dynamic = "force-dynamic";
+
 const ADDRESSES: Record<string, string> = {
   bsc: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
   eth: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
