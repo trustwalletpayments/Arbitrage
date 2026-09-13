@@ -76,7 +76,6 @@ export default function ProfilePage() {
     <main className={`profile-page ${theme === "light" ? "theme-light" : ""} ${theme === "system" ? "theme-system" : ""}`}>
       <header className="profile-header">
         <Link href="/dashboard" className="back-link"><ArrowLeft size={18} /> Back to dashboard</Link>
-        <Link href="/dashboard" className="profile-brand"><span className="brand-mark">◉</span> ORBITEX<span className="brand-dot">.</span></Link>
         <button className="header-logout" onClick={logout}><LogOut size={17} /> Log out</button>
       </header>
 
@@ -92,12 +91,9 @@ export default function ProfilePage() {
         <section className="profile-content">
           <div className="profile-title">
             <div><span className="eyebrow">USER PROFILE</span><h1>Account settings</h1><p>Manage your account, security, preferences and referral rewards.</p></div>
-            <div className="theme-switcher"><button className={theme === "dark" ? "selected" : ""} onClick={() => setTheme("dark")}><Moon size={16} /> Dark</button><button className={theme === "light" ? "selected" : ""} onClick={() => setTheme("light")}><Sun size={16} /> Light</button><button className={theme === "system" ? "selected" : ""} onClick={() => setTheme("system")}><Monitor size={16} /> System</button></div>
           </div>
 
           {notice && <div className="profile-notice">{notice}<button onClick={() => setNotice("")}><X size={16} /></button></div>}
-
-          <div className="quick-actions" aria-label="Quick actions"><a href="#security"><ShieldCheck size={16} /> Security</a><a href="#preferences"><Sun size={16} /> Appearance</a><a href="#notifications"><Bell size={16} /> Notifications</a><a href="#referral"><Users size={16} /> Referrals</a></div>
 
           <section className="settings-card" id="account"><div className="card-heading"><div><span className="card-kicker">PROFILE</span><h2>Personal information</h2><p>Update the contact details connected to your account.</p></div><UserRound size={21} /></div><div className="setting-row"><div className="setting-icon"><Mail size={19} /></div><div className="setting-copy"><span>Email address</span><strong>{email || "Not available"}</strong></div><button className="outline-button" onClick={() => setShowEmail(!showEmail)}>{showEmail ? "Cancel" : "Change"}</button></div>{showEmail && <div className="inline-editor"><input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} type="email" placeholder="New email address" /><button onClick={updateEmail}>Save email</button></div>}<div className="setting-row"><div className="setting-icon"><Phone size={19} /></div><div className="setting-copy"><span>Phone number</span><strong>{phone || "Not added"}</strong></div><button className="outline-button" onClick={() => setShowPhone(!showPhone)}>{showPhone ? "Cancel" : phone ? "Change" : "Add"}</button></div>{showPhone && <div className="inline-editor"><input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} type="tel" placeholder="New phone number" /><button onClick={updatePhone}>Save number</button></div>}</section>
 
