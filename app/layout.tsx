@@ -12,6 +12,7 @@ import "./security-icon.css";
 import "./market-scroll.css";
 import "./trading-ui.css";
 import "./components/mobile-nav.css";
+import "./usdt-bnb-logo.css";
 import MobileNav from "./components/MobileNav";
 
 export const metadata: Metadata = { title: "ORBITEX Exchange", description: "ORBITEX crypto exchange platform" };
