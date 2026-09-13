@@ -1,19 +1,5 @@
-.market-list {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-  max-height: none;
-  overflow: hidden;
-  background: #060b12;
-}
-
-/* Clearly visible premium scrollbar for the whole exchange */
-html {
-  scrollbar-width: auto !important;
-  scrollbar-color: #4f9cff #111a27 !important;
-}
-
+/* Premium neutral scrollbar styling */
+html,
 body,
 .app-shell,
 .trade-layout,
@@ -25,7 +11,7 @@ body,
 .futures-grid,
 .panel {
   scrollbar-width: auto !important;
-  scrollbar-color: #4f9cff #111a27 !important;
+  scrollbar-color: #64748b #111827 !important;
 }
 
 html::-webkit-scrollbar,
@@ -39,8 +25,8 @@ body::-webkit-scrollbar,
 .futures-wrap::-webkit-scrollbar,
 .futures-grid::-webkit-scrollbar,
 .panel::-webkit-scrollbar {
-  width: 13px !important;
-  height: 13px !important;
+  width: 12px !important;
+  height: 12px !important;
 }
 
 html::-webkit-scrollbar-track,
@@ -54,7 +40,7 @@ body::-webkit-scrollbar-track,
 .futures-wrap::-webkit-scrollbar-track,
 .futures-grid::-webkit-scrollbar-track,
 .panel::-webkit-scrollbar-track {
-  background: #111a27 !important;
+  background: #111827 !important;
   border-radius: 999px !important;
 }
 
@@ -69,8 +55,8 @@ body::-webkit-scrollbar-thumb,
 .futures-wrap::-webkit-scrollbar-thumb,
 .futures-grid::-webkit-scrollbar-thumb,
 .panel::-webkit-scrollbar-thumb {
-  background: #4f9cff !important;
-  border: 3px solid #111a27 !important;
+  background: #64748b !important;
+  border: 3px solid #111827 !important;
   border-radius: 999px !important;
   min-height: 55px !important;
 }
@@ -86,7 +72,17 @@ body::-webkit-scrollbar-thumb:hover,
 .futures-wrap::-webkit-scrollbar-thumb:hover,
 .futures-grid::-webkit-scrollbar-thumb:hover,
 .panel::-webkit-scrollbar-thumb:hover {
-  background: #82bdff !important;
+  background: #94a3b8 !important;
+}
+
+.market-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  overflow: hidden;
+  background: #060b12;
 }
 
 .market-list > .label,
@@ -124,7 +120,7 @@ body::-webkit-scrollbar-thumb:hover,
 
 .market-list button.selected {
   background: linear-gradient(90deg, #10243b, #0d1827);
-  box-shadow: inset 3px 0 0 #3b9cff;
+  box-shadow: inset 3px 0 0 #64748b;
 }
 
 .trade-layout {
