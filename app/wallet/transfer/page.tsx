@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowLeftRight, CheckCircle2, Info, WalletCards } from "luci
 import { useState } from "react";
 import MobileNav from "../../components/MobileNav";
 import "../wallet.css";
+import "./transfer.css";
 
 export default function TransferPage() {
   const [amount, setAmount] = useState("");
@@ -73,7 +74,7 @@ export default function TransferPage() {
           <aside className="transfer-info-card">
             <div className="transfer-info-icon"><Info size={20} /></div>
             <h3>How your balances work</h3>
-            <div className="transfer-info-row"><span>Funding Wallet</span><strong>Deposit & withdraw</strong></div>
+            <div className="transfer-info-row"><span>Funding Wallet</span><strong>Deposit &amp; withdraw</strong></div>
             <div className="transfer-info-row"><span>Trading Balance</span><strong>Spot + Futures</strong></div>
             <div className="transfer-info-row"><span>Transfer time</span><strong>Usually instant</strong></div>
             <p>You do not need separate wallets to choose a market. Use the trading balance for either Spot or Futures, and return funds to Funding when needed.</p>
