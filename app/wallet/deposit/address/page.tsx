@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Copy, QrCode, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Copy, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import MobileNav from "../../../components/MobileNav";
 import "../../wallet.css";
@@ -20,7 +20,6 @@ const ADDRESSES: Record<string, string> = {
   polygon: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
   optimism: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
   base: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  avalanche: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
 };
 
 export default function DepositAddressPage() {
@@ -45,9 +44,11 @@ export default function DepositAddressPage() {
   }, []);
 
   const { asset, assetName, network, networkShort, networkId } = details;
-  const address = ADDRESSES[networkId] || ADDRESSES.bsc;
+  const address = ADDRESSES[networkId] || "";
+  const isBnbUsdt = asset === "USDT" && networkId === "bsc";
 
   async function copyAddress() {
+    if (!address) return;
     try {
       await navigator.clipboard.writeText(address);
     } catch {}
@@ -87,17 +88,28 @@ export default function DepositAddressPage() {
             </p>
           </div>
 
-          <div className="deposit-qr-placeholder">
-            <QrCode size={92} />
-            <span>QR code will be added here</span>
-          </div>
+          {isBnbUsdt ? (
+            <div className="deposit-qr-placeholder">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(address)}`}
+                alt="USDT on BNB Smart Chain deposit QR code"
+              />
+              <span>USDT on BNB Smart Chain</span>
+            </div>
+          ) : (
+            <div className="deposit-qr-placeholder deposit-qr-unavailable">
+              <span>QR code is available only for USDT on BNB Smart Chain.</span>
+            </div>
+          )}
 
           <div className="deposit-address-box">
             <span>{asset} on {network} — {networkShort} deposit address</span>
-            <strong>{address}</strong>
-            <button type="button" onClick={copyAddress}>
-              <Copy size={17} /> {copied ? "Copied" : "Copy address"}
-            </button>
+            <strong>{address || "Address not configured for this network"}</strong>
+            {address && (
+              <button type="button" onClick={copyAddress}>
+                <Copy size={17} /> {copied ? "Copied" : "Copy address"}
+              </button>
+            )}
           </div>
 
           <div className="deposit-security-note">
