@@ -32,6 +32,47 @@ const ASSETS: Asset[] = [
   { symbol: "XLM", name: "Stellar", color: "#8b93a7" },
 ];
 
+const NETWORKS: Record<string, string[]> = {
+  USDT: ["BNB Smart Chain (BEP-20)", "Ethereum (ERC-20)", "Tron (TRC-20)"],
+  USDC: ["Ethereum (ERC-20)", "BNB Smart Chain (BEP-20)", "Solana"],
+  BTC: ["Bitcoin"],
+  ETH: ["Ethereum (ERC-20)"],
+  BNB: ["BNB Smart Chain (BEP-20)"],
+  SOL: ["Solana"],
+  XRP: ["XRP Ledger"],
+  ADA: ["Cardano"],
+  DOGE: ["Dogecoin"],
+  TRX: ["Tron (TRC-20)"],
+  AVAX: ["Avalanche C-Chain"],
+  LINK: ["Ethereum (ERC-20)"],
+  DOT: ["Polkadot"],
+  POL: ["Polygon"],
+  LTC: ["Litecoin"],
+  SHIB: ["Ethereum (ERC-20)"],
+  UNI: ["Ethereum (ERC-20)"],
+  BCH: ["Bitcoin Cash"],
+  ATOM: ["Cosmos"],
+  XLM: ["Stellar"],
+};
+
+const DEMO_ADDRESSES: Record<string, string> = {
+  "BNB Smart Chain (BEP-20)": "0xORBITEX-DEMO-BEP20-ADDRESS",
+  "Ethereum (ERC-20)": "0xORBITEX-DEMO-ERC20-ADDRESS",
+  "Tron (TRC-20)": "T ORBITEX-DEMO-TRC20-ADDRESS".replace(" ", ""),
+  Bitcoin: "bc1qorbitexdemobitcoinaddress",
+  Solana: "ORBITEX-DEMO-SOLANA-ADDRESS",
+  "XRP Ledger": "rORBITEXDemoXrpAddress",
+  Cardano: "addr1orbitexdemocardanoaddress",
+  Dogecoin: "DORBITEXDemoDogecoinAddress",
+  "Avalanche C-Chain": "0xORBITEX-DEMO-AVAX-ADDRESS",
+  Polygon: "0xORBITEX-DEMO-POLYGON-ADDRESS",
+  Polkadot: "1ORBITEXDemoPolkadotAddress",
+  Litecoin: "ltc1orbitexdemolitecoinaddress",
+  "Bitcoin Cash": "bitcoincash:qorbitexdemoaddress",
+  Cosmos: "cosmos1orbitexdemocosmosaddress",
+  Stellar: "GORBITEXDEMOSTELLARADDRESS",
+};
+
 function AssetLogo({ asset }: { asset: Asset }) {
   return (
     <span className="deposit-asset-logo" style={{ background: asset.color }}>
@@ -43,7 +84,7 @@ function AssetLogo({ asset }: { asset: Asset }) {
 export default function DepositPage() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Asset>(ASSETS[0]);
-  const [network, setNetwork] = useState("Select network");
+  const [network, setNetwork] = useState(NETWORKS.USDT[0]);
   const [copied, setCopied] = useState(false);
 
   const filteredAssets = useMemo(() => {
@@ -52,9 +93,17 @@ export default function DepositPage() {
     return ASSETS.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(value));
   }, [query]);
 
+  const selectedNetworks = NETWORKS[selected.symbol] ?? ["Network unavailable"];
+  const depositAddress = DEMO_ADDRESSES[network] ?? "ORBITEX-DEMO-DEPOSIT-ADDRESS";
+
+  function selectAsset(asset: Asset) {
+    setSelected(asset);
+    setNetwork(NETWORKS[asset.symbol]?.[0] ?? "Network unavailable");
+    setCopied(false);
+  }
+
   async function copyAddress() {
-    const address = "Deposit address will appear after network activation";
-    try { await navigator.clipboard.writeText(address); } catch {}
+    try { await navigator.clipboard.writeText(depositAddress); } catch {}
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }
@@ -84,7 +133,7 @@ export default function DepositPage() {
             <label className="deposit-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by coin name or symbol" /></label>
             <div className="deposit-asset-grid">
               {filteredAssets.map((asset) => (
-                <button key={asset.symbol} type="button" className={`deposit-asset-option ${selected.symbol === asset.symbol ? "selected" : ""}`} onClick={() => setSelected(asset)}>
+                <button key={asset.symbol} type="button" className={`deposit-asset-option ${selected.symbol === asset.symbol ? "selected" : ""}`} onClick={() => selectAsset(asset)}>
                   <AssetLogo asset={asset} />
                   <span><strong>{asset.symbol}</strong><small>{asset.name}</small></span>
                   {selected.symbol === asset.symbol && <Check size={17} className="asset-selected-check" />}
@@ -99,15 +148,11 @@ export default function DepositPage() {
             <p className="deposit-helper">Select the correct network before sending funds. Depositing through an unsupported network may permanently lose your funds.</p>
             <label className="deposit-field-label" htmlFor="deposit-network">Network</label>
             <select id="deposit-network" value={network} onChange={(event) => setNetwork(event.target.value)} className="deposit-network-select">
-              <option>Select network</option>
-              <option>Ethereum (ERC-20)</option>
-              <option>BNB Smart Chain (BEP-20)</option>
-              <option>Tron (TRC-20)</option>
-              <option>Solana</option>
+              {selectedNetworks.map((item) => <option key={item}>{item}</option>)}
             </select>
-            <div className="deposit-address-box"><span>Deposit address</span><strong>{network === "Select network" ? "Select a network to continue" : "Address will appear when deposits are enabled"}</strong><button type="button" onClick={copyAddress} disabled={network === "Select network"}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div>
-            <button className="primary-action deposit-continue" type="button" disabled={network === "Select network"}><ArrowDownToLine size={18} /> Deposit {selected.symbol}</button>
-            <div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Deposit safely</strong> Confirm the asset and network match before transferring. Deposits are credited only after network confirmation.</span></div>
+            <div className="deposit-address-box"><span>Demo deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button></div>
+            <button className="primary-action deposit-continue" type="button"><ArrowDownToLine size={18} /> Deposit {selected.symbol}</button>
+            <div className="deposit-security-note"><ShieldCheck size={18} /><span><strong>Demo mode</strong> This address is for interface testing only. Do not send real funds until live deposit infrastructure is enabled.</span></div>
           </div>
         </section>
       </div>
