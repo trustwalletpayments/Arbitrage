@@ -22,25 +22,15 @@ const ADDRESSES: Record<string, string> = {
   base: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
 };
 
+const BNB_USDT_QR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA3AAAANwCAIAAADhiB+AAAAQAElEQVR4Aezd";
+
 export default function DepositAddressPage() {
-  const [details, setDetails] = useState({
-    asset: "USDT",
-    assetName: "Tether",
-    network: "BNB Smart Chain",
-    networkShort: "BEP-20",
-    networkId: "bsc",
-  });
+  const [details, setDetails] = useState({ asset: "USDT", assetName: "Tether", network: "BNB Smart Chain", networkShort: "BEP-20", networkId: "bsc" });
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setDetails({
-      asset: params.get("asset") || "USDT",
-      assetName: params.get("assetName") || "Tether",
-      network: params.get("network") || "BNB Smart Chain",
-      networkShort: params.get("networkShort") || "BEP-20",
-      networkId: params.get("networkId") || "bsc",
-    });
+    setDetails({ asset: params.get("asset") || "USDT", assetName: params.get("assetName") || "Tether", network: params.get("network") || "BNB Smart Chain", networkShort: params.get("networkShort") || "BEP-20", networkId: params.get("networkId") || "bsc" });
   }, []);
 
   const { asset, assetName, network, networkShort, networkId } = details;
@@ -49,9 +39,7 @@ export default function DepositAddressPage() {
 
   async function copyAddress() {
     if (!address) return;
-    try {
-      await navigator.clipboard.writeText(address);
-    } catch {}
+    try { await navigator.clipboard.writeText(address); } catch {}
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }
@@ -59,65 +47,36 @@ export default function DepositAddressPage() {
   return (
     <main className="wallet-page">
       <header className="wallet-header">
-        <Link href="/wallet" className="wallet-brand">
-          <span className="brand-mark">◉</span> ORBITEX
-        </Link>
-        <Link href="/wallet/deposit" className="history-link">
-          <ArrowLeft size={18} /> Back to Deposit
-        </Link>
+        <Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link>
+        <Link href="/wallet/deposit" className="history-link"><ArrowLeft size={18} /> Back to Deposit</Link>
       </header>
-
       <div className="wallet-content deposit-content">
         <div className="wallet-heading">
           <span className="wallet-kicker">FUND YOUR ACCOUNT</span>
           <h1>Deposit {asset}</h1>
           <p>Send only {asset} through the selected network to the address below.</p>
         </div>
-
         <section className="deposit-address-page-card">
-          <Link href="/wallet/deposit" className="mobile-back-button">
-            <ArrowLeft size={17} /> Choose another network
-          </Link>
-
+          <Link href="/wallet/deposit" className="mobile-back-button"><ArrowLeft size={17} /> Choose another network</Link>
           <div className="deposit-address-title">
             <span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span>
             <h2>{assetName} ({asset})</h2>
-            <p>
-              This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>.
-              Only send {asset} using this exact network.
-            </p>
+            <p>This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>. Only send {asset} using this exact network.</p>
           </div>
-
           {isBnbUsdt ? (
             <div className="deposit-qr-placeholder">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(address)}`}
-                alt="USDT on BNB Smart Chain deposit QR code"
-              />
+              <img src={BNB_USDT_QR} alt="USDT on BNB Smart Chain deposit QR code" style={{ display: "block", width: "220px", height: "220px", objectFit: "contain" }} />
               <span>USDT on BNB Smart Chain</span>
             </div>
           ) : (
-            <div className="deposit-qr-placeholder deposit-qr-unavailable">
-              <span>QR code is available only for USDT on BNB Smart Chain.</span>
-            </div>
+            <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain.</span></div>
           )}
-
           <div className="deposit-address-box">
             <span>{asset} on {network} — {networkShort} deposit address</span>
             <strong>{address || "Address not configured for this network"}</strong>
-            {address && (
-              <button type="button" onClick={copyAddress}>
-                <Copy size={17} /> {copied ? "Copied" : "Copy address"}
-              </button>
-            )}
+            {address && <button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button>}
           </div>
-
-          <div className="deposit-security-note">
-            <ShieldCheck size={18} />
-            <span>
-              Network warning: sending another asset or using a different network may permanently result in lost funds.
-            </span>
-          </div>
+          <div className="deposit-security-note"><ShieldCheck size={18} /><span>Network warning: sending another asset or using a different network may permanently result in lost funds.</span></div>
         </section>
       </div>
       <MobileNav />
