@@ -6,6 +6,6 @@
 
 .brand img,.mobile-brand img,.orbitex-logo img,.phone-brand img,.orbitex-footer b img,.member-brand img,.wallet-brand img,.profile-brand img,.appbar .brand img,.transfer-brand img,.auth-brand img,.auth-logo img,.page-brand img{width:30px;height:30px;object-fit:contain;flex:0 0 auto}
 
-/* Remove placeholder dots/marks that previously appeared beside ORBITEX. */
-.wallet-brand .brand-mark,.brand>span,.appbar .brand>span,.profile-brand>span,.transfer-brand>span{font-size:0!important;line-height:0!important;width:0!important;margin:0!important;padding:0!important;display:none!important}
+/* Remove the old placeholder wallet mark. */
+.wallet-brand .brand-mark{display:none!important}
 .orbit-mark,.orbit-mini-mark{display:none!important}
