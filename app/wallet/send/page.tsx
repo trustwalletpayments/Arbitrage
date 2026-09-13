@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpFromLine, Check, Search, ShieldCheck, Wallet } from "
 import { useMemo, useState } from "react";
 import "../../wallet.css";
 import "../deposit/deposit.css";
+import "./send.css";
 
 type Asset = { symbol: string; name: string; color: string };
 type Network = { id: string; name: string; short: string; logo: string };
