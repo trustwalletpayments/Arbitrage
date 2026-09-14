@@ -24,19 +24,20 @@
 }
 @media (min-width:761px){
   .spot-expand-button{display:none!important}
-  .app-shell{height:100vh;min-height:0;overflow:hidden}
+  /* Keep Spot vertically scrollable. The old fixed 100vh shell trapped the page after client-side navigation. */
+  .app-shell{height:auto!important;min-height:100vh;overflow:visible!important}
   .app-shell .appbar{height:64px;padding-left:28px;padding-right:28px}
-  .app-shell .trade-layout{height:calc(100vh - 64px);min-height:0;grid-template-columns:180px minmax(0,1fr) 300px;overflow:hidden}
-  .app-shell .market-list{height:100%;max-height:none;min-height:0;overflow-y:auto;padding:18px 10px}
-  .app-shell .chart-area{min-width:0;min-height:0;padding:10px 12px 8px;overflow:hidden;display:flex;flex-direction:column}
+  .app-shell .trade-layout{height:auto!important;min-height:calc(100vh - 64px);grid-template-columns:180px minmax(0,1fr) 300px;overflow:visible!important}
+  .app-shell .market-list{height:auto;max-height:calc(100vh - 64px);min-height:0;overflow-y:auto;padding:18px 10px}
+  .app-shell .chart-area{min-width:0;min-height:0;padding:10px 12px 8px;overflow:visible;display:flex;flex-direction:column}
   .app-shell .chart-area .trade-head{margin-bottom:4px;flex:0 0 auto}
   .app-shell .chart-area .pair{font-size:17px}
   .app-shell .chart-area .price{font-size:22px;margin-top:4px}
-  .app-shell .chart-area .chart{min-height:0!important;height:auto!important;flex:1 1 auto;margin-top:6px;overflow:hidden}
-  .app-shell .chart-area .live-chart{min-height:0!important;height:100%!important;max-height:none;overflow:hidden}
+  .app-shell .chart-area .chart{min-height:0!important;height:500px!important;flex:0 0 500px;margin-top:6px;overflow:hidden}
+  .app-shell .chart-area .live-chart{min-height:0!important;height:500px!important;max-height:none;overflow:hidden}
   .app-shell .chart-area .live-chart .chart-toolbar{height:40px!important;min-height:40px!important}
   .app-shell .chart-area .live-chart .tradingview-widget-container{min-height:0!important;overflow:hidden}
-  .app-shell .order-panel{min-width:0;min-height:0;height:100%;max-height:100%;overflow-y:auto!important;overflow-x:hidden!important;padding:10px!important;scrollbar-width:thin;scrollbar-color:#334155 transparent}
+  .app-shell .order-panel{min-width:0;min-height:0;height:auto;max-height:none;overflow-y:visible!important;overflow-x:hidden!important;padding:10px!important;scrollbar-width:thin;scrollbar-color:#334155 transparent}
   .app-shell .order-panel::-webkit-scrollbar{width:6px}
   .app-shell .order-panel::-webkit-scrollbar-track{background:transparent}
   .app-shell .order-panel::-webkit-scrollbar-thumb{background:#334155;border-radius:999px}
