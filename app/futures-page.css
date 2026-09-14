@@ -1,0 +1,31 @@
+/* ORBITEX Futures page redesign */
+.futures-wrap{max-width:1440px!important;margin:0 auto!important;padding:28px 32px 40px!important}
+.futures-wrap>.trade-head{padding:10px 0 22px;align-items:flex-end}
+.futures-wrap>.trade-head .pair{display:flex;align-items:center;gap:10px;font-size:27px;letter-spacing:-.5px}
+.futures-wrap>.trade-head .price{font-size:32px;letter-spacing:-.8px;margin-top:12px}
+.futures-wrap>.trade-head .tiny{font-size:12px;margin-top:6px}
+.futures-wrap>.trade-head .leverage{display:grid;gap:8px;color:#aeb9c8;font-size:14px;font-weight:600;min-width:180px}
+.futures-wrap>.trade-head .leverage select{height:46px;font-size:15px;border-radius:10px}
+.futures-wrap>.market-list{display:flex!important;align-items:center;gap:8px!important;overflow-x:auto!important;overflow-y:hidden!important;margin:0 0 18px!important;padding:8px!important;border:1px solid #1b2b40;border-radius:12px;background:linear-gradient(90deg,#0b1420,#0a111b);scrollbar-width:thin}
+.futures-wrap>.market-list button{width:auto!important;min-width:126px!important;flex:0 0 auto!important;display:inline-flex!important;align-items:center;justify-content:flex-start!important;gap:8px;padding:12px 14px!important;border:1px solid transparent!important;background:transparent!important;color:#8fa0b5!important;border-radius:9px!important;font-size:13px!important;white-space:nowrap!important}
+.futures-wrap>.market-list button:hover{background:#101e2e!important;color:#dce8f8!important;border-color:#23476e!important}
+.futures-wrap>.market-list button.selected{background:#122b48!important;border-color:#2d83e8!important;color:#fff!important;box-shadow:0 0 16px #1477d51c}
+.futures-grid{grid-template-columns:minmax(0,1fr) 360px!important;gap:20px!important;align-items:stretch}
+.futures-grid>div:first-child{min-width:0}
+.futures-grid .chart{height:clamp(430px,calc(100vh - 390px),650px)!important;min-height:430px!important;margin-top:0!important;border-radius:14px!important;background:#080e16!important;border-color:#1b2b40!important}
+.futures-grid .chart span{bottom:14px;margin-top:0;color:#61748c}
+.futures-grid .panel{margin-top:16px!important;border-radius:14px!important;background:#0a111b!important;border-color:#1b2b40!important;padding:18px!important}
+.futures-grid .panel .trade-head{margin-bottom:8px}
+.futures-grid .panel .asset-row{padding:13px 0}
+.futures-grid .order-panel{height:clamp(430px,calc(100vh - 300px),720px)!important;max-height:720px!important;overflow-y:auto!important;overflow-x:hidden!important;padding:20px!important;border-radius:14px!important;background:linear-gradient(180deg,#0c1521,#09111a)!important;border-color:#243a55!important;scrollbar-width:thin;scrollbar-color:#2b4868 transparent}
+.futures-grid .order-panel::-webkit-scrollbar{width:6px}.futures-grid .order-panel::-webkit-scrollbar-thumb{background:#2b4868;border-radius:10px}
+.futures-grid .order-panel .tabs{margin-bottom:16px;border:1px solid #243a55;border-radius:10px;padding:4px;background:#080f18}
+.futures-grid .order-panel .tabs button{padding:11px;border-radius:7px;font-size:15px;font-weight:700}
+.futures-grid .order-panel .tabs button.on{background:#16365a;color:#fff;border-bottom:0}
+.futures-grid .order-panel label{gap:7px;margin:12px 0;color:#aebdd0;font-size:12px;font-weight:600}
+.futures-grid .order-panel input,.futures-grid .order-panel select{min-height:42px;padding:10px 12px;border-radius:9px}
+.futures-grid .order-panel .two-input{gap:10px}
+.futures-grid .order-panel .order-info{margin:15px 0;padding-top:12px;border-top:1px solid #1d2b3c;font-size:12px}
+.futures-grid .order-panel .btn.primary{min-height:46px;border-radius:9px;font-size:15px;font-weight:700}
+@media(max-width:900px){.futures-wrap{padding:20px 16px 90px!important}.futures-wrap>.trade-head{align-items:flex-start;gap:18px}.futures-wrap>.trade-head .pair{font-size:23px}.futures-wrap>.trade-head .price{font-size:28px}.futures-wrap>.trade-head .leverage{min-width:145px}.futures-grid{grid-template-columns:1fr!important}.futures-grid .chart{height:420px!important;min-height:420px!important}.futures-grid .order-panel{height:auto!important;max-height:none!important;overflow:visible!important}.futures-grid .panel{margin-bottom:0!important}}
+@media(max-width:560px){.futures-wrap{padding:14px 12px 90px!important}.futures-wrap>.trade-head{display:flex;flex-direction:column;padding-bottom:14px}.futures-wrap>.trade-head .leverage{width:100%;min-width:0}.futures-wrap>.market-list{margin-bottom:12px!important}.futures-wrap>.market-list button{min-width:112px!important;padding:10px 11px!important}.futures-grid .chart{height:330px!important;min-height:330px!important}.futures-grid .order-panel{padding:16px!important}.futures-grid .order-panel .two-input{grid-template-columns:1fr}.futures-grid .panel{padding:14px!important}}
