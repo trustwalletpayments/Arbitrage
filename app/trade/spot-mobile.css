@@ -13,9 +13,13 @@
   .chart-area{order:2;width:100%;box-sizing:border-box;padding:18px 14px 0}
   .chart-area .trade-head{align-items:flex-start;gap:12px}
   .chart-area .trade-head .btn{white-space:nowrap;padding:9px 10px;font-size:12px}
-  .chart{min-height:360px;margin-top:14px}
-  .live-chart{min-height:360px}
-  .live-chart svg{height:300px}
+  .chart-area .chart{height:430px!important;min-height:430px!important;max-height:430px!important;margin-top:14px;flex:none!important}
+  .chart-area .live-chart{height:430px!important;min-height:430px!important;max-height:430px!important;flex:none!important;overflow:hidden!important}
+  .chart-area .live-chart .chart-toolbar{height:44px!important;min-height:44px!important;flex:0 0 44px!important;overflow:hidden!important;white-space:nowrap}
+  .chart-area .live-chart .tradingview-widget-container{height:386px!important;min-height:0!important;max-height:386px!important;flex:0 0 386px!important;width:100%!important;overflow:hidden!important;position:relative!important}
+  .chart-area .live-chart .tradingview-widget-container__widget{height:100%!important;min-height:0!important;width:100%!important;overflow:hidden!important}
+  .chart-area .live-chart iframe{display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;border:0!important}
+  .chart-area .live-chart .chart-placeholder{inset:44px 0 0!important;height:auto!important}
   .order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
 }
 @media (min-width:761px){
