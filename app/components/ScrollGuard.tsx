@@ -20,8 +20,9 @@ function restorePageScroll() {
     body.classList.remove(className);
   });
 
-  // Clear only scroll-lock styles. Do not force position/height, because that
-  // can interfere with Next.js route transitions and the browser scroll root.
+  // Remove only temporary inline locks left by dialogs or previous routes.
+  // Do not set overflow-y: auto here because it can fight route CSS and create
+  // a stale scroll root after navigating between Spot, Futures, and Markets.
   [html, body].forEach((element) => {
     element.style.removeProperty("overflow");
     element.style.removeProperty("overflow-y");
@@ -32,8 +33,8 @@ function restorePageScroll() {
     element.style.removeProperty("touch-action");
   });
 
-  html.style.setProperty("overflow-y", "auto");
-  body.style.setProperty("overflow-y", "auto");
+  html.classList.remove("no-scroll", "modal-open", "scroll-locked");
+  body.classList.remove("no-scroll", "modal-open", "scroll-locked");
 }
 
 export default function ScrollGuard() {
