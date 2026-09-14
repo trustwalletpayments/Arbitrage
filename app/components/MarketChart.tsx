@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect,useRef,useState} from "react";
-import {binanceSymbol} from "../../lib/market-data";
+import {binanceSymbol,formatPrice} from "../../lib/market-data";
 
 type ChartInterval="1m"|"15m"|"1h"|"4h"|"1d";
 
@@ -12,6 +12,20 @@ const tradingViewInterval:Record<ChartInterval,string>={
   "4h":"240",
   "1d":"D",
 };
+
+function syncFuturesHeaderPrice(symbol:string,price:number){
+  if(typeof document==="undefined"||!Number.isFinite(price)||price<=0)return;
+  const header=document.querySelector<HTMLElement>(".trade-head .price");
+  if(!header)return;
+  const selected=header.dataset.priceSymbol;
+  if(selected&&selected!==symbol)return;
+  header.dataset.priceSymbol=symbol;
+  header.replaceChildren(document.createTextNode(`${formatPrice(price)} `));
+  const live=document.createElement("span");
+  live.className="up";
+  live.textContent="LIVE";
+  header.appendChild(live);
+}
 
 export default function MarketChart({pair}:{pair:string}){
   const containerRef=useRef<HTMLDivElement|null>(null);
@@ -67,6 +81,30 @@ export default function MarketChart({pair}:{pair:string}){
       if(containerRef.current)containerRef.current.innerHTML="";
     };
   },[symbol,interval]);
+
+  useEffect(()=>{
+    let cancelled=false;
+    let socket:WebSocket|undefined;
+    const apply=(value:number)=>{
+      if(cancelled||!Number.isFinite(value)||value<=0)return;
+      syncFuturesHeaderPrice(symbol,value);
+    };
+
+    fetch(`https://fapi.binance.com/fapi/v1/ticker/price?symbol=${symbol}`,{cache:"no-store"})
+      .then(response=>response.ok?response.json():null)
+      .then(data=>{const value=Number(data?.price);if(value>0)apply(value)})
+      .catch(()=>{});
+
+    try{
+      socket=new WebSocket(`wss://fstream.binance.com/ws/${symbol.toLowerCase()}@markPrice@1s`);
+      socket.onmessage=event=>{try{apply(Number(JSON.parse(event.data)?.p))}catch{}};
+    }catch{}
+
+    return()=>{
+      cancelled=true;
+      socket?.close();
+    };
+  },[symbol]);
 
   const intervals:ChartInterval[]=["1m","15m","1h","4h","1d"];
 
