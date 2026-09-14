@@ -20,21 +20,15 @@ function restorePageScroll() {
     body.classList.remove(className);
   });
 
-  // Remove only temporary inline locks left by dialogs or previous routes.
-  // Do not set overflow-y: auto here because it can fight route CSS and create
-  // a stale scroll root after navigating between Spot, Futures, and Markets.
   [html, body].forEach((element) => {
-    element.style.removeProperty("overflow");
-    element.style.removeProperty("overflow-y");
-    element.style.removeProperty("overflow-x");
+    element.removeAttribute("data-scroll-locked");
     element.style.removeProperty("position");
     element.style.removeProperty("height");
     element.style.removeProperty("max-height");
     element.style.removeProperty("touch-action");
+    element.style.setProperty("overflow-y", "auto", "important");
+    element.style.setProperty("overflow-x", "hidden", "important");
   });
-
-  html.classList.remove("no-scroll", "modal-open", "scroll-locked");
-  body.classList.remove("no-scroll", "modal-open", "scroll-locked");
 }
 
 export default function ScrollGuard() {
@@ -51,17 +45,19 @@ export default function ScrollGuard() {
         restorePageScroll();
         secondFrame = window.requestAnimationFrame(restorePageScroll);
       });
-      timeout = window.setTimeout(restorePageScroll, 250);
+      timeout = window.setTimeout(restorePageScroll, 350);
     };
 
     restore();
     window.addEventListener("pageshow", restore);
+    window.addEventListener("popstate", restore);
 
     return () => {
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(secondFrame);
       window.clearTimeout(timeout);
       window.removeEventListener("pageshow", restore);
+      window.removeEventListener("popstate", restore);
     };
   }, [pathname]);
 
