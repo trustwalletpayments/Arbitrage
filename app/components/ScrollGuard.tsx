@@ -3,35 +3,54 @@
 import {useEffect} from "react";
 import {usePathname} from "next/navigation";
 
-export default function ScrollGuard(){
-  const pathname=usePathname();
+const LOCK_CLASSES = ["no-scroll", "modal-open", "scroll-locked", "overflow-hidden"];
 
-  useEffect(()=>{
-    const html=document.documentElement;
-    const body=document.body;
+function restorePageScroll() {
+  const html = document.documentElement;
+  const body = document.body;
 
-    html.classList.remove("no-scroll","modal-open","scroll-locked");
-    body.classList.remove("no-scroll","modal-open","scroll-locked");
+  LOCK_CLASSES.forEach((className) => {
+    html.classList.remove(className);
+    body.classList.remove(className);
+  });
 
-    html.style.removeProperty("overflow");
-    html.style.removeProperty("overflow-y");
-    html.style.removeProperty("position");
-    html.style.removeProperty("height");
-    body.style.removeProperty("overflow");
-    body.style.removeProperty("overflow-y");
-    body.style.removeProperty("position");
-    body.style.removeProperty("height");
+  [html, body].forEach((element) => {
+    element.style.removeProperty("overflow");
+    element.style.removeProperty("overflow-y");
+    element.style.removeProperty("position");
+    element.style.removeProperty("height");
+    element.style.removeProperty("touch-action");
+  });
 
-    html.style.overflowY="auto";
-    body.style.overflowY="auto";
-    body.style.touchAction="auto";
+  html.style.setProperty("overflow-y", "auto");
+  body.style.setProperty("overflow-y", "auto");
+  body.style.setProperty("touch-action", "auto");
+}
 
-    return()=>{
-      html.style.removeProperty("overflow-y");
-      body.style.removeProperty("overflow-y");
-      body.style.removeProperty("touch-action");
+export default function ScrollGuard() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    let frame = 0;
+    let timeout = 0;
+
+    const restore = () => {
+      restorePageScroll();
+      frame = window.requestAnimationFrame(() => restorePageScroll());
+      timeout = window.setTimeout(() => restorePageScroll(), 120);
     };
-  },[pathname]);
+
+    restore();
+    window.addEventListener("pageshow", restore);
+    window.addEventListener("popstate", restore);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+      window.removeEventListener("pageshow", restore);
+      window.removeEventListener("popstate", restore);
+    };
+  }, [pathname]);
 
   return null;
 }
