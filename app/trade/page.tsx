@@ -103,6 +103,15 @@ export default function SpotPage(){
     return orderPrice>0&&usdt>0?(usdt/orderPrice).toFixed(8):"0.00000000";
   },[orderPrice,quoteAmount]);
 
+  function selectMarket(next:string){
+    setPair(next);
+    setExpanded(false);
+    window.history.replaceState(null,"",`/trade?pair=${encodeURIComponent(next.replace("/",""))}`);
+    window.requestAnimationFrame(()=>{
+      document.querySelector(".chart-area")?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
+
   async function submit(){
     setMessage("");
     const usdt=Number(quoteAmount);
@@ -136,7 +145,7 @@ export default function SpotPage(){
         <input className="spot-mobile-search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins or symbols..." aria-label="Search spot markets"/>
         <input className="desktop-market-search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search coins..." aria-label="Search spot markets" style={{width:"100%",margin:"12px 0",padding:"11px 12px",borderRadius:10,border:"1px solid #263244",background:"#080d14",color:"#fff",outline:"none",boxSizing:"border-box"}}/>
         <div className="market-count" style={{color:"#687589",fontSize:11,marginBottom:8}}>{filteredMarkets.length} spot pairs</div>
-        <div className="market-scroll">{filteredMarkets.map(item=>{const selected=displayPair(item.symbol)===pair;return <button key={`${item.symbol}-${item.marketCapRank}`} className={selected?"selected":""} onClick={()=>{const next=displayPair(item.symbol);setPair(next);window.history.replaceState(null,"",`/trade?pair=${encodeURIComponent(item.symbol)}`)}}><span style={{display:"inline-flex",alignItems:"center",gap:8,minWidth:0,overflow:"hidden"}}>{item.logo?<img src={item.logo} alt="" width={24} height={24} style={{borderRadius:"50%"}}/>:<CoinIcon symbol={item.baseAsset} size={24}/>}<span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.baseAsset}/USDT</span></span><small>#{item.marketCapRank}</small></button>})}</div>
+        <div className="market-scroll">{filteredMarkets.map(item=>{const selected=displayPair(item.symbol)===pair;return <button key={`${item.symbol}-${item.marketCapRank}`} className={selected?"selected":""} onClick={()=>selectMarket(displayPair(item.symbol))}><span style={{display:"inline-flex",alignItems:"center",gap:8,minWidth:0,overflow:"hidden"}}>{item.logo?<img src={item.logo} alt="" width={24} height={24} style={{borderRadius:"50%"}}/>:<CoinIcon symbol={item.baseAsset} size={24}/>}<span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.baseAsset}/USDT</span></span><small>#{item.marketCapRank}</small></button>})}</div>
         <button type="button" className="spot-expand-button" onClick={()=>setExpanded(value=>!value)}>{expanded?"Collapse coins":"Expand all coins"}<span aria-hidden="true">{expanded?"⌃":"⌄"}</span></button>
       </aside>
       <section className="chart-area">
