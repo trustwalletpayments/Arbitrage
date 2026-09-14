@@ -17,8 +17,10 @@ function syncFuturesHeaderPrice(symbol:string,price:number){
   if(typeof document==="undefined"||!Number.isFinite(price)||price<=0)return;
   const header=document.querySelector<HTMLElement>(".trade-head .price");
   if(!header)return;
-  const selected=header.dataset.priceSymbol;
-  if(selected&&selected!==symbol)return;
+
+  // Always replace the displayed value for the currently mounted market.
+  // The previous data-priceSymbol guard could permanently keep the old
+  // coin's price after switching from BTC to another futures pair.
   header.dataset.priceSymbol=symbol;
   header.replaceChildren(document.createTextNode(`${formatPrice(price)} `));
   const live=document.createElement("span");
