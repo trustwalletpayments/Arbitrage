@@ -14,17 +14,17 @@ function restorePageScroll() {
     body.classList.remove(className);
   });
 
-  [html, body].forEach((element) => {
-    element.style.removeProperty("overflow");
-    element.style.removeProperty("overflow-y");
-    element.style.removeProperty("position");
-    element.style.removeProperty("height");
-    element.style.removeProperty("touch-action");
-  });
+  html.classList.add("orbitex-scroll-enabled");
+  body.classList.add("orbitex-scroll-enabled");
 
-  html.style.setProperty("overflow-y", "auto");
-  body.style.setProperty("overflow-y", "auto");
-  body.style.setProperty("touch-action", "auto");
+  [html, body].forEach((element) => {
+    element.style.setProperty("overflow", "visible", "important");
+    element.style.setProperty("overflow-y", "auto", "important");
+    element.style.setProperty("position", "static", "important");
+    element.style.setProperty("height", "auto", "important");
+    element.style.setProperty("min-height", "100%", "important");
+    element.style.setProperty("touch-action", "auto", "important");
+  });
 }
 
 export default function ScrollGuard() {
@@ -33,22 +33,33 @@ export default function ScrollGuard() {
   useEffect(() => {
     let frame = 0;
     let timeout = 0;
+    let observer: MutationObserver | null = null;
 
     const restore = () => {
       restorePageScroll();
       frame = window.requestAnimationFrame(() => restorePageScroll());
-      timeout = window.setTimeout(() => restorePageScroll(), 120);
+      timeout = window.setTimeout(() => restorePageScroll(), 150);
     };
 
     restore();
     window.addEventListener("pageshow", restore);
     window.addEventListener("popstate", restore);
 
+    observer = new MutationObserver(() => {
+      const html = document.documentElement;
+      const body = document.body;
+      const locked = LOCK_CLASSES.some((className) => html.classList.contains(className) || body.classList.contains(className));
+      if (locked || html.style.overflow === "hidden" || body.style.overflow === "hidden") restorePageScroll();
+    });
+    observer.observe(document.documentElement, {attributes: true, attributeFilter: ["class", "style"]});
+    observer.observe(document.body, {attributes: true, attributeFilter: ["class", "style"]});
+
     return () => {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timeout);
       window.removeEventListener("pageshow", restore);
       window.removeEventListener("popstate", restore);
+      observer?.disconnect();
     };
   }, [pathname]);
 
