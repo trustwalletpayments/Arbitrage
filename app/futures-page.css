@@ -27,5 +27,22 @@
 .futures-grid .order-panel .two-input{gap:10px}
 .futures-grid .order-panel .order-info{margin:15px 0;padding-top:12px;border-top:1px solid #1d2b3c;font-size:12px}
 .futures-grid .order-panel .btn.primary{min-height:46px;border-radius:9px;font-size:15px;font-weight:700}
+.futures-expand-button{display:none}
 @media(max-width:900px){.futures-wrap{padding:20px 16px 90px!important}.futures-wrap>.trade-head{align-items:flex-start;gap:18px}.futures-wrap>.trade-head .pair{font-size:23px}.futures-wrap>.trade-head .price{font-size:28px}.futures-wrap>.trade-head .leverage{min-width:145px}.futures-grid{grid-template-columns:1fr!important}.futures-grid .chart{height:420px!important;min-height:420px!important}.futures-grid .order-panel{height:auto!important;max-height:none!important;overflow:visible!important}.futures-grid .panel{margin-bottom:0!important}}
-@media(max-width:560px){.futures-wrap{padding:14px 12px 90px!important}.futures-wrap>.trade-head{display:flex;flex-direction:column;padding-bottom:14px}.futures-wrap>.trade-head .leverage{width:100%;min-width:0}.futures-wrap>.market-list{margin-bottom:12px!important}.futures-wrap>.market-list button{min-width:112px!important;padding:10px 11px!important}.futures-grid .chart{height:330px!important;min-height:330px!important}.futures-grid .order-panel{padding:16px!important}.futures-grid .order-panel .two-input{grid-template-columns:1fr}.futures-grid .panel{padding:14px!important}}
+@media(max-width:760px){
+  .futures-wrap{padding:14px 12px 100px!important;max-width:100%!important;box-sizing:border-box!important;overflow-x:hidden!important}
+  .futures-wrap>.trade-head{display:flex;flex-direction:column;align-items:stretch!important;gap:14px!important;padding:8px 0 14px!important}
+  .futures-wrap>.trade-head .pair{font-size:22px!important}
+  .futures-wrap>.trade-head .price{font-size:28px!important;margin-top:8px!important}
+  .futures-wrap>.trade-head .leverage{width:100%!important;min-width:0!important}
+  .futures-wrap>.market-list.futures-market-list{display:none!important;height:0!important;max-height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
+  .futures-wrap>.market-list.futures-market-list.expanded{display:flex!important;height:auto!important;max-height:210px!important;margin:0 0 10px!important;padding:8px!important;border:1px solid #1b2b40!important;overflow-x:auto!important;overflow-y:hidden!important}
+  .futures-wrap>.market-list.futures-market-list.expanded button{min-width:112px!important;padding:10px 11px!important}
+  .futures-expand-button{display:flex!important;width:100%!important;height:44px!important;align-items:center!important;justify-content:space-between!important;margin:0 0 12px!important;padding:12px 14px!important;border:1px solid #263b54!important;border-radius:10px!important;background:#101d2d!important;color:#75b5ff!important;font-weight:700!important;font-size:14px!important;cursor:pointer!important}
+  .futures-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;width:100%!important;min-width:0!important}
+  .futures-grid>div:first-child{width:100%!important;min-width:0!important}
+  .futures-grid .chart{width:100%!important;height:430px!important;min-height:430px!important;max-height:430px!important;margin-top:0!important;box-sizing:border-box!important;overflow:hidden!important}
+  .futures-grid .panel{margin-top:10px!important;padding:14px!important;box-sizing:border-box!important}
+  .futures-grid .order-panel{width:100%!important;box-sizing:border-box!important;padding:16px!important}
+}
+@media(max-width:560px){.futures-wrap>.trade-head .pair{font-size:21px!important}.futures-grid .chart{height:430px!important;min-height:430px!important;max-height:430px!important}.futures-grid .order-panel .two-input{grid-template-columns:1fr}.futures-grid .panel{padding:14px!important}}
