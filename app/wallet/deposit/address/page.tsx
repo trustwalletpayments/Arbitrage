@@ -28,23 +28,31 @@ const ADDRESSES: Record<string, string> = {
 export default function DepositAddressPage() {
   const [details, setDetails] = useState({ asset: "USDT", assetName: "Tether", network: "BNB Smart Chain", networkShort: "BEP-20", networkId: "bsc" });
   const [copied, setCopied] = useState(false);
-  useEffect(() => { const params = new URLSearchParams(window.location.search); setDetails({ asset: params.get("asset") || "USDT", assetName: params.get("assetName") || "Tether", network: params.get("network") || "BNB Smart Chain", networkShort: params.get("networkShort") || "BEP-20", networkId: params.get("networkId") || "bsc" }); }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setDetails({
+      asset: params.get("asset") || "USDT",
+      assetName: params.get("assetName") || "Tether",
+      network: params.get("network") || "BNB Smart Chain",
+      networkShort: params.get("networkShort") || "BEP-20",
+      networkId: params.get("networkId") || "bsc",
+    });
+  }, []);
+
   const { asset, assetName, network, networkShort, networkId } = details;
   const address = ADDRESSES[networkId] || "";
-  const isBnbUsdt = asset === "USDT" && networkId === "bsc";
-  const isEthUsdt = asset === "USDT" && networkId === "eth";
-  const isArbitrumUsdt = asset === "USDT" && networkId === "arbitrum";
-  const isAvalancheUsdt = asset === "USDT" && (networkId === "avalanche" || networkId === "avax");
-  const isPolygonUsdt = asset === "USDT" && networkId === "polygon";
-  const isBaseUsdt = asset === "USDT" && networkId === "base";
-  const isTonUsdt = asset === "USDT" && networkId === "ton";
-  const isOptimismUsdt = asset === "USDT" && (networkId === "optimism" || networkId === "op");
-  const isTronUsdt = asset === "USDT" && (networkId === "tron" || networkId === "trc20");
-  const isAptosUsdt = asset === "USDT" && networkId === "aptos";
-  const isSolanaUsdt = asset === "USDT" && (networkId === "solana" || networkId === "sol");
-  const isNearUsdt = asset === "USDT" && networkId === "near";
-  const isSuiUsdt = asset === "USDT" && networkId === "sui";
-  async function copyAddress() { if (!address) return; try { await navigator.clipboard.writeText(address); } catch {} setCopied(true); window.setTimeout(() => setCopied(false), 1800); }
+  const qrUrl = address
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=${encodeURIComponent(address)}`
+    : "";
+
+  async function copyAddress() {
+    if (!address) return;
+    try { await navigator.clipboard.writeText(address); } catch {}
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
+
   return (
     <main className="wallet-page">
       <header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet/deposit" className="history-link"><ArrowLeft size={18} /> Back to Deposit</Link></header>
@@ -53,7 +61,7 @@ export default function DepositAddressPage() {
         <section className="deposit-address-page-card">
           <Link href="/wallet/deposit" className="mobile-back-button"><ArrowLeft size={17} /> Choose another network</Link>
           <div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h2>{assetName} ({asset})</h2><p>This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>. Only send {asset} using this exact network.</p></div>
-          {isBnbUsdt ? <div className="deposit-qr-placeholder"><img src="/real_bnb_logo_scannable_qr.png?v=20260915" alt="USDT on BNB Smart Chain deposit QR code" /></div> : isEthUsdt ? <div className="deposit-qr-placeholder"><img src="/real_eth_logo_scannable_qr.png?v=20260915" alt="USDT on Ethereum deposit QR code" /></div> : isArbitrumUsdt ? <div className="deposit-qr-placeholder"><img src="/real_arbitrum_logo_scannable_qr.png?v=20260915" alt="USDT on Arbitrum deposit QR code" /></div> : isAvalancheUsdt ? <div className="deposit-qr-placeholder"><img src="/real_avax_logo_scannable_qr.png?v=20260915" alt="USDT on Avalanche deposit QR code" /></div> : isPolygonUsdt ? <div className="deposit-qr-placeholder"><img src="/real_polygon_logo_scannable_qr.png?v=20260915" alt="USDT on Polygon deposit QR code" /></div> : isBaseUsdt ? <div className="deposit-qr-placeholder"><img src="/real_base_logo_scannable_qr.png?v=20260915" alt="USDT on Base deposit QR code" /></div> : isTonUsdt ? <div className="deposit-qr-placeholder"><img src="/real_ton_logo_scannable_qr.png?v=20260915" alt="USDT on TON deposit QR code" /></div> : isOptimismUsdt ? <div className="deposit-qr-placeholder"><img src="/real_optimism_logo_scannable_qr.png?v=20260915" alt="USDT on Optimism deposit QR code" /></div> : isTronUsdt ? <div className="deposit-qr-placeholder"><img src="/real_tron_logo_scannable_qr.png?v=20260915" alt="USDT on Tron TRC-20 deposit QR code" /></div> : isAptosUsdt ? <div className="deposit-qr-placeholder"><img src="/real_aptos_logo_scannable_qr.png?v=20260915" alt="USDT on Aptos deposit QR code" /></div> : isSolanaUsdt ? <div className="deposit-qr-placeholder"><img src="/real_solana_logo_scannable_qr.png?v=20260915" alt="USDT on Solana deposit QR code" /></div> : isNearUsdt ? <div className="deposit-qr-placeholder"><img src="/real_near_logo_scannable_qr.png?v=20260915" alt="USDT on NEAR deposit QR code" /></div> : isSuiUsdt ? <div className="deposit-qr-placeholder"><img src="/sui_qr_exact_address_proper_logo.png?v=20260915" alt="USDT on Sui deposit QR code" /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain, Ethereum, Arbitrum, Avalanche, Polygon, Base, TON, Optimism, Tron, Aptos, Solana, NEAR, and Sui.</span></div>}
+          {qrUrl ? <div className="deposit-qr-placeholder"><img src={qrUrl} alt={`${asset} on ${network} deposit QR code`} /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is unavailable because this network has no configured address.</span></div>}
           <div className="deposit-address-box"><span>{asset} on {network} — {networkShort} deposit address</span><strong>{address || "Address not configured for this network"}</strong>{address && <button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button>}</div>
           <div className="deposit-security-note"><ShieldCheck size={18} /><span>Network warning: sending another asset or using a different network may permanently result in lost funds.</span></div>
         </section>
