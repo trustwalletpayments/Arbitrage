@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Eye, EyeOff, History, WalletCards, BarChart3, TrendingUp, Plus, Bitcoin, CircleDollarSign, Clock3, ArrowRight } from "lucide-react";
+import { ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Eye, EyeOff, History, WalletCards, BarChart3, TrendingUp, Plus, Bitcoin, CircleDollarSign, Clock3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import MobileNav from "../components/MobileNav";
 import CoinIcon from "../components/CoinIcon";
@@ -53,12 +53,6 @@ export default function WalletPage() {
         <section className="wallet-balance-card">
           <div className="balance-copy"><span>Funding balance <button onClick={() => setHidden(!hidden)} aria-label="Toggle balance visibility">{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button></span><strong>{hidden ? "••••••" : `${formatAmount(total)} USDT`}</strong><small>≈ {hidden ? "••••" : `$${formatAmount(total)}`}</small></div>
           <div className="balance-side"><span>Today’s PNL</span><strong>+0.00 USDT</strong><small>+0.00%</small></div>
-        </section>
-
-        <section className="funding-quick-actions" aria-label="Funding actions">
-          <Link href="/wallet/deposit" className="quick-action-card"><span className="quick-action-icon"><ArrowDownToLine size={19} /></span><span><strong>Deposit</strong><small>Add funds to your funding account</small></span><ArrowRight size={17} /></Link>
-          <Link href="/wallet/withdraw" className="quick-action-card"><span className="quick-action-icon"><ArrowUpFromLine size={19} /></span><span><strong>Withdraw</strong><small>Send funds to an external wallet</small></span><ArrowRight size={17} /></Link>
-          <Link href="/wallet/transfer" className="quick-action-card"><span className="quick-action-icon"><ArrowLeftRight size={19} /></span><span><strong>Transfer</strong><small>Move funds between accounts</small></span><ArrowRight size={17} /></Link>
         </section>
 
         <div className="wallet-tabs"><Link className="active" href="/wallet">Overview</Link><Link href="/orders">Trading history</Link></div>
