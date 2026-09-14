@@ -16,13 +16,11 @@ const ADDRESSES: Record<string, string> = {
   solana: "79z3yH2t7BcWdSJYx1V9CftpwEDjXS6JryVPTMtLPQJF",
   aptos: "0x78faf651ee5fab278b1e93e2117bff92bedc182d1077e9d2710a14aedc164fc3",
   ton: "UQCFeiYwfU9xPr5RkY9-X11HcYLMGPFq766OXZ5a0qyI_9dt",
-  near: "7fb16d6c760050f8ff099b67a8b91db5762d835be5d257b0d4cb97af1cd0c909",
+  near: "7fb16d6c7600508ff099b67a8b91db5762d835be5d257b0d4cb97af1cd0c909",
   polygon: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
   optimism: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
   base: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
 };
-
-const BNB_USDT_QR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA3AAAANwCAIAAADhiB+AAAAQAElEQVR4Aezd";
 
 export default function DepositAddressPage() {
   const [details, setDetails] = useState({ asset: "USDT", assetName: "Tether", network: "BNB Smart Chain", networkShort: "BEP-20", networkId: "bsc" });
@@ -40,7 +38,7 @@ export default function DepositAddressPage() {
         <section className="deposit-address-page-card">
           <Link href="/wallet/deposit" className="mobile-back-button"><ArrowLeft size={17} /> Choose another network</Link>
           <div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h2>{assetName} ({asset})</h2><p>This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>. Only send {asset} using this exact network.</p></div>
-          {isBnbUsdt ? <div className="deposit-qr-placeholder"><img src={BNB_USDT_QR} alt="USDT on BNB Smart Chain deposit QR code" style={{ display: "block", width: "220px", height: "220px", objectFit: "contain" }} /><span>USDT on BNB Smart Chain</span></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain.</span></div>}
+          {isBnbUsdt ? <div className="deposit-qr-placeholder"><img src="/real_bnb_logo_scannable_qr.png?v=20260915" alt="USDT on BNB Smart Chain deposit QR code" /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain.</span></div>}
           <div className="deposit-address-box"><span>{asset} on {network} — {networkShort} deposit address</span><strong>{address || "Address not configured for this network"}</strong>{address && <button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button>}</div>
           <div className="deposit-security-note"><ShieldCheck size={18} /><span>Network warning: sending another asset or using a different network may permanently result in lost funds.</span></div>
         </section>
