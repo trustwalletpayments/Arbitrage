@@ -28,7 +28,7 @@ export default function SpotPage(){
   const [price,setPrice]=useState("");
   const [livePrice,setLivePrice]=useState(0);
   const [change,setChange]=useState(0);
-  const [amount,setAmount]=useState("");
+  const [quoteAmount,setQuoteAmount]=useState("");
   const [available,setAvailable]=useState(0);
   const [message,setMessage]=useState("");
   const [submitting,setSubmitting]=useState(false);
@@ -96,13 +96,19 @@ export default function SpotPage(){
     const query=search.trim().toUpperCase();
     return query?markets.filter(item=>item.baseAsset.includes(query)||item.symbol.includes(query)):markets;
   },[markets,search]);
-  const total=useMemo(()=>{const p=type==="Market"?livePrice:Number(price);const q=Number(amount);return p>0&&q>0?(p*q).toFixed(2):"0.00"},[type,livePrice,price,amount]);
+
+  const orderPrice=type==="Market"?livePrice:Number(price);
+  const coinQuantity=useMemo(()=>{
+    const usdt=Number(quoteAmount);
+    return orderPrice>0&&usdt>0?(usdt/orderPrice).toFixed(8):"0.00000000";
+  },[orderPrice,quoteAmount]);
 
   async function submit(){
     setMessage("");
-    const qty=Number(amount);
-    const orderPrice=type==="Market"?livePrice:Number(price);
-    if(!Number.isFinite(qty)||qty<=0){setMessage("Enter a valid amount.");return}
+    const usdt=Number(quoteAmount);
+    const qty=Number(coinQuantity);
+    if(!Number.isFinite(usdt)||usdt<=0){setMessage("Enter a valid USDT amount.");return}
+    if(!Number.isFinite(qty)||qty<=0){setMessage("Enter a valid price or wait for the live market price.");return}
     if(type==="Limit"&&(!Number.isFinite(orderPrice)||orderPrice<=0)){setMessage("Enter a valid limit price.");return}
     setSubmitting(true);
     try{
@@ -110,10 +116,13 @@ export default function SpotPage(){
       const data=await response.json();
       if(!response.ok||!data.ok)throw new Error(data.error||"Order was rejected.");
       setMessage(`Order submitted successfully. Binance order ID: ${data.order?.orderId||"—"}`);
-      setAmount("");
+      setQuoteAmount("");
     }catch(error){setMessage(error instanceof Error?error.message:"Unable to submit order.");}
     finally{setSubmitting(false)}
   }
+
+  const inputStyle={display:"block",width:"100%",boxSizing:"border-box" as const,marginTop:8,padding:"14px 15px",borderRadius:12,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:16,outline:"none"};
+  const labelStyle={display:"block",color:"#a9b7ca",fontSize:13,fontWeight:600,marginBottom:17};
 
   return <main className="app-shell">
     <header className="appbar">
@@ -138,13 +147,13 @@ export default function SpotPage(){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}><div><div className="label">SPOT TRADING</div><h2 style={{margin:"6px 0 0",fontSize:22}}>{pair}</h2></div><span style={{fontSize:12,color:"#7f90a7"}}>Production market</span></div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,padding:5,background:"#070c13",border:"1px solid #263244",borderRadius:14,marginBottom:18,boxShadow:"none"}}><button type="button" onClick={()=>setSide("Buy")} style={{border:"1px solid transparent",borderRadius:10,padding:"13px 10px",fontSize:16,fontWeight:700,cursor:"pointer",color:isBuy?"#04140a":"#8b9ab0",background:isBuy?"#22c55e":"transparent",boxShadow:"none"}}>Buy</button><button type="button" onClick={()=>setSide("Sell")} style={{border:"1px solid transparent",borderRadius:10,padding:"13px 10px",fontSize:16,fontWeight:700,cursor:"pointer",color:!isBuy?"#fff":"#8b9ab0",background:!isBuy?"#ef4444":"transparent",boxShadow:"none"}}>Sell</button></div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",borderBottom:"1px solid #1d2a3b",marginBottom:22}}>{["Limit","Market"].map(item=><button type="button" key={item} onClick={()=>setType(item as "Limit"|"Market")} style={{border:0,borderBottom:type===item?`2px solid ${accent}`:"2px solid transparent",background:"transparent",color:type===item?"#eef4ff":"#7e8da3",padding:"10px 8px 13px",fontSize:14,fontWeight:600,cursor:"pointer"}}>{item}</button>)}</div>
-        {type==="Limit"&&<label style={{display:"block",color:"#a9b7ca",fontSize:13,fontWeight:600,marginBottom:17}}>Price <span style={{float:"right",color:"#718198",fontWeight:400}}>USDT</span><input value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" inputMode="decimal" style={{display:"block",width:"100%",boxSizing:"border-box",marginTop:8,padding:"14px 15px",borderRadius:12,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:16,outline:"none"}}/></label>}
-        <label style={{display:"block",color:"#a9b7ca",fontSize:13,fontWeight:600,marginBottom:17}}>Amount <span style={{float:"right",color:"#718198",fontWeight:400}}>{base}</span><input value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00" inputMode="decimal" style={{display:"block",width:"100%",boxSizing:"border-box",marginTop:8,padding:"14px 15px",borderRadius:12,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:16,outline:"none"}}/></label>
-        <label style={{display:"block",color:"#a9b7ca",fontSize:13,fontWeight:600,marginBottom:18}}>Total <span style={{float:"right",color:"#718198",fontWeight:400}}>USDT</span><input value={total} readOnly style={{display:"block",width:"100%",boxSizing:"border-box",marginTop:8,padding:"14px 15px",borderRadius:12,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:16,outline:"none"}}/></label>
+        {type==="Limit"&&<label style={labelStyle}>Price <span style={{float:"right",color:"#718198",fontWeight:400}}>USDT</span><input value={price} onChange={e=>setPrice(e.target.value)} placeholder="0.00" inputMode="decimal" style={inputStyle}/></label>}
+        <label style={labelStyle}>Amount <span style={{float:"right",color:"#718198",fontWeight:400}}>USDT</span><input value={quoteAmount} onChange={e=>setQuoteAmount(e.target.value)} placeholder="Enter USDT amount" inputMode="decimal" style={inputStyle}/></label>
+        <label style={{...labelStyle,marginBottom:18}}>Estimated quantity <span style={{float:"right",color:"#718198",fontWeight:400}}>{base}</span><input value={coinQuantity} readOnly aria-label={`Estimated ${base} quantity`} style={{...inputStyle,color:"#9fb4cf"}}/></label>
         <div style={{display:"flex",justifyContent:"space-between",padding:"14px 0",borderTop:"1px solid #1b2a3c",borderBottom:"1px solid #1b2a3c",marginBottom:18}}><span style={{color:"#8e9db2",fontSize:13}}>Available funding balance</span><strong style={{color:"#dbe6f5",fontSize:14}}>{available.toFixed(2)} USDT</strong></div>
         {message&&<div className="notice" style={{marginBottom:14}}>{message}</div>}
         <button className="order-submit-button" disabled={submitting} onClick={submit} style={{width:"100%",border:"1px solid transparent",borderRadius:12,padding:"15px 12px",fontSize:16,fontWeight:700,cursor:submitting?"wait":"pointer",color:isBuy?"#04140a":"#fff",background:isBuy?"#22c55e":"#ef4444",boxShadow:"none",opacity:submitting?.7:1}}>{submitting?"Submitting…":`${side} ${base}`}</button>
-        <p className="muted tiny" style={{lineHeight:1.6,marginTop:16}}>Live Binance spot market data. Orders are sent only through the secured production API connection; no testnet wallet or simulated order engine is used here.</p>
+        <p className="muted tiny" style={{lineHeight:1.6,marginTop:16}}>Enter the amount you want to spend in USDT. The estimated coin quantity is calculated automatically using the selected price.</p>
       </section>
     </div>
   </main>;
