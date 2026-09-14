@@ -29,6 +29,7 @@ export default function DepositAddressPage() {
   const { asset, assetName, network, networkShort, networkId } = details;
   const address = ADDRESSES[networkId] || "";
   const isBnbUsdt = asset === "USDT" && networkId === "bsc";
+  const isEthUsdt = asset === "USDT" && networkId === "eth";
   async function copyAddress() { if (!address) return; try { await navigator.clipboard.writeText(address); } catch {} setCopied(true); window.setTimeout(() => setCopied(false), 1800); }
   return (
     <main className="wallet-page">
@@ -38,7 +39,7 @@ export default function DepositAddressPage() {
         <section className="deposit-address-page-card">
           <Link href="/wallet/deposit" className="mobile-back-button"><ArrowLeft size={17} /> Choose another network</Link>
           <div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h2>{assetName} ({asset})</h2><p>This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>. Only send {asset} using this exact network.</p></div>
-          {isBnbUsdt ? <div className="deposit-qr-placeholder"><img src="/real_bnb_logo_scannable_qr.png?v=20260915" alt="USDT on BNB Smart Chain deposit QR code" /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain.</span></div>}
+          {isBnbUsdt ? <div className="deposit-qr-placeholder"><img src="/real_bnb_logo_scannable_qr.png?v=20260915" alt="USDT on BNB Smart Chain deposit QR code" /></div> : isEthUsdt ? <div className="deposit-qr-placeholder"><img src="/real_eth_logo_scannable_qr.png?v=20260915" alt="USDT on Ethereum deposit QR code" /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is available only for USDT on BNB Smart Chain and Ethereum.</span></div>}
           <div className="deposit-address-box"><span>{asset} on {network} — {networkShort} deposit address</span><strong>{address || "Address not configured for this network"}</strong>{address && <button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button>}</div>
           <div className="deposit-security-note"><ShieldCheck size={18} /><span>Network warning: sending another asset or using a different network may permanently result in lost funds.</span></div>
         </section>
