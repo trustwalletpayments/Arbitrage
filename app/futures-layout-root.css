@@ -1,0 +1,80 @@
+/* Root layout fix: the summary card must span the full content area beside Markets. */
+@media (min-width: 1100px) {
+  .futures-wrap {
+    display: grid !important;
+    grid-template-columns: 240px minmax(0, 1fr) 360px !important;
+    column-gap: 18px !important;
+    row-gap: 14px !important;
+    align-items: start !important;
+  }
+
+  .futures-wrap > .market-list.futures-market-list {
+    grid-column: 1 !important;
+    grid-row: 1 / span 5 !important;
+    width: 240px !important;
+    min-width: 0 !important;
+  }
+
+  /* The summary card occupies both main-content columns, never just the middle one. */
+  .futures-wrap > .trade-head {
+    grid-column: 2 / 4 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
+  .futures-wrap > .trade-head > div {
+    display: grid !important;
+    grid-template-columns: minmax(320px, 1.65fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "primary mark contract asset"
+      "primary mark contract asset" !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .futures-wrap > .trade-head .pair {
+    grid-area: primary !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .futures-wrap > .trade-head .price {
+    grid-area: primary !important;
+    align-self: end !important;
+    margin: 54px 0 0 !important;
+    min-width: 0 !important;
+  }
+
+  .futures-wrap > .trade-head .market-stats {
+    display: contents !important;
+  }
+
+  .futures-wrap > .trade-head .market-stats > span {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .futures-wrap > .trade-head .market-stats > span:nth-child(1) { grid-area: mark !important; }
+  .futures-wrap > .trade-head .market-stats > span:nth-child(2) { grid-area: contract !important; }
+  .futures-wrap > .trade-head .market-stats > span:nth-child(3) { grid-area: asset !important; }
+
+  .futures-wrap > .trade-head > div > .muted {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin-left: -28px !important;
+    margin-right: -28px !important;
+  }
+}
+
+@media (max-width: 1099px) and (min-width: 761px) {
+  .futures-wrap > .trade-head {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
