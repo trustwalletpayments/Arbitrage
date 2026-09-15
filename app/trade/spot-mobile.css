@@ -20,52 +20,59 @@
 .app-shell .order-panel .order-submit-button:not(:disabled):hover{transform:translateY(-1px)}
 
 @media (max-width:760px){
-  .trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
-  .market-list{order:1;display:block;width:100%;height:auto;min-height:0;max-height:none;box-sizing:border-box;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;overflow:visible;background:#080d14}
-  .market-list .market-scroll{display:none;height:auto;max-height:0;min-height:0;overflow:hidden;transition:max-height .25s ease}
-  .market-list.expanded .market-scroll{display:block;max-height:520px;overflow-y:auto}
-  .market-list .market-scroll button{padding:12px 10px}
-  .desktop-market-search{display:none!important}
-  .spot-expand-button{display:flex!important;width:100%;height:44px;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:12px 14px;border:1px solid #263b54;border-radius:10px;background:#101d2d;color:#75b5ff;font-weight:700;font-size:14px;cursor:pointer}
-  .spot-mobile-search{display:block;width:100%;height:44px;box-sizing:border-box;margin:0 0 12px;padding:13px 14px;border:1px solid #263244;border-radius:10px;background:#070c13;color:#fff;outline:none;font-size:15px}
-  .market-count{margin-bottom:0!important}
-  .chart-area{order:2;width:100%;box-sizing:border-box;padding:18px 14px 0}
-  .chart-area .trade-head{align-items:flex-start;gap:12px}
-  .chart-area .trade-head .btn{white-space:nowrap;padding:9px 10px;font-size:12px}
-  .chart-area .chart{height:430px!important;min-height:430px!important;max-height:430px!important;margin-top:14px;flex:none!important}
-  .chart-area .live-chart{height:430px!important;min-height:430px!important;max-height:430px!important;flex:none!important;overflow:hidden!important}
-  .chart-area .live-chart .chart-toolbar{height:44px!important;min-height:44px!important;flex:0 0 44px!important;overflow:hidden!important;white-space:nowrap}
-  .chart-area .live-chart .tradingview-widget-container{height:386px!important;min-height:0!important;max-height:386px!important;flex:0 0 386px!important;width:100%!important;overflow:hidden!important;position:relative!important}
-  .chart-area .live-chart .tradingview-widget-container__widget{height:100%!important;min-height:0!important;width:100%!important;overflow:hidden!important}
-  .chart-area .live-chart iframe{display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;border:0!important}
-  .chart-area .live-chart .chart-placeholder{inset:44px 0 0!important;height:auto!important}
-  .order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
+.trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
+.market-list{order:1;display:block;width:100%;height:auto;min-height:0;max-height:none;box-sizing:border-box;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;overflow:visible;background:#080d14}
+.market-list .market-scroll{display:none;height:auto;max-height:0;min-height:0;overflow:hidden;transition:max-height .25s ease}
+.market-list.expanded .market-scroll{display:block;max-height:520px;overflow-y:auto}
+.market-list .market-scroll button{padding:12px 10px}
+.desktop-market-search{display:none!important}
+.spot-expand-button{display:flex!important;width:100%;height:44px;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:12px 14px;border:1px solid #263b54;border-radius:10px;background:#101d2d;color:#75b5ff;font-weight:700;font-size:14px;cursor:pointer}
+.spot-mobile-search{display:block;width:100%;height:44px;box-sizing:border-box;margin:0 0 12px;padding:13px 14px;border:1px solid #263244;border-radius:10px;background:#070c13;color:#fff;outline:none;font-size:15px}
+.market-count{margin-bottom:0!important}
+.chart-area{order:2;width:100%;box-sizing:border-box;padding:18px 14px 0}
+.chart-area .trade-head{align-items:flex-start;gap:12px}
+.chart-area .trade-head .btn{white-space:nowrap;padding:9px 10px;font-size:12px}
+.chart-area .chart{height:430px!important;min-height:430px!important;max-height:430px!important;margin-top:14px;flex:none!important}
+.chart-area .live-chart{height:430px!important;min-height:430px!important;max-height:430px!important;flex:none!important;overflow:hidden!important}
+.chart-area .live-chart .chart-toolbar{height:44px!important;min-height:44px!important;flex:0 0 44px!important;overflow:hidden!important;white-space:nowrap}
+.chart-area .live-chart .tradingview-widget-container{height:386px!important;min-height:0!important;max-height:386px!important;flex:0 0 386px!important;width:100%!important;overflow:hidden!important;position:relative!important}
+.chart-area .live-chart .tradingview-widget-container__widget{height:100%!important;min-height:0!important;width:100%!important;overflow:hidden!important}
+.chart-area .live-chart iframe{display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;border:0!important}
+.chart-area .live-chart .chart-placeholder{inset:44px 0 0!important;height:auto!important}
+.order-panel{order:3;border-left:0;border-top:1px solid #1b2433;padding:18px 14px!important;border-radius:0!important}
 }
+
 @media (min-width:761px){
-  .spot-expand-button{display:none!important}
-  .app-shell{height:auto!important;min-height:100vh;overflow:visible!important}
-  .app-shell .appbar{height:64px;padding-left:28px;padding-right:28px}
-  .app-shell .trade-layout{height:auto!important;min-height:calc(100vh - 64px);grid-template-columns:180px minmax(0,1fr) 300px;overflow:visible!important}
-  .app-shell .market-list{height:auto;max-height:calc(100vh - 64px);min-height:0;overflow-y:auto;padding:18px 10px}
-  .app-shell .chart-area{min-width:0;min-height:0;padding:10px 12px 8px;overflow:visible;display:flex;flex-direction:column}
-  .app-shell .chart-area .trade-head{margin-bottom:4px;flex:0 0 auto}
-  .app-shell .chart-area .pair{font-size:17px}
-  .app-shell .chart-area .price{font-size:22px;margin-top:4px}
-  .app-shell .chart-area .chart{min-height:0!important;height:500px!important;flex:0 0 500px;margin-top:6px;overflow:hidden}
-  .app-shell .chart-area .live-chart{min-height:0!important;height:500px!important;max-height:none;overflow:hidden}
-  .app-shell .chart-area .live-chart .chart-toolbar{height:40px!important;min-height:40px!important}
-  .app-shell .chart-area .live-chart .tradingview-widget-container{min-height:0!important;overflow:hidden}
-  .app-shell .order-panel{min-width:0;min-height:0;height:auto;max-height:none;overflow-y:visible!important;overflow-x:hidden!important;padding:10px!important;scrollbar-width:thin;scrollbar-color:#334155 transparent}
-  .app-shell .order-panel::-webkit-scrollbar{width:6px}
-  .app-shell .order-panel::-webkit-scrollbar-track{background:transparent}
-  .app-shell .order-panel::-webkit-scrollbar-thumb{background:#334155;border-radius:999px}
-  .app-shell .order-panel h2{font-size:19px!important}
-  .app-shell .order-panel>div:first-child{margin-bottom:8px!important}
-  .app-shell .order-panel>div:nth-child(2){margin-bottom:8px!important}
-  .app-shell .order-panel>div:nth-child(3){margin-bottom:8px!important}
-  .app-shell .order-panel label{margin-bottom:7px!important}
-  .app-shell .order-panel label input{margin-top:4px!important;padding:8px 10px!important;min-height:38px}
-  .app-shell .order-panel>div[style*="Available funding balance"]{padding:7px 0!important;margin-bottom:8px!important}
-  .app-shell .order-panel .order-submit-button{padding:9px 10px!important;min-height:40px}
-  .app-shell .order-panel .tiny{margin-top:7px!important;line-height:1.25!important}
+.spot-expand-button{display:none!important}
+.app-shell{height:auto!important;min-height:100vh;overflow:visible!important}
+.app-shell .appbar{height:64px;padding-left:28px;padding-right:28px}
+.app-shell .trade-layout{height:auto!important;min-height:calc(100vh - 64px);grid-template-columns:190px minmax(0,1fr) 320px;gap:14px;overflow:visible!important;align-items:start}
+.app-shell .market-list{height:calc(100vh - 64px);max-height:calc(100vh - 64px);min-height:0;overflow-y:auto;padding:18px 10px;position:sticky;top:64px}
+.app-shell .chart-area{min-width:0;min-height:0;padding:10px 0 18px;overflow:visible;display:flex;flex-direction:column}
+.app-shell .chart-area .trade-head{margin-bottom:4px;flex:0 0 auto}
+.app-shell .chart-area .pair{font-size:17px}
+.app-shell .chart-area .price{font-size:22px;margin-top:4px}
+.app-shell .chart-area .chart{min-height:0!important;height:440px!important;flex:0 0 440px;margin-top:6px;overflow:hidden}
+.app-shell .chart-area .live-chart{min-height:0!important;height:440px!important;max-height:none;overflow:hidden}
+.app-shell .chart-area .live-chart .chart-toolbar{height:40px!important;min-height:40px!important}
+.app-shell .chart-area .live-chart .tradingview-widget-container{min-height:0!important;overflow:hidden}
+.app-shell .order-panel{position:sticky;top:78px;align-self:start;min-width:0;min-height:0;height:fit-content;max-height:calc(100vh - 94px);overflow-y:auto!important;overflow-x:hidden!important;padding:14px!important;scrollbar-width:thin;scrollbar-color:#334155 transparent}
+.app-shell .order-panel::-webkit-scrollbar{width:6px}
+.app-shell .order-panel::-webkit-scrollbar-track{background:transparent}
+.app-shell .order-panel::-webkit-scrollbar-thumb{background:#334155;border-radius:999px}
+.app-shell .order-panel h2{font-size:19px!important}
+.app-shell .order-panel>div:first-child{margin-bottom:8px!important}
+.app-shell .order-panel>div:nth-child(2){margin-bottom:8px!important}
+.app-shell .order-panel>div:nth-child(3){margin-bottom:8px!important}
+.app-shell .order-panel label{margin-bottom:7px!important}
+.app-shell .order-panel label input{margin-top:4px!important;padding:8px 10px!important;min-height:38px}
+.app-shell .order-panel>div[style*="Available funding balance"]{padding:7px 0!important;margin-bottom:8px!important}
+.app-shell .order-panel .order-submit-button{padding:9px 10px!important;min-height:40px}
+.app-shell .order-panel .tiny{margin-top:7px!important;line-height:1.25!important}
+
+/* Final desktop balance: keep the terminal compact and remove artificial empty space */
+.app-shell .trade-layout{grid-template-rows:auto;align-items:start}
+.app-shell .chart-area .chart,.app-shell .chart-area .live-chart{border-radius:14px}
+.app-shell .chart-area>div:last-child{margin-top:12px}
+.app-shell .order-panel{box-sizing:border-box}
 }
