@@ -28,6 +28,15 @@
 .app-shell .order-panel [style*="grid-template-columns:1fr 1fr"] button{transition:background .18s ease,color .18s ease,transform .18s ease}
 .app-shell .order-panel [style*="grid-template-columns:1fr 1fr"] button:active{transform:scale(.98)}
 
+/* Trading-terminal visual hierarchy */
+.app-shell .order-panel>div:first-child{padding-bottom:10px;border-bottom:1px solid #18283a}
+.app-shell .order-panel>div:first-child .label{font-size:10px;letter-spacing:.12em;color:#7fa7d4}
+.app-shell .order-panel>div:first-child h2{letter-spacing:-.025em}
+.app-shell .order-panel label span{font-size:11px;letter-spacing:.04em}
+.app-shell .order-panel label input{font-variant-numeric:tabular-nums}
+.app-shell .order-panel .order-submit-button:disabled{cursor:not-allowed;filter:saturate(.65)}
+.app-shell .order-panel .muted{color:#71839a}
+
 @media (max-width:760px){
 .trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
 .market-list{order:1;display:block;width:100%;height:auto;min-height:0;max-height:none;box-sizing:border-box;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;overflow:visible;background:#080d14}
