@@ -1,37 +1,55 @@
 import {NextResponse} from "next/server";
 import {estimatedLiquidationPrice,initialMargin,notional,unrealizedPnl,validateOrder} from "../../../../lib/trading";
 
+const API_BASES=["https://testnet.binancefuture.com","https://fapi.binance.com"];
+
+async function getJson(path:string){
+  let lastError:unknown;
+  for(const base of API_BASES){
+    try{
+      const response=await fetch(`${base}${path}`,{cache:"no-store",headers:{accept:"application/json"}});
+      if(!response.ok){lastError=new Error(`Market API returned ${response.status}`);continue}
+      return await response.json();
+    }catch(error){lastError=error}
+  }
+  throw lastError instanceof Error?lastError:new Error("Market API unavailable");
+}
+
 export async function GET(request:Request){
   const params=new URL(request.url).searchParams;
   const symbol=(params.get("symbol")||"BTCUSDT").toUpperCase().replace(/[^A-Z0-9]/g,"");
-  if(params.get("market")==="1"){
-    try{
+  try{
+    if(params.get("market")==="1"){
       const [depth,recentTrades,dailyTicker,funding]=await Promise.all([
-        fetch(`https://fapi.binance.com/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`,{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error("Order book unavailable");return r.json()}),
-        fetch(`https://fapi.binance.com/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error("Trades unavailable");return r.json()}),
-        fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`,{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error("Ticker unavailable");return r.json()}),
-        fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`,{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error("Funding data unavailable");return r.json()})
+        getJson(`/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`),
+        getJson(`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`),
+        getJson(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`),
+        getJson(`/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`)
       ]);
-      return NextResponse.json({ok:true,symbol,depth,recentTrades,dailyTicker,funding},{headers:{"Cache-Control":"no-store"}});
-    }catch(error){
-      return NextResponse.json({ok:false,error:error instanceof Error?error.message:"Unable to load market data"},{status:503});
+      return NextResponse.json({ok:true,symbol,depth,recentTrades,dailyTicker,funding},{headers:{"Cache-Control":"no-store, max-age=0"}});
     }
+
+    const [ticker,funding]=await Promise.all([
+      getJson(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`),
+      getJson(`/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`)
+    ]);
+    const markPrice=Number(funding.markPrice??ticker.lastPrice??ticker.price);
+    if(!Number.isFinite(markPrice)||markPrice<=0)throw new Error("Invalid mark price");
+    return NextResponse.json({
+      ok:true,
+      symbol,
+      markPrice,
+      lastPrice:Number(ticker.lastPrice??markPrice),
+      priceChange:Number(ticker.priceChange??0),
+      priceChangePercent:Number(ticker.priceChangePercent??0),
+      fundingRate:Number(funding.lastFundingRate??0),
+      volume:Number(ticker.volume??0),
+      quoteVolume:Number(ticker.quoteVolume??0),
+      nextFundingTime:Number(funding.nextFundingTime??0)
+    },{headers:{"Cache-Control":"no-store, max-age=0"}});
+  }catch(error){
+    return NextResponse.json({ok:false,error:error instanceof Error?error.message:"Unable to load live market data"},{status:503,headers:{"Cache-Control":"no-store"}});
   }
-  const providers=[
-    `https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`,
-    `https://fapi.binance.com/fapi/v1/ticker/price?symbol=${encodeURIComponent(symbol)}`,
-    `https://api.binance.com/api/v3/ticker/price?symbol=${encodeURIComponent(symbol)}`
-  ];
-  for(const url of providers){
-    try{
-      const response=await fetch(url,{cache:"no-store",headers:{accept:"application/json"}});
-      if(!response.ok)continue;
-      const data=await response.json();
-      const price=Number(data.markPrice??data.price);
-      if(Number.isFinite(price)&&price>0)return NextResponse.json({ok:true,symbol,markPrice:price});
-    }catch{}
-  }
-  return NextResponse.json({ok:false,error:"Unable to load live mark price"},{status:503});
 }
 
 export async function POST(request:Request){
