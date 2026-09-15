@@ -1,15 +1,15 @@
-/* Desktop futures terminal layout: market statistics above the coin list, order controls on the right, settlement below them. */
+/* Stable Futures desktop layout: no absolute overlays or display-contents positioning hacks. */
 @media (min-width: 761px) {
   .futures-wrap {
     position: relative;
     grid-template-columns: 240px minmax(0, 1fr);
     column-gap: 18px;
+    align-items: start;
   }
 
   .futures-wrap > .trade-head {
     grid-column: 2;
     grid-row: 1;
-    position: relative;
     min-height: 108px;
     margin-bottom: 0;
   }
@@ -19,16 +19,22 @@
     grid-column: 1;
     grid-row: 2;
     align-self: start;
-    margin-top: 180px;
+    margin-top: 0;
+    width: 240px;
+    max-height: calc(100vh - 170px);
+    height: auto;
+    overflow-y: auto;
   }
 
   .futures-wrap > .futures-grid {
     grid-column: 2;
     grid-row: 2;
+    display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     align-items: start;
     gap: 18px;
+    min-width: 0;
   }
 
   .futures-wrap > .futures-grid > .futures-chart-area {
@@ -41,31 +47,29 @@
     width: 100% !important;
   }
 
-  /* The six 24-hour/funding cards sit in the left rail above the coin list. */
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 240px;
+    position: static;
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    z-index: 2;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    z-index: auto;
   }
 
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-stat {
-    min-height: 48px;
+    min-height: 76px;
     box-sizing: border-box;
   }
 
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-data-grid {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 3;
     width: 100%;
   }
 
-  /* Position settlement is directly below the buy/sell order panel. */
   .futures-wrap > .futures-grid > .futures-chart-area > .settlement-panel {
     grid-column: 2;
     grid-row: 2;
@@ -86,8 +90,15 @@
 }
 
 @media (max-width: 760px) {
+  .futures-wrap > .futures-grid > .futures-chart-area {
+    display: flex;
+    flex-direction: column;
+  }
+
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
     position: static;
     width: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
