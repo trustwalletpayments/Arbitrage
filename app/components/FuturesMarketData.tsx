@@ -1,8 +1,136 @@
 "use client";
-import {useEffect,useState} from "react";
-import {binanceSymbol} from "../../lib/market-data";
-import {closeTestnetPosition,getTestnetPositions} from "../../lib/testnet-store";
-import type {StoredPosition} from "../../lib/testnet-store";
-import {getTestnetBalances,setTestnetBalances,recordFuturesSettlement} from "../../lib/testnet-wallet";
-type Book={bids:[string,string][];asks:[string,string][]};
-export default function FuturesMarketData({pair}:{pair:string}){const [book,setBook]=useState<Book>({bids:[],asks:[]});const [trades,setTrades]=useState<any[]>([]);const [ticker,setTicker]=useState<any>({});const [premium,setPremium]=useState<any>({});const [positions,setPositions]=useState<StoredPosition[]>([]);const [settling,setSettling]=useState<string|null>(null);const [notice,setNotice]=useState("");useEffect(()=>{let stop=false;const symbol=binanceSymbol(pair);const load=async()=>{try{const [d,t,k,p]=await Promise.all([fetch(`https://fapi.binance.com/fapi/v1/depth?symbol=${symbol}&limit=12`).then(r=>r.json()),fetch(`https://fapi.binance.com/fapi/v1/aggTrades?symbol=${symbol}&limit=20`).then(r=>r.json()),fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`).then(r=>r.json()),fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`).then(r=>r.json())]);if(!stop){setBook({bids:d.bids||[],asks:d.asks||[]});setTrades(t||[]);setTicker(k||{});setPremium(p||{})}}catch{}};load();const id=setInterval(load,3000);return()=>{stop=true;clearInterval(id)}},[pair]);useEffect(()=>{const refresh=()=>setPositions(getTestnetPositions().filter(p=>p.symbol===pair&&p.status==="OPEN"));refresh();const id=setInterval(refresh,1000);return()=>clearInterval(id)},[pair]);const closeAtMarket=(id:string)=>{if(settling)return;setSettling(id);setNotice("");try{const current=getTestnetPositions().find(p=>p.id===id);const closePrice=Number(premium.markPrice||ticker.lastPrice);if(!current||current.status!=="OPEN")throw new Error("Position is already closed");if(!Number.isFinite(closePrice)||closePrice<=0)throw new Error("Live market price is unavailable");const pnl=current.side==="LONG"?(closePrice-current.entryPrice)*current.quantity:(current.entryPrice-closePrice)*current.quantity;const returned=Math.max(0,current.margin+pnl);const balances=getTestnetBalances();const funds=balances.find(x=>x.asset==="USDT");if(!funds)throw new Error("USDT wallet is unavailable");funds.futures+=returned;setTestnetBalances(balances);closeTestnetPosition(id,closePrice,"CLOSED");recordFuturesSettlement({symbol:current.symbol,side:current.side,status:"CLOSED",margin:returned,realizedPnl:pnl});setPositions(getTestnetPositions().filter(p=>p.symbol===pair&&p.status==="OPEN"));setNotice(`Position closed at ${closePrice.toFixed(4)} · ${pnl>=0?"Profit":"Loss"} ${pnl>=0?"+":""}${pnl.toFixed(2)} USDT`)}catch(error){setNotice(error instanceof Error?error.message:"Unable to close position")}finally{setSettling(null)}};const change=Number(ticker.priceChangePercent||0);return <><style>{`.futures-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:18px 0}.futures-stat{padding:13px 14px;border:1px solid #20364d;border-radius:12px;background:#0a1523;min-width:0}.futures-stat-label{font-size:10px;letter-spacing:.08em;color:#6f849b;text-transform:uppercase;margin-bottom:6px}.futures-stat-value{font-size:14px;font-weight:700;color:#dbeafe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.positive{color:#34d399!important}.negative{color:#fb7185!important}.futures-data-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.market-data-panel{padding:22px!important;border:1px solid #20364d!important;border-radius:16px!important;background:#0a1523!important;min-width:0}.market-data-panel h2{margin:7px 0 0;font-size:22px}.market-data-panel .section-heading{display:flex;align-items:flex-start;justify-content:space-between}.book-head,.trades-head,.book-side>div,.trade-line{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;font-size:12px}.book-head,.trades-head{padding:10px 0;color:#6f849b;border-bottom:1px solid #203247}.book-side>div,.trade-line{padding:6px 0;color:#a9bbce}.book-side>div span:last-child,.trade-line span:nth-child(2),.trade-line span:last-child{text-align:right}.book-side.asks span:first-child{color:#fb7185}.book-side.bids span:first-child{color:#34d399}.book-mid{margin:6px 0;padding:8px;text-align:center;border:1px dashed #29435e;border-radius:8px;color:#7f96ae;font-size:11px}.trades-head,.trade-line{grid-template-columns:1fr 1fr 1fr}.trade-line{border-bottom:1px solid #14263a}.market-data-panel .tiny{padding-top:4px}.settlement-panel{margin-top:18px;padding:18px!important;border:1px solid #20364d!important;border-radius:16px!important;background:#0a1523!important}.settlement-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid #14263a}.settlement-row:last-child{border-bottom:0}.settlement-meta{display:flex;flex-direction:column;gap:4px}.settlement-button{border:1px solid #31506d;background:#10263a;color:#dbeafe;border-radius:9px;padding:9px 13px;cursor:pointer;font:inherit}.settlement-button:hover{background:#173b59}.settlement-button:disabled{opacity:.55;cursor:not-allowed}.settlement-notice{margin-top:12px;color:#9ec5e8;font-size:12px}@media(max-width:980px){.futures-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.futures-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.futures-stat{padding:11px}.futures-data-grid{grid-template-columns:1fr;gap:14px}.market-data-panel,.settlement-panel{padding:18px!important;border-radius:12px!important}.settlement-row{align-items:flex-start;flex-direction:column}.settlement-button{width:100%}}`}</style><div className="futures-stats"><div className="futures-stat"><div className="futures-stat-label">24h Change</div><div className={`futures-stat-value ${change>=0?"positive":"negative"}`}>{ticker.priceChangePercent?`${change.toFixed(2)}%`:"—"}</div></div><div className="futures-stat"><div className="futures-stat-label">24h High</div><div className="futures-stat-value">{ticker.highPrice?Number(ticker.highPrice).toFixed(4):"—"}</div></div><div className="futures-stat"><div className="futures-stat-label">24h Low</div><div className="futures-stat-value">{ticker.lowPrice?Number(ticker.lowPrice).toFixed(4):"—"}</div></div><div className="futures-stat"><div className="futures-stat-label">24h Volume</div><div className="futures-stat-value">{ticker.quoteVolume?Number(ticker.quoteVolume).toLocaleString(undefined,{maximumFractionDigits:0}):"—"}</div></div><div className="futures-stat"><div className="futures-stat-label">Funding Rate</div><div className="futures-stat-value">{premium.lastFundingRate?`${(Number(premium.lastFundingRate)*100).toFixed(4)}%`:"—"}</div></div><div className="futures-stat"><div className="futures-stat-label">Mark / Index</div><div className="futures-stat-value">{premium.markPrice&&premium.indexPrice?`${Number(premium.markPrice).toFixed(2)} / ${Number(premium.indexPrice).toFixed(2)}`:"—"}</div></div></div><div className="futures-data-grid"><section className="panel market-data-panel"><div className="section-heading"><div><div className="label">MARKET DEPTH</div><h2>Order book</h2></div><span className="muted tiny">Live</span></div><div className="book-head"><span>Price (USDT)</span><span>Amount</span></div><div className="book-side asks">{book.asks.slice(0,6).reverse().map((x,i)=><div key={i}><span>{Number(x[0]).toFixed(2)}</span><span>{Number(x[1]).toFixed(4)}</span></div>)}</div><div className="book-mid">Spread {book.asks[0]&&book.bids[0]?((+book.asks[0][0])-(+book.bids[0][0])).toFixed(2):"—"}</div><div className="book-side bids">{book.bids.slice(0,6).map((x,i)=><div key={i}><span>{Number(x[0]).toFixed(2)}</span><span>{Number(x[1]).toFixed(4)}</span></div>)}</div></section><section className="panel market-data-panel"><div className="section-heading"><div><div className="label">RECENT ACTIVITY</div><h2>Recent trades</h2></div><span className="muted tiny">Live</span></div><div className="trades-head"><span>Price</span><span>Quantity</span><span>Time</span></div>{trades.slice(0,10).map((t,i)=><div className={`trade-line ${t.isBuyerMaker?"down":"up"}`} key={i}><span>{Number(t.p).toFixed(2)}</span><span>{Number(t.q).toFixed(4)}</span><span>{new Date(t.T||Date.now()).toLocaleTimeString()}</span></div>)}</section></div><section className="panel settlement-panel"><div className="section-heading"><div><div className="label">TESTNET POSITIONS</div><h2>Position settlement</h2></div><span className="muted tiny">Market close</span></div>{positions.length===0?<div className="muted tiny">No open {pair} positions.</div>:positions.map(p=><div className="settlement-row" key={p.id}><div className="settlement-meta"><strong>{p.side} · {p.quantity} {p.symbol.replace("USDT","")}</strong><span className="muted tiny">Entry {p.entryPrice} · Margin {p.margin.toFixed(2)} USDT · {p.leverage}x</span></div><button className="settlement-button" disabled={settling===p.id} onClick={()=>closeAtMarket(p.id)}>{settling===p.id?"Closing…":"Close at market"}</button></div>)}{notice&&<div className="settlement-notice">{notice}</div>}</section></>}
+
+import { useEffect, useState } from "react";
+import { binanceSymbol } from "../../lib/market-data";
+import { closeTestnetPosition, getTestnetPositions } from "../../lib/testnet-store";
+import type { StoredPosition } from "../../lib/testnet-store";
+import { getTestnetBalances, setTestnetBalances, recordFuturesSettlement } from "../../lib/testnet-wallet";
+
+type Book = { bids: [string, string][]; asks: [string, string][] };
+type Ticker = { priceChangePercent?: string; highPrice?: string; lowPrice?: string; quoteVolume?: string; lastPrice?: string };
+type Premium = { lastFundingRate?: string; markPrice?: string; indexPrice?: string };
+
+const formatNumber = (value?: string | number, digits = 2) => {
+  if (value === undefined || value === null || value === "") return "—";
+  return Number(value).toLocaleString(undefined, { maximumFractionDigits: digits });
+};
+
+export default function FuturesMarketData({ pair }: { pair: string }) {
+  const [book, setBook] = useState<Book>({ bids: [], asks: [] });
+  const [trades, setTrades] = useState<any[]>([]);
+  const [ticker, setTicker] = useState<Ticker>({});
+  const [premium, setPremium] = useState<Premium>({});
+  const [positions, setPositions] = useState<StoredPosition[]>([]);
+  const [settling, setSettling] = useState<string | null>(null);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    let stopped = false;
+    const symbol = binanceSymbol(pair);
+    const load = async () => {
+      try {
+        const [depth, recentTrades, dailyTicker, funding] = await Promise.all([
+          fetch(`https://fapi.binance.com/fapi/v1/depth?symbol=${symbol}&limit=12`).then((r) => r.json()),
+          fetch(`https://fapi.binance.com/fapi/v1/aggTrades?symbol=${symbol}&limit=20`).then((r) => r.json()),
+          fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${symbol}`).then((r) => r.json()),
+          fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${symbol}`).then((r) => r.json()),
+        ]);
+        if (!stopped) {
+          setBook({ bids: depth.bids || [], asks: depth.asks || [] });
+          setTrades(Array.isArray(recentTrades) ? recentTrades : []);
+          setTicker(dailyTicker || {});
+          setPremium(funding || {});
+        }
+      } catch {
+        // Keep the last successful snapshot visible.
+      }
+    };
+    load();
+    const timer = window.setInterval(load, 3000);
+    return () => { stopped = true; window.clearInterval(timer); };
+  }, [pair]);
+
+  useEffect(() => {
+    const refresh = () => setPositions(getTestnetPositions().filter((p) => p.symbol === pair && p.status === "OPEN"));
+    refresh();
+    const timer = window.setInterval(refresh, 1000);
+    return () => window.clearInterval(timer);
+  }, [pair]);
+
+  const closeAtMarket = (id: string) => {
+    if (settling) return;
+    setSettling(id);
+    setNotice("");
+    try {
+      const current = getTestnetPositions().find((p) => p.id === id);
+      const closePrice = Number(premium.markPrice || ticker.lastPrice);
+      if (!current || current.status !== "OPEN") throw new Error("Position is already closed");
+      if (!Number.isFinite(closePrice) || closePrice <= 0) throw new Error("Live market price is unavailable");
+      const pnl = current.side === "LONG" ? (closePrice - current.entryPrice) * current.quantity : (current.entryPrice - closePrice) * current.quantity;
+      const returned = Math.max(0, current.margin + pnl);
+      const balances = getTestnetBalances();
+      const funds = balances.find((x) => x.asset === "USDT");
+      if (!funds) throw new Error("USDT wallet is unavailable");
+      funds.futures += returned;
+      setTestnetBalances(balances);
+      closeTestnetPosition(id, closePrice, "CLOSED");
+      recordFuturesSettlement({ symbol: current.symbol, side: current.side, status: "CLOSED", margin: returned, realizedPnl: pnl });
+      setPositions(getTestnetPositions().filter((p) => p.symbol === pair && p.status === "OPEN"));
+      setNotice(`Position closed at ${closePrice.toFixed(4)} · ${pnl >= 0 ? "Profit" : "Loss"} ${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} USDT`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Unable to close position");
+    } finally {
+      setSettling(null);
+    }
+  };
+
+  const change = Number(ticker.priceChangePercent || 0);
+  const spread = book.asks[0] && book.bids[0] ? (Number(book.asks[0][0]) - Number(book.bids[0][0])).toFixed(2) : "—";
+
+  return (
+    <>
+      <style>{`
+        .futures-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:20px 0}
+        .futures-stat{min-width:0;min-height:82px;padding:15px 16px;border:1px solid #1d344c;border-radius:14px;background:linear-gradient(145deg,#0d1b2b,#091321);box-shadow:0 8px 22px rgba(0,0,0,.12);display:flex;flex-direction:column;justify-content:space-between}
+        .futures-stat-label{font-size:10px;line-height:1.25;letter-spacing:.08em;color:#7890a8;text-transform:uppercase}
+        .futures-stat-value{margin-top:10px;font-size:15px;font-weight:700;color:#e5effb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .positive{color:#36d399!important}.negative{color:#fb7185!important}
+        .futures-data-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch}
+        .market-data-panel,.settlement-panel{min-width:0;padding:22px!important;border:1px solid #1d344c!important;border-radius:16px!important;background:linear-gradient(145deg,#0d1b2b,#091321)!important;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+        .market-data-panel{min-height:390px}.market-data-panel h2,.settlement-panel h2{margin:6px 0 0;font-size:22px;letter-spacing:-.02em}
+        .section-heading{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}.section-heading .label{font-size:10px;letter-spacing:.1em;color:#7890a8}.section-live{padding:5px 9px;border:1px solid #23435e;border-radius:999px;color:#7e9ab5;font-size:11px}
+        .book-head,.trades-head,.book-row,.trade-line{display:grid;align-items:center;gap:12px;font-size:12px}.book-head,.book-row{grid-template-columns:1fr 1fr}.trades-head,.trade-line{grid-template-columns:1fr 1fr 72px}.book-head,.trades-head{padding:10px 0;color:#7890a8;border-bottom:1px solid #1c3044}.book-row,.trade-line{padding:8px 0;color:#b8c8d8;border-bottom:1px solid #14283b}.book-row span:last-child,.trade-line span:nth-child(2),.trade-line span:last-child{text-align:right}.book-side.asks span:first-child{color:#fb7185}.book-side.bids span:first-child{color:#36d399}.book-mid{margin:8px 0;padding:9px;text-align:center;border:1px dashed #2b4761;border-radius:9px;color:#8198af;font-size:11px;background:#0a1726}.empty-state{display:flex;align-items:center;justify-content:center;min-height:230px;color:#6f8499;font-size:12px}.trade-line.up span:first-child{color:#36d399}.trade-line.down span:first-child{color:#fb7185}.trade-line span:last-child{font-size:11px;color:#7890a8}.scroll-table{min-height:280px}
+        .settlement-panel{margin-top:16px}.settlement-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid #14263a}.settlement-row:last-of-type{border-bottom:0}.settlement-meta{display:flex;flex-direction:column;gap:5px;min-width:0}.settlement-meta strong{font-size:13px;color:#e5effb}.settlement-button{border:1px solid #31506d;background:#10263a;color:#dbeafe;border-radius:9px;padding:9px 13px;cursor:pointer;font:inherit;white-space:nowrap}.settlement-button:hover{background:#173b59}.settlement-button:disabled{opacity:.55;cursor:not-allowed}.settlement-notice{margin-top:12px;padding:10px 12px;border:1px solid #23435e;border-radius:9px;color:#9ec5e8;font-size:12px;background:#0a1726}
+        @media(max-width:1100px){.futures-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+        @media(max-width:760px){.futures-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}.futures-stat{min-height:74px;padding:12px}.futures-stat-value{font-size:14px}.futures-data-grid{grid-template-columns:1fr;gap:14px}.market-data-panel,.settlement-panel{min-height:0;padding:18px!important;border-radius:13px!important}.market-data-panel h2,.settlement-panel h2{font-size:20px}.settlement-row{align-items:flex-start;flex-direction:column}.settlement-button{width:100%}}
+      `}</style>
+
+      <div className="futures-stats">
+        <div className="futures-stat"><div className="futures-stat-label">24h Change</div><div className={`futures-stat-value ${change >= 0 ? "positive" : "negative"}`}>{ticker.priceChangePercent ? `${change.toFixed(2)}%` : "—"}</div></div>
+        <div className="futures-stat"><div className="futures-stat-label">24h High</div><div className="futures-stat-value">{formatNumber(ticker.highPrice)}</div></div>
+        <div className="futures-stat"><div className="futures-stat-label">24h Low</div><div className="futures-stat-value">{formatNumber(ticker.lowPrice)}</div></div>
+        <div className="futures-stat"><div className="futures-stat-label">24h Volume</div><div className="futures-stat-value">{formatNumber(ticker.quoteVolume, 0)}</div></div>
+        <div className="futures-stat"><div className="futures-stat-label">Funding Rate</div><div className="futures-stat-value">{premium.lastFundingRate ? `${(Number(premium.lastFundingRate) * 100).toFixed(4)}%` : "—"}</div></div>
+        <div className="futures-stat"><div className="futures-stat-label">Mark / Index</div><div className="futures-stat-value">{premium.markPrice && premium.indexPrice ? `${formatNumber(premium.markPrice)} / ${formatNumber(premium.indexPrice)}` : "—"}</div></div>
+      </div>
+
+      <div className="futures-data-grid">
+        <section className="panel market-data-panel">
+          <div className="section-heading"><div><div className="label">MARKET DEPTH</div><h2>Order book</h2></div><span className="section-live">LIVE</span></div>
+          <div className="scroll-table"><div className="book-head"><span>Price (USDT)</span><span>Amount</span></div>{book.asks.length || book.bids.length ? <><div className="book-side asks">{book.asks.slice(0,6).reverse().map((row,i)=><div className="book-row" key={`ask-${i}`}><span>{formatNumber(row[0])}</span><span>{formatNumber(row[1],4)}</span></div>)}</div><div className="book-mid">Spread {spread}</div><div className="book-side bids">{book.bids.slice(0,6).map((row,i)=><div className="book-row" key={`bid-${i}`}><span>{formatNumber(row[0])}</span><span>{formatNumber(row[1],4)}</span></div>)}</div></> : <div className="empty-state">Order book is loading…</div>}</div>
+        </section>
+
+        <section className="panel market-data-panel">
+          <div className="section-heading"><div><div className="label">RECENT ACTIVITY</div><h2>Recent trades</h2></div><span className="section-live">LIVE</span></div>
+          <div className="scroll-table"><div className="trades-head"><span>Price</span><span>Quantity</span><span>Time</span></div>{trades.length ? trades.slice(0,10).map((trade,i)=><div className={`trade-line ${trade.isBuyerMaker ? "down" : "up"}`} key={i}><span>{formatNumber(trade.p)}</span><span>{formatNumber(trade.q,4)}</span><span>{new Date(trade.T || Date.now()).toLocaleTimeString()}</span></div>) : <div className="empty-state">Recent trades are loading…</div>}</div>
+        </section>
+      </div>
+
+      <section className="panel settlement-panel">
+        <div className="section-heading"><div><div className="label">TESTNET POSITIONS</div><h2>Position settlement</h2></div><span className="section-live">MARKET CLOSE</span></div>
+        {positions.length === 0 ? <div className="muted tiny">No open {pair} positions.</div> : positions.map((position) => <div className="settlement-row" key={position.id}><div className="settlement-meta"><strong>{position.side} · {position.quantity} {position.symbol.replace("USDT", "")}</strong><span className="muted tiny">Entry {formatNumber(position.entryPrice)} · Margin {position.margin.toFixed(2)} USDT · {position.leverage}x</span></div><button className="settlement-button" disabled={settling === position.id} onClick={() => closeAtMarket(position.id)}>{settling === position.id ? "Closing…" : "Close at market"}</button></div>)}
+        {notice && <div className="settlement-notice">{notice}</div>}
+      </section>
+    </>
+  );
+}
