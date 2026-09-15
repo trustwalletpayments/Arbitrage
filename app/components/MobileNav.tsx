@@ -41,7 +41,8 @@ export default function MobileNav() {
     };
   }, []);
 
-  if (!isLoggedIn) return null;
+  // The landing page should remain clean; bottom navigation is for app pages only.
+  if (pathname === "/" || !isLoggedIn) return null;
 
   const item = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`) ? "active" : "";
