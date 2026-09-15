@@ -18,6 +18,7 @@ import "./usdt-bnb-logo.css";
 import "./qr-fix.css";
 import "./futures-page.css";
 import ScrollGuard from "./components/ScrollGuard";
+import AuthGuard from "./components/AuthGuard";
 
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ScrollGuard />
+        <AuthGuard />
         {children}
         <script dangerouslySetInnerHTML={{ __html: enhanceScript }} />
       </body>
