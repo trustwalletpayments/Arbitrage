@@ -1,0 +1,22 @@
+/* Premium visual layer for the futures terminal */
+.futures-wrap>.trade-head{padding:22px 24px;border:1px solid #1b3047;border-radius:18px;background:linear-gradient(135deg,#0c1929,#09131f 62%,#0b1727);box-shadow:0 14px 36px rgba(0,0,0,.16);position:relative;overflow:hidden}
+.futures-wrap>.trade-head:after{content:"";position:absolute;right:-90px;top:-130px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(45,140,255,.13),transparent 68%);pointer-events:none}
+.futures-wrap>.trade-head .price{display:flex;align-items:center;gap:13px;font-size:38px;letter-spacing:-1px}
+.futures-wrap>.trade-head .price .up{display:inline-flex;align-items:center;gap:6px;margin-left:0;padding:7px 11px;border:1px solid rgba(52,211,153,.25);border-radius:999px;background:rgba(52,211,153,.1);color:#42e3aa;font-size:12px;letter-spacing:.8px;font-weight:800}
+.futures-wrap>.trade-head .price .up:before{content:"";width:6px;height:6px;border-radius:50%;background:#42e3aa;box-shadow:0 0 10px #42e3aa}
+.futures-wrap>.market-list.futures-market-list button{min-height:44px;border-radius:10px;transition:.18s}
+.futures-wrap>.market-list.futures-market-list button:hover{background:#132b45;border-color:#315d87;transform:translateY(-1px)}
+.futures-wrap>.market-list.futures-market-list button.selected{border-color:#2f91ff;background:linear-gradient(135deg,#12375e,#102a49);box-shadow:inset 3px 0 #3b9cff,0 0 0 1px rgba(47,145,255,.08)}
+.futures-chart-area .chart.live-chart{border:1px solid #1c334b;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.18)}
+.positions-panel,.futures-grid>.order-panel{border-radius:18px!important;box-shadow:0 14px 36px rgba(0,0,0,.16)}
+.futures-grid>.order-panel{background:linear-gradient(180deg,#0d1b2c,#0a1624)!important;border-color:#23405c!important}
+.futures-grid>.order-panel .panel-title{padding-bottom:20px;border-bottom:1px solid #1d344b}
+.futures-grid>.order-panel .panel-title .muted{padding:5px 9px;border:1px solid #27425c;border-radius:7px;background:#0a1522}
+.futures-grid>.order-panel input,.futures-grid>.order-panel select{height:50px;border-radius:11px;border-color:#29445e;transition:.2s}
+.futures-grid>.order-panel input:focus,.futures-grid>.order-panel select:focus{border-color:#3b9cff;box-shadow:0 0 0 3px rgba(59,156,255,.12)}
+.order-type-tabs{border-radius:11px}
+.futures-grid .submit-futures{min-height:53px;border-radius:11px;transition:.2s}
+.futures-grid .submit-futures:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.08)}
+.futures-grid .submit-futures.long-submit{background:linear-gradient(135deg,#0b9d78,#0bb889)}
+.futures-grid .submit-futures.short-submit{background:linear-gradient(135deg,#bd3852,#e14b65)}
+@media(max-width:760px){.futures-wrap>.trade-head{padding:18px;border-radius:14px}.futures-wrap>.trade-head .price{font-size:30px;gap:10px}.futures-wrap>.trade-head .price .up{font-size:10px;padding:6px 9px}.futures-chart-area .chart.live-chart,.positions-panel,.futures-grid>.order-panel{border-radius:14px!important}}
