@@ -1,10 +1,10 @@
-/* Final reusable layout for the single futures market-summary card. */
+/* Stable reusable layout for the single futures market-summary card. */
 .futures-wrap > .trade-head {
   width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
   margin: 0 !important;
-  padding: 18px 24px 0 !important;
+  padding: 16px 24px 0 !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
   border: 1px solid #214967 !important;
@@ -14,7 +14,7 @@
 
 .futures-wrap > .trade-head > div {
   display: grid !important;
-  grid-template-columns: minmax(330px,1.8fr) repeat(4,minmax(125px,1fr)) !important;
+  grid-template-columns: minmax(0,1.8fr) repeat(4,minmax(120px,1fr)) !important;
   grid-template-rows: auto auto !important;
   grid-template-areas:
     "pair mark change funding volume"
@@ -48,10 +48,11 @@
   flex-wrap: nowrap !important;
   gap: 10px !important;
   min-width: 0 !important;
-  margin: 0 18px 18px 0 !important;
+  width: 100% !important;
+  margin: 0 18px 16px 0 !important;
   padding: 0 !important;
   white-space: nowrap !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   font-size: clamp(34px,3vw,52px) !important;
   line-height: 1 !important;
   letter-spacing: -.045em !important;
@@ -75,7 +76,7 @@
   align-items: flex-start !important;
   gap: 6px !important;
   min-width: 0 !important;
-  min-height: 96px !important;
+  min-height: 84px !important;
   padding: 10px 16px !important;
   box-sizing: border-box !important;
   border: 0 !important;
@@ -110,7 +111,7 @@
   grid-row: 3 !important;
   width: auto !important;
   margin: 0 -24px !important;
-  padding: 11px 20px 12px !important;
+  padding: 10px 20px 11px !important;
   border-top: 1px solid #203d59 !important;
   text-align: center !important;
   font-size: 12px !important;
@@ -119,7 +120,7 @@
 
 @media (max-width:1250px) and (min-width:1100px) {
   .futures-wrap > .trade-head { padding-left:18px !important; padding-right:18px !important; }
-  .futures-wrap > .trade-head > div { grid-template-columns:minmax(285px,1.7fr) repeat(4,minmax(105px,1fr)) !important; }
+  .futures-wrap > .trade-head > div { grid-template-columns:minmax(0,1.7fr) repeat(4,minmax(105px,1fr)) !important; }
   .futures-wrap > .trade-head .pair { font-size:25px !important; margin-right:10px !important; }
   .futures-wrap > .trade-head .price { font-size:44px !important; margin-right:10px !important; }
   .futures-wrap > .trade-head .price .up { font-size:26px !important; }
@@ -130,7 +131,7 @@
 
 @media (max-width:1099px) and (min-width:761px) {
   .futures-wrap > .trade-head { grid-column:1 !important; }
-  .futures-wrap > .trade-head > div { grid-template-columns:minmax(260px,1.5fr) repeat(4,minmax(92px,1fr)) !important; }
+  .futures-wrap > .trade-head > div { grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(92px,1fr)) !important; }
   .futures-wrap > .trade-head .pair { font-size:22px !important; }
   .futures-wrap > .trade-head .price { font-size:38px !important; }
   .futures-wrap > .trade-head .price .up { font-size:23px !important; }
