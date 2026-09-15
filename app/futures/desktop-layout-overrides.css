@@ -1,4 +1,4 @@
-/* Desktop futures terminal layout: market stats left, order controls right, positions below controls. */
+/* Desktop futures terminal layout: market stats left, order controls right, position settlement below controls. */
 @media (min-width: 761px) {
   .futures-wrap {
     grid-template-columns: 240px minmax(0, 1fr);
@@ -62,15 +62,22 @@
     width: 100% !important;
   }
 
-  .futures-wrap > .futures-grid > .futures-chart-area > :not(.chart):not(.positions-panel) {
+  .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
     grid-column: 1;
     grid-row: 2;
-    min-width: 0;
+    width: 100%;
+    margin: 0;
   }
 
-  .futures-wrap > .futures-grid > .futures-chart-area > .positions-panel {
+  .futures-wrap > .futures-grid > .futures-chart-area > .futures-data-grid {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area > .settlement-panel {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 2 / span 2;
     width: 100%;
     align-self: start;
     margin: 0 !important;
