@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./global-theme.css";
 import "./orbitex.css";
@@ -22,6 +22,14 @@ import ScrollGuard from "./components/ScrollGuard";
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
   description: "ORBITEX crypto exchange platform",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 const themeScript = `(() => {
