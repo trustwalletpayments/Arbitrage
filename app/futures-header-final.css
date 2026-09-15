@@ -1,46 +1,50 @@
 .futures-wrap > .trade-head {
-  width: 80% !important;
-  max-width: 980px !important;
-  min-height: 390px !important;
-  margin: 26px auto 20px !important;
-  padding: 38px 28px 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 26px 0 20px !important;
+  padding: 30px 34px 0 !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
+  border-radius: 28px !important;
 }
 
-/* The actual markup has an extra wrapper, so target the inner content grid. */
-.futures-wrap > .trade-head > div > div {
+/* Actual markup: trade-head > div contains pair, price, stats and footer text. */
+.futures-wrap > .trade-head > div {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  grid-template-rows: auto auto auto auto !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(420px, 1fr) !important;
+  grid-template-rows: auto auto auto !important;
+  column-gap: 34px !important;
+  align-items: center !important;
   width: 100% !important;
   min-width: 0 !important;
-  gap: 0 !important;
 }
 
 .futures-wrap > .trade-head .pair {
+  grid-column: 1 !important;
   grid-row: 1 !important;
   display: flex !important;
   align-items: center !important;
   gap: 14px !important;
   min-width: 0 !important;
   white-space: nowrap !important;
-  font-size: clamp(24px, 3vw, 34px) !important;
+  font-size: clamp(24px, 2.4vw, 34px) !important;
   line-height: 1.15 !important;
 }
 
 .futures-wrap > .trade-head .price {
+  grid-column: 1 !important;
   grid-row: 2 !important;
   display: flex !important;
   align-items: baseline !important;
   flex-wrap: nowrap !important;
-  width: 100% !important;
   min-width: 0 !important;
-  margin: 42px 0 42px !important;
-  gap: 16px !important;
-  overflow: hidden !important;
+  width: 100% !important;
+  margin: 24px 0 28px !important;
+  gap: 18px !important;
+  overflow: visible !important;
   white-space: nowrap !important;
-  font-size: clamp(34px, 5vw, 62px) !important;
+  font-size: clamp(42px, 5vw, 76px) !important;
   line-height: .95 !important;
   letter-spacing: -.045em !important;
   box-sizing: border-box !important;
@@ -49,15 +53,18 @@
 .futures-wrap > .trade-head .price .up {
   flex: 0 0 auto !important;
   margin: 0 !important;
-  font-size: clamp(25px, 3.4vw, 42px) !important;
+  color: #35d6a0 !important;
+  font-size: clamp(30px, 3vw, 48px) !important;
   line-height: 1 !important;
   white-space: nowrap !important;
 }
 
 .futures-wrap > .trade-head .market-stats {
-  grid-row: 3 !important;
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
   width: 100% !important;
   min-width: 0 !important;
   margin: 0 !important;
@@ -72,14 +79,16 @@
   justify-content: center !important;
   gap: 12px !important;
   min-width: 0 !important;
-  min-height: 112px !important;
-  padding: 24px 18px !important;
+  min-height: 132px !important;
+  padding: 22px 20px !important;
   border: 0 !important;
   border-left: 1px solid #24445f !important;
   border-radius: 0 !important;
+  background: transparent !important;
   box-sizing: border-box !important;
-  font-size: 17px !important;
+  font-size: 15px !important;
   line-height: 1.2 !important;
+  color: #8295aa !important;
 }
 
 .futures-wrap > .trade-head .market-stats span:first-child {
@@ -88,40 +97,68 @@
 }
 
 .futures-wrap > .trade-head .market-stats b {
-  font-size: clamp(17px, 2vw, 22px) !important;
-  white-space: nowrap !important;
+  display: inline-block !important;
+  max-width: 100% !important;
   color: #e8f1fb !important;
+  font-size: clamp(16px, 1.6vw, 22px) !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-.futures-wrap > .trade-head > div > div > .muted {
-  grid-row: 4 !important;
-  margin: 0 -28px !important;
-  padding: 20px 22px 22px !important;
+.futures-wrap > .trade-head > div > .muted {
+  grid-column: 1 / -1 !important;
+  grid-row: 3 !important;
+  margin: 0 -34px !important;
+  padding: 16px 22px 18px !important;
+  border-top: 1px solid #203d59 !important;
   text-align: center !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   color: #71879d !important;
+}
+
+@media (max-width: 1100px) {
+  .futures-wrap > .trade-head > div {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    row-gap: 0 !important;
+  }
+
+  .futures-wrap > .trade-head .pair,
+  .futures-wrap > .trade-head .price,
+  .futures-wrap > .trade-head .market-stats {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+
+  .futures-wrap > .trade-head .market-stats {
+    margin-top: 6px !important;
+  }
 }
 
 @media (max-width: 760px) {
   .futures-wrap > .trade-head {
     width: 100% !important;
     min-height: 0 !important;
-    padding: 28px 18px 0 !important;
+    margin: 18px 0 !important;
+    padding: 24px 20px 0 !important;
+    border-radius: 22px !important;
   }
 
   .futures-wrap > .trade-head .pair {
-    font-size: 22px !important;
-    gap: 9px !important;
+    font-size: 24px !important;
+    gap: 10px !important;
   }
 
   .futures-wrap > .trade-head .price {
-    margin: 28px 0 32px !important;
-    font-size: clamp(30px, 10vw, 48px) !important;
-    gap: 9px !important;
+    margin: 24px 0 28px !important;
+    font-size: clamp(38px, 10vw, 56px) !important;
+    gap: 12px !important;
   }
 
   .futures-wrap > .trade-head .price .up {
-    font-size: clamp(23px, 7vw, 34px) !important;
+    font-size: clamp(28px, 7vw, 38px) !important;
   }
 
   .futures-wrap > .trade-head .market-stats {
@@ -142,9 +179,9 @@
     border-top: 0 !important;
   }
 
-  .futures-wrap > .trade-head > div > div > .muted {
-    margin-left: -18px !important;
-    margin-right: -18px !important;
+  .futures-wrap > .trade-head > div > .muted {
+    margin-left: -20px !important;
+    margin-right: -20px !important;
     font-size: 11px !important;
   }
 }
