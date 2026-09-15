@@ -1,9 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import LiveMarkets from "../components/LiveMarkets";
+import { createSupabaseBrowserClient } from "../lib/supabase-browser";
 
 export default function Markets() {
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const supabase = createSupabaseBrowserClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (!mounted) return;
+      if (!data.user) {
+        router.replace("/login?next=/markets");
+        return;
+      }
+      setAuthChecked(true);
+    }).catch(() => {
+      if (mounted) router.replace("/login?next=/markets");
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
+
+  if (!authChecked) {
+    return <main className="app-shell" />;
+  }
+
   return (
     <main className="app-shell">
       <header className="appbar">
