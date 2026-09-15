@@ -8,6 +8,7 @@ import {addTestnetPosition,getTestnetPositions,updateTestnetPosition} from "../.
 import type {StoredPosition} from "../../lib/testnet-store";
 import {getTestnetBalances,setTestnetBalances} from "../../lib/testnet-wallet";
 import "../futures-page.css";
+import "../futures-polish.css";
 
 function validPair(value:string|null){const compact=(value||"BTCUSDT").toUpperCase().replace(/[^A-Z0-9]/g,"");return MARKET_SYMBOLS.includes(compact)?displayPair(compact):"BTC/USDT"}
 function priceFrom(data:any){const value=Number(data?.p??data?.markPrice??data?.price);return Number.isFinite(value)&&value>0?value:0}
