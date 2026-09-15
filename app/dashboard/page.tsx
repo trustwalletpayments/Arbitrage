@@ -29,19 +29,31 @@ export default function Dashboard() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     let mounted = true;
+    let resolved = false;
+
     const load = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!mounted) return;
-      if (error || !data.user) { router.replace("/login?next=/dashboard"); return; }
+      resolved = true;
+      if (error || !data.user) {
+        router.replace("/login?next=/dashboard");
+        return;
+      }
       setEmail(data.user.email || "");
       setLoading(false);
     };
+
     load();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      if (session?.user) { setEmail(session.user.email || ""); setLoading(false); }
-      else router.replace("/login?next=/dashboard");
+      if (!mounted || !resolved) return;
+      // Do not redirect on transient null sessions while navigating between
+      // protected pages. Only the initial getUser check determines access.
+      if (session?.user) {
+        setEmail(session.user.email || "");
+        setLoading(false);
+      }
     });
+
     return () => { mounted = false; subscription.unsubscribe(); };
   }, [router]);
 
