@@ -8,7 +8,8 @@
     align-items: start !important;
   }
 
-  .futures-wrap > .market-list.futures-market-list {
+  .futures-wrap > .market-list.futures-market-list,
+  .futures-wrap > .market-search-wrap {
     grid-column: 1 !important;
     grid-row: 1 / span 5 !important;
     width: 240px !important;
@@ -29,4 +30,90 @@
     width: 100% !important;
     max-width: none !important;
   }
+}
+
+.market-search-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #20364d;
+  border-radius: 12px;
+  background: #09131f;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.market-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid #29445f;
+  border-radius: 9px;
+  background: #0d1b2a;
+  color: #7890a8;
+  box-sizing: border-box;
+}
+
+.market-search-box input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e8f1fb;
+  font: inherit;
+  font-size: 13px;
+}
+
+.market-search-box input::placeholder { color: #7890a8; }
+.market-search-box button {
+  border: 0;
+  background: transparent;
+  color: #9eb3c8;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.market-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  max-height: calc(100vh - 235px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.market-search-results button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #1d3045;
+  border-radius: 9px;
+  background: #0d1b2a;
+  color: #b8c7d9;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.market-search-results button span { margin-left: auto; }
+.market-search-results button:hover { background: #142a43; border-color: #31577e; }
+.market-search-results button.selected { border-color: #2d8cff; background: #12345a; color: #fff; }
+.market-search-empty { padding: 16px 8px; color: #7890a8; font-size: 12px; text-align: center; }
+
+@media (max-width: 760px) {
+  .futures-wrap > .market-search-wrap {
+    width: 100% !important;
+    max-width: none !important;
+  }
+  .market-search-results { max-height: 360px; }
 }
