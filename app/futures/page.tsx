@@ -4,26 +4,26 @@ import Link from "next/link";
 import MarketChart from "../components/MarketChart";
 import CoinIcon from "../components/CoinIcon";
 import {MARKET_SYMBOLS,displayPair,binanceSymbol,formatPrice} from "../../lib/market-data";
-import {addTestnetPosition,getTestnetPositions,updateTestnetPosition,closeTestnetPosition} from "../../lib/testnet-store";
+import {addTestnetPosition,getTestnetPositions,updateTestnetPosition} from "../../lib/testnet-store";
 import type {StoredPosition} from "../../lib/testnet-store";
 import {getTestnetBalances,setTestnetBalances} from "../../lib/testnet-wallet";
 import "../futures-page.css";
 
 function validPair(value:string|null){const compact=(value||"BTCUSDT").toUpperCase().replace(/[^A-Z0-9]/g,"");return MARKET_SYMBOLS.includes(compact)?displayPair(compact):"BTC/USDT"}
-function priceFrom(data:any){const value=Number(data?.p??data?.markPrice);return Number.isFinite(value)&&value>0?value:0}
+function priceFrom(data:any){const value=Number(data?.p??data?.markPrice??data?.price);return Number.isFinite(value)&&value>0?value:0}
 
 export default function Futures(){
  const [pair,setPair]=useState("BTC/USDT"),[expanded,setExpanded]=useState(false),[side,setSide]=useState("Long"),[lev,setLev]=useState(10),[orderType,setOrderType]=useState("Limit"),[entryPrice,setEntryPrice]=useState(""),[quantity,setQuantity]=useState(""),[takeProfit,setTakeProfit]=useState(""),[stopLoss,setStopLoss]=useState(""),[markPrice,setMarkPrice]=useState(0),[positions,setPositions]=useState<StoredPosition[]>([]),[message,setMessage]=useState(""),[submitting,setSubmitting]=useState(false);
  const symbol=binanceSymbol(pair),base=pair.split("/")[0];
  useEffect(()=>{setPair(validPair(new URLSearchParams(window.location.search).get("pair")));setPositions(getTestnetPositions())},[]);
  useEffect(()=>{
-  let cancelled=false,ws:WebSocket|undefined, timer:ReturnType<typeof setInterval>|undefined;
+  let cancelled=false,ws:WebSocket|undefined,timer:ReturnType<typeof setInterval>|undefined;
   setMarkPrice(0);setEntryPrice("");
   const apply=(value:number)=>{if(!cancelled&&value>0){setMarkPrice(value);setEntryPrice(x=>x||String(value));setPositions(current=>current.map(p=>{if(p.status!=="OPEN")return p;const pnl=(p.side==="LONG"?value-p.entryPrice:p.entryPrice-value)*p.quantity;updateTestnetPosition(p.id,{markPrice:value,unrealizedPnl:pnl});return {...p,markPrice:value,unrealizedPnl:pnl}}))}};
-  const poll=async()=>{try{const r=await fetch(`/api/testnet/futures?symbol=${encodeURIComponent(symbol)}`,{cache:"no-store"});if(r.ok)apply(priceFrom(await r.json()))}catch{}};
-  poll();timer=setInterval(poll,5000);
-  try{ws=new WebSocket(`wss://fstream.binance.com/public/ws/${symbol.toLowerCase()}@markPrice@1s`);ws.onmessage=e=>{try{apply(priceFrom(JSON.parse(e.data)))}catch{}};ws.onerror=()=>{try{ws?.close()}catch{}}}catch{}
-  return()=>{cancelled=true;timer&&clearInterval(timer);try{ws?.close()}catch{}}
+  const poll=async()=>{try{const r=await fetch(`/api/testnet/futures?symbol=${encodeURIComponent(symbol)}&t=${Date.now()}`,{cache:"no-store"});const data=await r.json();if(r.ok)apply(priceFrom(data))}catch{}};
+  poll();timer=setInterval(poll,3000);
+  try{ws=new WebSocket(`wss://fstream.binance.com/ws/${symbol.toLowerCase()}@markPrice@1s`);ws.onmessage=e=>{try{apply(priceFrom(JSON.parse(e.data)))}catch{}};ws.onclose=()=>{if(!cancelled)poll()}}catch{}
+  return()=>{cancelled=true;if(timer)clearInterval(timer);try{ws?.close()}catch{}}
  },[symbol]);
  const livePnl=useMemo(()=>{const e=Number(entryPrice),q=Number(quantity);return e>0&&q>0&&markPrice>0?(side==="Long"?markPrice-e:e-markPrice)*q:0},[entryPrice,quantity,side,markPrice]);
  async function submit(){setMessage("");const entry=orderType==="Market"?markPrice:Number(entryPrice),qty=Number(quantity);if(entry<=0||qty<=0){setMessage("Live price is still loading. Enter a valid price and quantity.");return}const margin=entry*qty/lev,balances=getTestnetBalances(),wallet=balances.find(x=>x.asset==="USDT");if(!wallet||wallet.futures<margin){setMessage(`Insufficient futures balance. Required margin: ${margin.toFixed(2)} USDT`);return}setSubmitting(true);try{const r=await fetch("/api/testnet/futures",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symbol:pair,side:side.toUpperCase(),entryPrice:entry,markPrice,quantity:qty,leverage:lev,takeProfit:takeProfit?Number(takeProfit):undefined,stopLoss:stopLoss?Number(stopLoss):undefined})}),data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||"Position rejected");wallet.futures-=margin;setTestnetBalances(balances);addTestnetPosition(data.position);setPositions(getTestnetPositions());setQuantity("");setMessage(`Position opened · ${margin.toFixed(2)} USDT margin`)}catch(e){setMessage(e instanceof Error?e.message:"Position failed")}finally{setSubmitting(false)}}
