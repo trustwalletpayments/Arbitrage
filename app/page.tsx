@@ -48,6 +48,7 @@ export default function Home() {
   }, []);
 
   const accountLabel = userId ? `ID: ${userId.slice(0, 8)}…` : "Log in";
+  const marketsHref = userId ? "/markets" : "/login?next=/markets";
 
   return (
     <main className="orbitex-home redesign-home">
@@ -65,7 +66,7 @@ export default function Home() {
         <div className="hero-device-wrap"><div className="hero-device-glow" /><div className="hero-orbit-ring ring-a" /><div className="hero-orbit-ring ring-b" /><div className="hero-device"><div className="device-notch" /><div className="device-brand"><img src="/orbitex-logo.svg" alt="" /><b>ORBITEX</b></div><small>Total Balance</small><strong>$6,079.39</strong><em>+2.45% (24h)</em><div className="device-actions"><span><ArrowDownToLine /><small>Deposit</small></span><span><ArrowUpFromLine /><small>Withdraw</small></span><span><ArrowLeftRight /><small>Transfer</small></span><span><Gift /><small>Earn</small></span></div><div className="device-tabs"><b>Favorites</b><b className="active">Hot</b><b>Gainers</b><b>New</b></div>{featured.map(([symbol, name, price, change]) => <div className="device-market" key={symbol}><CoinIcon symbol={symbol} size={29} /><div><b>{symbol}/USDT</b><small>{name}</small></div><div><b>{price}</b><small className={change.startsWith("-") ? "down" : "up"}>{change}</small></div></div>)}</div></div>
       </section>
 
-      <section className="redesign-markets" id="markets"><div className="redesign-section-head"><div><div className="orbitex-eyebrow">LIVE MARKET DATA</div><h2>Markets</h2></div><Link href="/markets">View all →</Link></div><div className="market-cards">{featured.map(([symbol, name, price, change]) => <AuthGateMarketCard symbol={symbol} name={name} price={price} change={change} key={symbol} />)}</div></section>
+      <section className="redesign-markets" id="markets"><div className="redesign-section-head"><div><div className="orbitex-eyebrow">LIVE MARKET DATA</div><h2>Markets</h2></div><Link href={marketsHref}>View all →</Link></div><div className="market-cards">{featured.map(([symbol, name, price, change]) => <AuthGateMarketCard symbol={symbol} name={name} price={price} change={change} key={symbol} />)}</div></section>
 
       <section className="redesign-feature-section" id="features"><div className="feature-copy"><div className="orbitex-eyebrow">BUILT FOR TRADERS</div><h2>A Smarter Way<br />to <span>Trade.</span></h2><p>Powerful tools, deep market data and a seamless trading experience. ORBITEX gives you everything you need to trade with confidence.</p><Link href="/signup" className="orbitex-primary">Create Your Account →</Link></div><div className="redesign-feature-grid">{features.map(([Icon, title, text]) => <article key={title}><b className="feature-icon"><Icon aria-hidden="true" /></b><h3>{title}</h3><p>{text}</p></article>)}</div></section>
 
