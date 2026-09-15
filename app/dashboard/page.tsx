@@ -10,6 +10,7 @@ import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 import "./dashboard.css";
 import "./compact.css";
 import "./mobile-fix.css";
+import "./action-fix.css";
 
 type Market = { symbol: string; price: number; change: number };
 const initialMarkets: Market[] = [
