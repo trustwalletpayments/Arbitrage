@@ -1,71 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Copy, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
-import MobileNav from "../../../components/MobileNav";
-import "../../wallet.css";
-import "../deposit.css";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowDownToLine, Check, Copy, Search, ShieldCheck } from "lucide-react";
+import { useMemo, useState } from "react";
+import MobileNav from "../../components/MobileNav";
+import "../wallet.css";
+import "./deposit.css";
 
-const ADDRESSES: Record<string, string> = {
-  bsc: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  eth: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  arbitrum: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  avalanche: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  tron: "TKqK2iAEKFC7M5RA12gBdskBLGNdtrTH3q3",
-  trc20: "TKqK2iAEKFC7M5RA12gBdskBLGNdtrTH3q3",
-  bitcoin: "bc1q3nu0hklvvnkzfsd6e8g8e29kzd8q9k6mw4ssk2",
-  solana: "79z3yH2t7BcWdSJYx1V9CftpwEDjXS6JryVPTMtLPQJF",
-  aptos: "0x78faf651ee5fab278b1e93e2117bff92bedc182d1077e9d2710a14aedc164fc3",
-  ton: "UQCFeiYwfU9xPr5RkY9-X11HcYLMGPFq766OXZ5a0qyI_9dt",
-  near: "7fb16d6c7600508ff099b67a8b91db5762d835be5d257b0d4cb97af1cd0c909",
-  polygon: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  optimism: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  base: "0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",
-  sui: "0xc7489fba859d9f693e7b9de0de87c919a9b2a2ea8d9fbfb156c4e586f76cb4d5",
-};
-
-export default function DepositAddressPage() {
-  const [details, setDetails] = useState({ asset: "USDT", assetName: "Tether", network: "BNB Smart Chain", networkShort: "BEP-20", networkId: "bsc" });
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setDetails({
-      asset: params.get("asset") || "USDT",
-      assetName: params.get("assetName") || "Tether",
-      network: params.get("network") || "BNB Smart Chain",
-      networkShort: params.get("networkShort") || "BEP-20",
-      networkId: params.get("networkId") || "bsc",
-    });
-  }, []);
-
-  const { asset, assetName, network, networkShort, networkId } = details;
-  const address = ADDRESSES[networkId] || "";
-  const qrUrl = address
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=${encodeURIComponent(address)}`
-    : "";
-
-  async function copyAddress() {
-    if (!address) return;
-    try { await navigator.clipboard.writeText(address); } catch {}
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  }
-
-  return (
-    <main className="wallet-page">
-      <header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet/deposit" className="history-link"><ArrowLeft size={18} /> Back to Deposit</Link></header>
-      <div className="wallet-content deposit-content">
-        <div className="wallet-heading"><span className="wallet-kicker">FUND YOUR ACCOUNT</span><h1>Deposit {asset}</h1><p>Send only {asset} through the selected network to the address below.</p></div>
-        <section className="deposit-address-page-card">
-          <Link href="/wallet/deposit" className="mobile-back-button"><ArrowLeft size={17} /> Choose another network</Link>
-          <div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h2>{assetName} ({asset})</h2><p>This is your <strong>{asset} deposit address on {network} ({networkShort})</strong>. Only send {asset} using this exact network.</p></div>
-          {qrUrl ? <div className="deposit-qr-placeholder"><img src={qrUrl} alt={`${asset} on ${network} deposit QR code`} /></div> : <div className="deposit-qr-placeholder deposit-qr-unavailable"><span>QR code is unavailable because this network has no configured address.</span></div>}
-          <div className="deposit-address-box"><span>{asset} on {network} — {networkShort} deposit address</span><strong>{address || "Address not configured for this network"}</strong>{address && <button type="button" onClick={copyAddress}><Copy size={17} /> {copied ? "Copied" : "Copy address"}</button>}</div>
-          <div className="deposit-security-note"><ShieldCheck size={18} /><span>Network warning: sending another asset or using a different network may permanently result in lost funds.</span></div>
-        </section>
-      </div><MobileNav />
-    </main>
-  );
-}
+type Asset = { symbol: string; name: string; color: string };
+type Network = { id: string; name: string; short: string; logo: string };
+const ASSETS: Asset[] = [["USDT","Tether","#26a17b"],["BTC","Bitcoin","#f7931a"],["ETH","Ethereum","#627eea"],["BNB","BNB","#f3ba2f"],["SOL","Solana","#8b5cf6"],["XRP","XRP","#64748b"],["USDC","USD Coin","#2775ca"],["ADA","Cardano","#2563eb"],["DOGE","Dogecoin","#c2a633"],["TRX","TRON","#ef4444"],["AVAX","Avalanche","#e84142"],["LINK","Chainlink","#2a5ada"],["DOT","Polkadot","#e6007a"],["POL","Polygon","#8247e5"],["LTC","Litecoin","#345d9d"],["SHIB","Shiba Inu","#f28c28"],["UNI","Uniswap","#ff007a"],["BCH","Bitcoin Cash","#0ac18e"],["ATOM","Cosmos","#6f7390"],["XLM","Stellar","#8b93a7"]].map(([symbol,name,color])=>({symbol,name,color}));
+const n=(id:string,name:string,short:string,logo:string):Network=>({id,name,short,logo});
+const EVM=[n("bsc","BNB Smart Chain","BEP-20","bnb"),n("eth","Ethereum","ERC-20","eth"),n("arbitrum","Arbitrum One","Arbitrum","arb")];
+const NETWORKS:Record<string,Network[]>={USDT:[n("bsc","BNB Smart Chain","BEP-20","bnb"),n("eth","Ethereum","ERC-20","eth"),n("tron","Tron","TRC-20","trx"),n("aptos","Aptos","Aptos","apt"),n("solana","Solana","Solana","sol"),n("arbitrum","Arbitrum One","Arbitrum","arb"),n("ton","TON","TON","ton"),n("optimism","Optimism","OP","op"),n("near","NEAR Protocol","NEAR","near"),n("polygon","Polygon","Polygon","pol"),n("avalanche","Avalanche C-Chain","AVAX","avax"),n("sui","Sui","Sui","sui"),n("base","Base","Base","base")],BTC:[n("bitcoin","Bitcoin","BTC","btc"),...EVM],ETH:[n("eth","Ethereum","ERC-20","eth"),n("bsc","BNB Smart Chain","BEP-20","bnb"),n("arbitrum","Arbitrum One","Arbitrum","arb"),n("optimism","Optimism","OP","op"),n("base","Base","Base","base"),n("polygon","Polygon","Polygon","pol"),n("linea","Linea","Linea","linea")],BNB:EVM,SOL:[n("solana","Solana","Solana","sol"),...EVM],XRP:[n("xrp","XRP Ledger","XRP","xrp"),...EVM],USDC:[n("eth","Ethereum","ERC-20","eth"),n("bsc","BNB Smart Chain","BEP-20","bnb"),n("solana","Solana","Solana","sol"),n("arbitrum","Arbitrum One","Arbitrum","arb"),n("base","Base","Base","base"),n("polygon","Polygon","Polygon","pol"),n("optimism","Optimism","OP","op")],ADA:[n("cardano","Cardano","Cardano","ada"),...EVM],DOGE:[n("dogecoin","Dogecoin","DOGE","doge"),...EVM],TRX:[n("tron","Tron","TRC-20","trx"),...EVM],AVAX:[n("avalanche","Avalanche C-Chain","AVAX","avax"),...EVM],LINK:[n("eth","Ethereum","ERC-20","eth"),n("bsc","BNB Smart Chain","BEP-20","bnb"),n("arbitrum","Arbitrum One","Arbitrum","arb"),n("polygon","Polygon","Polygon","pol"),n("optimism","Optimism","OP","op"),n("base","Base","Base","base")],DOT:[n("polkadot","Polkadot","DOT","dot"),...EVM],POL:[n("polygon","Polygon","Polygon","pol"),...EVM],LTC:[n("litecoin","Litecoin","LTC","ltc"),...EVM],SHIB:[n("eth","Ethereum","ERC-20","eth"),n("bsc","BNB Smart Chain","BEP-20","bnb"),n("arbitrum","Arbitrum One","Arbitrum","arb")],UNI:[n("eth","Ethereum","ERC-20","eth"),n("bsc","BNB Smart Chain","BEP-20","bnb"),n("arbitrum","Arbitrum One","Arbitrum","arb"),n("polygon","Polygon","Polygon","pol"),n("optimism","Optimism","OP","op"),n("base","Base","Base","base")],BCH:[n("bitcoincash","Bitcoin Cash","BCH","bch"),...EVM],ATOM:[n("cosmos","Cosmos Hub","ATOM","atom"),...EVM],XLM:[n("stellar","Stellar","XLM","xlm"),...EVM]};
+const DEMO_ADDRESSES:Record<string,string>={bsc:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",eth:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",arbitrum:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",optimism:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",polygon:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",avalanche:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",base:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",linea:"0x43A690962edb1a5198E856E95fdEE68cFF4F0E83",tron:"TKqK2iAEKFC7M5RA12gBdskBLGNdtrTH3q3",bitcoin:"bc1q3nu0hklvvnkzfsd6e8g8e29kzd8q9k6mw4ssk2",solana:"79z3yH2t7BcWdSJYx1V9CftpwEDjXS6JryVPTMtLPQJF",aptos:"0x78faf651ee5fab278b1e93e2117bff92bedc182d1077e9d2710a14aedc164fc3",ton:"UQCFeiYwfU9xPr5RkY9-X11HcYLMGPFq766OXZ5a0qyI_9dt",near:"7fb16d6c7600508ff099b67a8b91db5762d835be5d257b0d4cb97af1cd0c909",sui:"0xc7489fba859d9f693e7b9de0de87c919a9b2a2ea8d9fbfb156c4e586f76cb4d5",xrp:"rGvJwEheqLztdxhz32Wgpm1TjPXopUFji",cardano:"addr1q827wexwa8ghk0zknmpllxrk26qvqq9me2e7s69n5shty9hnmevm45jtmst32qsvupk3hepyxkg3ezxzsw06evlelafsp9hksw",dogecoin:"DRYR9UiLC72EEXJMbP86aoCnL149JMLDcM",polkadot:"1nHzS9upAUikrpXCsE1yDHPR7n2r86NL79dHWCH6Wdw6jgc",litecoin:"ltc1qm2s8vkruqyhu9dpneuyct8paky7vemkzzagxur",bitcoincash:"bitcoincash:qpxq2ue80khteuvktl0skfgsm5r78yp7p5r5xsj0st",cosmos:"cosmos146ah07njwh2zyzc54ulwer8c7p3k002jtc6ucc",stellar:"GCWJQUWD2GLEFTR4752RQGHSTRZNP4FUIZUGW74M7SG6F4MUYTDL7AXV"};
+const QR_FILES:Record<string,string>={bsc:"/real_bnb_logo_scannable_qr.png",eth:"/real_eth_logo_scannable_qr.png",tron:"/real_tron_logo_scannable_qr.png",aptos:"/real_aptos_logo_scannable_qr.png",solana:"/real_solana_logo_scannable_qr.png",arbitrum:"/real_arbitrum_logo_scannable_qr.png",ton:"/real_ton_logo_scannable_qr.png",optimism:"/real_optimism_logo_scannable_qr.png",near:"/real_near_logo_scannable_qr.png",polygon:"/real_polygon_logo_scannable_qr.png",avalanche:"/real_avax_logo_scannable_qr.png",sui:"/real_sui_logo_scannable_qr.png",base:"/real_base_logo_scannable_qr.png",bitcoin:"/real_btc_logo_scannable_qr.png",linea:"/real_linea_logo_scannable_qr.png",xrp:"/real_xrp_logo_scannable_qr.png",cardano:"/real_ada_logo_scannable_qr.png",dogecoin:"/real_doge_logo_scannable_qr.png",polkadot:"/real_dot_logo_scannable_qr.png",litecoin:"/real_ltc_logo_scannable_qr.png",bitcoincash:"/real_bch_logo_scannable_qr.png",cosmos:"/real_atom_logo_scannable_qr.png",stellar:"/real_xlm_logo_scannable_qr.png"};
+function AssetLogo({asset}:{asset:Asset}){return <span className="deposit-asset-logo" style={{background:asset.color}}><img src={`https://assets.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`} alt={`${asset.name} logo`}/></span>}
+function NetworkLogo({network}:{network:Network}){return <span className="deposit-network-logo"><img src={`https://assets.coincap.io/assets/icons/${network.logo}@2x.png`} alt={`${network.name} logo`}/><span>{network.short.slice(0,2)}</span></span>}
+export default function DepositPage(){const router=useRouter();const [query,setQuery]=useState("");const [selected,setSelected]=useState<Asset>(ASSETS[0]);const [networkId,setNetworkId]=useState("");const [copied,setCopied]=useState(false);const [showDetails,setShowDetails]=useState(false);const filteredAssets=useMemo(()=>{const q=query.trim().toLowerCase();return q?ASSETS.filter(a=>`${a.symbol} ${a.name}`.toLowerCase().includes(q)):ASSETS},[query]);const selectedNetworks=NETWORKS[selected.symbol]??[];const selectedNetwork=selectedNetworks.find(n=>n.id===networkId);const depositAddress=selectedNetwork?DEMO_ADDRESSES[selectedNetwork.id]??"ORBITEX-DEMO-DEPOSIT-ADDRESS":"";function selectAsset(asset:Asset){setSelected(asset);setNetworkId("");setCopied(false);setShowDetails(true)}function chooseNetwork(id:string){setNetworkId(id);setCopied(false);if(typeof window!=="undefined"&&window.innerWidth<=560){const network=selectedNetworks.find(item=>item.id===id);if(network)router.push(`/wallet/deposit/address?asset=${encodeURIComponent(selected.symbol)}&assetName=${encodeURIComponent(selected.name)}&network=${encodeURIComponent(network.name)}&networkShort=${encodeURIComponent(network.short)}&networkId=${encodeURIComponent(network.id)}`)}}async function copyAddress(){if(!depositAddress)return;try{await navigator.clipboard.writeText(depositAddress)}catch{}setCopied(true);window.setTimeout(()=>setCopied(false),1800)}return <main className="wallet-page"><header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet" className="history-link"><ArrowLeft size={18}/> Back to Wallet</Link></header><div className="wallet-content deposit-content"><div className="wallet-heading"><div><span className="wallet-kicker">FUND YOUR ACCOUNT</span><h1>Deposit</h1><p>Choose a crypto and the network you want to use for your deposit.</p></div></div><section className="deposit-shell"><div className={`deposit-selector withdraw-assets ${showDetails?"mobile-hidden":""}`}><div className="deposit-section-heading"><div><span className="wallet-kicker">SELECT ASSET</span><h2>Choose a deposit asset</h2></div><span className="supported-count">20 supported assets</span></div><label className="deposit-search"><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by coin name or symbol"/></label><div className="deposit-asset-grid">{filteredAssets.map(asset=><button key={asset.symbol} type="button" className={`deposit-asset-option ${selected.symbol===asset.symbol?"selected":""}`} onClick={()=>selectAsset(asset)}><AssetLogo asset={asset}/><span><strong>{asset.symbol}</strong><small>{asset.name}</small></span>{selected.symbol===asset.symbol&&<Check size={17} className="asset-selected-check"/>}</button>)}</div>{!filteredAssets.length&&<div className="deposit-no-results">No supported asset matches your search.</div>}</div><div className={`deposit-details withdraw-form ${showDetails?"mobile-visible":"mobile-hidden"}`}><button type="button" className="mobile-back-button" onClick={()=>setShowDetails(false)}><ArrowLeft size={17}/> Choose another asset</button><div className="selected-asset-heading"><AssetLogo asset={selected}/><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{selected.name} <em>{selected.symbol}</em></h2></div></div><p className="deposit-helper">Select the network that matches the wallet or exchange you are sending from. Sending through the wrong network can permanently lose funds.</p><div className="deposit-network-step"><label className="deposit-field-label">Choose network for {selected.symbol}</label><div className="deposit-network-list">{selectedNetworks.map(item=><button key={item.id} type="button" className={`deposit-network-option ${networkId===item.id?"selected":""}`} onClick={()=>chooseNetwork(item.id)}><NetworkLogo network={item}/><span><strong>{selected.symbol} on {item.name}</strong><small>{item.short} network</small></span>{networkId===item.id&&<Check size={17} className="asset-selected-check"/>}</button>)}</div></div>{selectedNetwork&&<div className="deposit-address-step"><div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h3>{selected.symbol} on {selectedNetwork.short}</h3><p>Send only <strong>{selected.symbol}</strong> using the <strong>{selectedNetwork.name}</strong> network.</p></div><div className="deposit-qr-placeholder"><img src={QR_FILES[selectedNetwork.id] ?? QR_FILES.bsc} alt={`${selected.symbol} ${selectedNetwork.short} deposit QR code`} /></div><div className="deposit-address-box"><span>{selected.symbol} on {selectedNetwork.name} ({selectedNetwork.short}) deposit address</span><strong>{depositAddress}</strong><button type="button" onClick={copyAddress}><Copy size={17}/> {copied?"Copied":"Copy address"}</button></div><div className="deposit-security-note"><ShieldCheck size={18}/><span>Make sure the network is <strong>{selectedNetwork.short}</strong> before sending funds.</span></div></div>}<button className="primary-action deposit-continue" type="button"><ArrowDownToLine size={18}/> Deposit {selected.symbol}</button></div></section></div><MobileNav/></main>}
