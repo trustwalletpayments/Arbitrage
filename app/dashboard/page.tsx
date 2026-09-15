@@ -32,29 +32,60 @@ export default function Dashboard() {
     let mounted = true;
     let checked = false;
 
-    const load = async () => {
-      const { data, error } = await supabase.auth.getUser();
+    const finishWithUser = (user: { email?: string | null } | null) => {
       if (!mounted) return;
       checked = true;
-      if (data.user) {
-        setEmail(data.user.email || "");
+      if (user) {
+        setEmail(user.email || "");
         setLoading(false);
-        return;
       }
-      // Do not log a member out because of a temporary network/auth error.
-      if (!error) router.replace("/login?next=/dashboard");
+    };
+
+    const load = async () => {
+      try {
+        // Read the persisted browser session first; this avoids waiting on a
+        // network request before rendering an already-authenticated dashboard.
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 5000)),
+        ]);
+
+        if (!mounted) return;
+        if (sessionResult && "data" in sessionResult && sessionResult.data.session?.user) {
+          finishWithUser(sessionResult.data.session.user);
+          return;
+        }
+
+        const userResult = await Promise.race([
+          supabase.auth.getUser(),
+          new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 5000)),
+        ]);
+        if (!mounted) return;
+        if (userResult && "data" in userResult && userResult.data.user) {
+          finishWithUser(userResult.data.user);
+          return;
+        }
+
+        // A missing session after the timeout means the user needs to sign in.
+        // Never leave the page permanently stuck on “Checking your account…”.
+        setLoading(false);
+        router.replace("/login?next=/dashboard");
+      } catch {
+        if (!mounted) return;
+        setLoading(false);
+        router.replace("/login?next=/dashboard");
+      }
     };
 
     load();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       if (session?.user) {
-        setEmail(session.user.email || "");
-        setLoading(false);
+        finishWithUser(session.user);
         return;
       }
-      // Only an explicit SIGNED_OUT event is allowed to redirect.
-      // INITIAL_SESSION or transient null sessions must not log users out.
+      // Only an explicit SIGNED_OUT event is allowed to redirect after the
+      // initial auth check has completed.
       if (event === "SIGNED_OUT" && checked) {
         router.replace("/login?next=/dashboard");
       }
