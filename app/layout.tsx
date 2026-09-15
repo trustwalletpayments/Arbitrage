@@ -5,6 +5,7 @@ import "./orbitex.css";
 import "./orbitex-internal.css";
 import "./logo-overrides.css";
 import "./home-redesign.css";
+import "./market-card-fix.css";
 import "./store-badge-overrides.css";
 import "./footer-redesign.css";
 import "./footer-binance.css";
