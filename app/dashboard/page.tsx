@@ -29,28 +29,33 @@ export default function Dashboard() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     let mounted = true;
-    let resolved = false;
+    let checked = false;
 
     const load = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!mounted) return;
-      resolved = true;
-      if (error || !data.user) {
-        router.replace("/login?next=/dashboard");
+      checked = true;
+      if (data.user) {
+        setEmail(data.user.email || "");
+        setLoading(false);
         return;
       }
-      setEmail(data.user.email || "");
-      setLoading(false);
+      // Do not log a member out because of a temporary network/auth error.
+      if (!error) router.replace("/login?next=/dashboard");
     };
 
     load();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted || !resolved) return;
-      // Do not redirect on transient null sessions while navigating between
-      // protected pages. Only the initial getUser check determines access.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
       if (session?.user) {
         setEmail(session.user.email || "");
         setLoading(false);
+        return;
+      }
+      // Only an explicit SIGNED_OUT event is allowed to redirect.
+      // INITIAL_SESSION or transient null sessions must not log users out.
+      if (event === "SIGNED_OUT" && checked) {
+        router.replace("/login?next=/dashboard");
       }
     });
 
