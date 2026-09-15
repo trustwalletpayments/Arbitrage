@@ -19,6 +19,7 @@ import "./qr-fix.css";
 import "./futures-page.css";
 import ScrollGuard from "./components/ScrollGuard";
 import AuthGuard from "./components/AuthGuard";
+import MobileNav from "./components/MobileNav";
 
 export const metadata: Metadata = {
   title: "ORBITEX Exchange",
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ScrollGuard />
         <AuthGuard />
         {children}
+        <MobileNav />
         <script dangerouslySetInnerHTML={{ __html: enhanceScript }} />
       </body>
     </html>
