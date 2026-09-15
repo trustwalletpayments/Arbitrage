@@ -1,4 +1,4 @@
-/* Root layout fix: the summary card must span the full content area beside Markets. */
+/* Root page layout only. The summary card's internal layout is defined in futures-header-final.css. */
 @media (min-width: 1100px) {
   .futures-wrap {
     display: grid !important;
@@ -15,63 +15,12 @@
     min-width: 0 !important;
   }
 
-  /* The summary card spans both desktop content columns beside the sidebar. */
   .futures-wrap > .trade-head {
     grid-column: 2 / 4 !important;
     grid-row: 1 !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
-  }
-
-  /* Actual JSX is pair, price, market-stats, muted. Pair and price get their own rows. */
-  .futures-wrap > .trade-head > div {
-    display: grid !important;
-    grid-template-columns: minmax(390px, 1.7fr) repeat(3, minmax(150px, 1fr)) !important;
-    grid-template-rows: auto auto !important;
-    grid-template-areas:
-      "pair mark contract asset"
-      "price mark contract asset" !important;
-    align-items: center !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .futures-wrap > .trade-head .pair {
-    grid-area: pair !important;
-    margin: 0 !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-  }
-
-  .futures-wrap > .trade-head .price {
-    grid-area: price !important;
-    margin: 18px 0 0 !important;
-    min-width: 0 !important;
-    white-space: nowrap !important;
-    overflow: visible !important;
-  }
-
-  .futures-wrap > .trade-head .market-stats {
-    display: contents !important;
-  }
-
-  .futures-wrap > .trade-head .market-stats > span {
-    min-width: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .futures-wrap > .trade-head .market-stats > span:nth-child(1) { grid-area: mark !important; }
-  .futures-wrap > .trade-head .market-stats > span:nth-child(2) { grid-area: contract !important; }
-  .futures-wrap > .trade-head .market-stats > span:nth-child(3) { grid-area: asset !important; }
-
-  .futures-wrap > .trade-head > div > .muted {
-    grid-column: 1 / -1 !important;
-    grid-row: 3 !important;
-    width: auto !important;
-    min-width: 0 !important;
-    margin-left: -28px !important;
-    margin-right: -28px !important;
   }
 }
 
