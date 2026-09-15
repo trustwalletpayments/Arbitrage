@@ -1,6 +1,7 @@
-/* Desktop futures terminal layout: market stats left, order controls right, position settlement below controls. */
+/* Desktop futures terminal layout: market statistics above the coin list, order controls on the right, settlement below them. */
 @media (min-width: 761px) {
   .futures-wrap {
+    position: relative;
     grid-template-columns: 240px minmax(0, 1fr);
     column-gap: 18px;
   }
@@ -13,34 +14,12 @@
     margin-bottom: 0;
   }
 
-  .futures-wrap > .trade-head .market-stats {
-    position: absolute;
-    left: calc(-240px - 18px);
-    top: 0;
-    width: 240px;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .futures-wrap > .trade-head .market-stats span {
-    min-height: 48px;
-    box-sizing: border-box;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px 10px;
-    line-height: 1.2;
-  }
-
   .futures-wrap > .market-list.futures-market-list,
   .futures-wrap > .market-list.futures-market-list:not(.expanded) {
     grid-column: 1;
     grid-row: 2;
     align-self: start;
-    margin-top: 0;
+    margin-top: 180px;
   }
 
   .futures-wrap > .futures-grid {
@@ -62,22 +41,34 @@
     width: 100% !important;
   }
 
+  /* The six 24-hour/funding cards sit in the left rail above the coin list. */
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
-    grid-column: 1;
-    grid-row: 2;
-    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 240px;
     margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area > .futures-stat {
+    min-height: 48px;
+    box-sizing: border-box;
   }
 
   .futures-wrap > .futures-grid > .futures-chart-area > .futures-data-grid {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
     width: 100%;
   }
 
+  /* Position settlement is directly below the buy/sell order panel. */
   .futures-wrap > .futures-grid > .futures-chart-area > .settlement-panel {
     grid-column: 2;
-    grid-row: 2 / span 2;
+    grid-row: 2;
     width: 100%;
     align-self: start;
     margin: 0 !important;
@@ -95,7 +86,7 @@
 }
 
 @media (max-width: 760px) {
-  .futures-wrap > .trade-head .market-stats {
+  .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
     position: static;
     width: auto;
   }
