@@ -1,6 +1,19 @@
 import {NextResponse} from "next/server";
 import {estimatedLiquidationPrice,initialMargin,notional,unrealizedPnl,validateOrder} from "../../../../lib/trading";
 
+export async function GET(request:Request){
+  const symbol=new URL(request.url).searchParams.get("symbol")||"BTCUSDT";
+  const safeSymbol=symbol.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  try{
+    const response=await fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${encodeURIComponent(safeSymbol)}`,{cache:"no-store"});
+    if(!response.ok)throw new Error("Price provider unavailable");
+    const data=await response.json();
+    const price=Number(data.markPrice);
+    if(!Number.isFinite(price)||price<=0)throw new Error("Invalid mark price");
+    return NextResponse.json({ok:true,symbol:safeSymbol,markPrice:price});
+  }catch(error){return NextResponse.json({ok:false,error:error instanceof Error?error.message:"Unable to load mark price"},{status:503})}
+}
+
 export async function POST(request:Request){
   try{
     const body=await request.json();
