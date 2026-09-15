@@ -1,0 +1,95 @@
+/* Desktop futures terminal layout: market stats left, order controls right, positions below controls. */
+@media (min-width: 761px) {
+  .futures-wrap {
+    grid-template-columns: 240px minmax(0, 1fr);
+    column-gap: 18px;
+  }
+
+  .futures-wrap > .trade-head {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    min-height: 108px;
+    margin-bottom: 0;
+  }
+
+  .futures-wrap > .trade-head .market-stats {
+    position: absolute;
+    left: calc(-240px - 18px);
+    top: 0;
+    width: 240px;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .futures-wrap > .trade-head .market-stats span {
+    min-height: 48px;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 10px;
+    line-height: 1.2;
+  }
+
+  .futures-wrap > .market-list.futures-market-list,
+  .futures-wrap > .market-list.futures-market-list:not(.expanded) {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    margin-top: 0;
+  }
+
+  .futures-wrap > .futures-grid {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-rows: auto auto;
+    align-items: start;
+    gap: 18px;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area {
+    display: contents;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100% !important;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area > :not(.chart):not(.positions-panel) {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+
+  .futures-wrap > .futures-grid > .futures-chart-area > .positions-panel {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    align-self: start;
+    margin: 0 !important;
+  }
+
+  .futures-wrap > .futures-grid > .order-panel {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    height: auto !important;
+    min-height: 0 !important;
+    position: sticky;
+    top: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .futures-wrap > .trade-head .market-stats {
+    position: static;
+    width: auto;
+  }
+}
