@@ -12,25 +12,32 @@ export default function MobileNav() {
 
   useEffect(() => {
     let mounted = true;
-    let unsubscribe = () => {};
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    try {
-      const supabase = createSupabaseBrowserClient();
-      supabase.auth.getUser().then(({ data }) => {
-        if (mounted) setIsLoggedIn(Boolean(data.user));
-      });
+    const setup = async () => {
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data } = await supabase.auth.getUser();
+        if (!mounted) return;
+        setIsLoggedIn(Boolean(data.user));
 
-      const subscription = supabase.auth.onAuthStateChange((_event, session) => {
-        if (mounted) setIsLoggedIn(Boolean(session?.user));
-      });
-      unsubscribe = () => subscription.data.subscription.unsubscribe();
-    } catch {
-      if (mounted) setIsLoggedIn(false);
-    }
+        // Register the listener only after auth initialization has completed.
+        // This prevents refresh/navigation races in Supabase Auth.
+        const result = supabase.auth.onAuthStateChange((_event, session) => {
+          if (mounted && session?.user) setIsLoggedIn(true);
+          if (mounted && _event === "SIGNED_OUT") setIsLoggedIn(false);
+        });
+        subscription = result.data.subscription;
+      } catch {
+        // A temporary auth/network error must not sign the member out.
+        if (mounted) setIsLoggedIn(false);
+      }
+    };
 
+    setup();
     return () => {
       mounted = false;
-      unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
