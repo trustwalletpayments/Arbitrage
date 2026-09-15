@@ -15,7 +15,7 @@
     min-width: 0 !important;
   }
 
-  /* The summary card occupies both main-content columns, never just the middle one. */
+  /* The summary card spans both desktop content columns beside the sidebar. */
   .futures-wrap > .trade-head {
     grid-column: 2 / 4 !important;
     grid-row: 1 !important;
@@ -24,29 +24,32 @@
     max-width: none !important;
   }
 
+  /* Actual JSX is pair, price, market-stats, muted. Pair and price get their own rows. */
   .futures-wrap > .trade-head > div {
     display: grid !important;
-    grid-template-columns: minmax(320px, 1.65fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr) !important;
+    grid-template-columns: minmax(390px, 1.7fr) repeat(3, minmax(150px, 1fr)) !important;
     grid-template-rows: auto auto !important;
     grid-template-areas:
-      "primary mark contract asset"
-      "primary mark contract asset" !important;
+      "pair mark contract asset"
+      "price mark contract asset" !important;
     align-items: center !important;
     width: 100% !important;
     min-width: 0 !important;
   }
 
   .futures-wrap > .trade-head .pair {
-    grid-area: primary !important;
+    grid-area: pair !important;
     margin: 0 !important;
     min-width: 0 !important;
+    white-space: nowrap !important;
   }
 
   .futures-wrap > .trade-head .price {
-    grid-area: primary !important;
-    align-self: end !important;
-    margin: 54px 0 0 !important;
+    grid-area: price !important;
+    margin: 18px 0 0 !important;
     min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
   }
 
   .futures-wrap > .trade-head .market-stats {
