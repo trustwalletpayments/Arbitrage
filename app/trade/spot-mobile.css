@@ -19,6 +19,15 @@
 .app-shell .order-panel .order-submit-button{transition:filter .18s ease,transform .18s ease}
 .app-shell .order-panel .order-submit-button:not(:disabled):hover{transform:translateY(-1px)}
 
+/* Compact order-terminal controls */
+.app-shell .order-panel{font-variant-numeric:tabular-nums}
+.app-shell .order-panel input::placeholder{color:#53657c}
+.app-shell .order-panel label{letter-spacing:.01em}
+.app-shell .order-panel .notice{border-radius:10px!important;font-size:12px!important;line-height:1.45!important}
+.app-shell .order-panel .order-submit-button{letter-spacing:.01em}
+.app-shell .order-panel [style*="grid-template-columns:1fr 1fr"] button{transition:background .18s ease,color .18s ease,transform .18s ease}
+.app-shell .order-panel [style*="grid-template-columns:1fr 1fr"] button:active{transform:scale(.98)}
+
 @media (max-width:760px){
 .trade-layout{display:flex;flex-direction:column;min-height:calc(100vh - 64px);padding-bottom:84px}
 .market-list{order:1;display:block;width:100%;height:auto;min-height:0;max-height:none;box-sizing:border-box;border-right:0;border-bottom:1px solid #1b2433;padding:16px 14px 14px;overflow:visible;background:#080d14}
@@ -69,8 +78,6 @@
 .app-shell .order-panel>div[style*="Available funding balance"]{padding:7px 0!important;margin-bottom:8px!important}
 .app-shell .order-panel .order-submit-button{padding:9px 10px!important;min-height:40px}
 .app-shell .order-panel .tiny{margin-top:7px!important;line-height:1.25!important}
-
-/* Final desktop balance: keep the terminal compact and remove artificial empty space */
 .app-shell .trade-layout{grid-template-rows:auto;align-items:start}
 .app-shell .chart-area .chart,.app-shell .chart-area .live-chart{border-radius:14px}
 .app-shell .chart-area>div:last-child{margin-top:12px}
