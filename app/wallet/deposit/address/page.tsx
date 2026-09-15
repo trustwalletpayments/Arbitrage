@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, Copy, ShieldCheck } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import MobileNav from "../../../components/MobileNav";
 import "../../wallet.css";
@@ -19,7 +19,13 @@ function DepositAddressContent() {
   const networkShort = params.get("networkShort") || "BEP-20";
   const networkId = params.get("networkId") || "bsc";
   const address = ADDRESSES[networkId] || "ORBITEX-DEMO-DEPOSIT-ADDRESS";
+  const fallbackQr = `https://quickchart.io/qr?text=${encodeURIComponent(address)}&size=500&margin=12`;
+  const [qrSrc, setQrSrc] = useState(QRS[networkId] || QRS.bsc);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setQrSrc(QRS[networkId] || QRS.bsc);
+  }, [networkId, address]);
 
   async function copyAddress() {
     try { await navigator.clipboard.writeText(address); } catch {}
@@ -27,7 +33,7 @@ function DepositAddressContent() {
     window.setTimeout(() => setCopied(false), 1800);
   }
 
-  return <main className="wallet-page"><header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet/deposit" className="history-link"><ArrowLeft size={18}/> Back to Deposit</Link></header><div className="wallet-content deposit-content"><div className="wallet-heading"><div><span className="wallet-kicker">FUND YOUR ACCOUNT</span><h1>Deposit address</h1><p>Use this address and QR code for your deposit.</p></div></div><section className="deposit-shell"><div className="deposit-details withdraw-form mobile-visible"><div className="selected-asset-heading"><div className="deposit-asset-logo"><span>{asset.slice(0, 2)}</span></div><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{assetName} <em>{asset}</em></h2></div></div><div className="deposit-address-step"><div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h3>{asset} on {networkShort}</h3><p>Send only <strong>{asset}</strong> using the <strong>{network}</strong> network.</p></div><div className="deposit-qr-placeholder"><img src={QRS[networkId] || QRS.bsc} alt={`${asset} deposit QR code`} /></div><div className="deposit-address-box"><span>{asset} on {network} ({networkShort}) deposit address</span><strong>{address}</strong><button type="button" onClick={copyAddress}><Copy size={17}/> {copied ? "Copied" : "Copy address"}</button></div><div className="deposit-security-note"><ShieldCheck size={18}/><span>Make sure the network is <strong>{networkShort}</strong> before sending funds.</span></div></div><Link href="/wallet/deposit" className="mobile-back-button" style={{display:"flex",marginTop:14}}><ArrowLeft size={17}/> Choose another asset</Link></div></section></div><MobileNav/></main>;
+  return <main className="wallet-page"><header className="wallet-header"><Link href="/wallet" className="wallet-brand"><span className="brand-mark">◉</span> ORBITEX</Link><Link href="/wallet/deposit" className="history-link"><ArrowLeft size={18}/> Back to Deposit</Link></header><div className="wallet-content deposit-content"><div className="wallet-heading"><div><span className="wallet-kicker">FUND YOUR ACCOUNT</span><h1>Deposit address</h1><p>Use this address and QR code for your deposit.</p></div></div><section className="deposit-shell"><div className="deposit-details withdraw-form mobile-visible"><div className="selected-asset-heading"><div className="deposit-asset-logo"><span>{asset.slice(0, 2)}</span></div><div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{assetName} <em>{asset}</em></h2></div></div><div className="deposit-address-step"><div className="deposit-address-title"><span className="wallet-kicker">YOUR DEPOSIT ADDRESS</span><h3>{asset} on {networkShort}</h3><p>Send only <strong>{asset}</strong> using the <strong>{network}</strong> network.</p></div><div className="deposit-qr-placeholder"><img src={qrSrc} onError={() => setQrSrc(fallbackQr)} alt={`${asset} deposit QR code`} /></div><div className="deposit-address-box"><span>{asset} on {network} ({networkShort}) deposit address</span><strong>{address}</strong><button type="button" onClick={copyAddress}><Copy size={17}/> {copied ? "Copied" : "Copy address"}</button></div><div className="deposit-security-note"><ShieldCheck size={18}/><span>Make sure the network is <strong>{networkShort}</strong> before sending funds.</span></div></div><Link href="/wallet/deposit" className="mobile-back-button" style={{display:"flex",marginTop:14}}><ArrowLeft size={17}/> Choose another asset</Link></div></section></div><MobileNav/></main>;
 }
 
 export default function DepositAddressPage() {
