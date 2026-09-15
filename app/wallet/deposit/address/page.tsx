@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowDownToLine, Check, Copy, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
-import MobileNav from "../../../../components/MobileNav";
+import MobileNav from "../../../components/MobileNav";
 import "../../wallet.css";
 import "./deposit.css";
 
