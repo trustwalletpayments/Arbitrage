@@ -7,6 +7,41 @@
     padding-bottom: 132px !important;
   }
 
+  /* Keep the four account actions mounted and visible after client-side navigation. */
+  .member-dashboard .quick-actions {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 92px !important;
+    margin: 10px 0 !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  .member-dashboard .quick-actions .quick-action {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 92px !important;
+    height: 92px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+  }
+
+  .member-dashboard .quick-actions .quick-action-icon {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
   .content-grid {
     gap: 12px !important;
   }
