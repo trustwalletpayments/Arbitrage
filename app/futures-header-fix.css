@@ -1,0 +1,65 @@
+/* Futures market header: compact width, taller card, no overlap */
+.futures-wrap>.trade-head{
+  width:80%!important;
+  max-width:none!important;
+  min-height:410px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  padding:38px 42px 0!important;
+  border-radius:30px!important;
+  overflow:hidden!important;
+}
+.futures-wrap>.trade-head>div{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto!important;
+  gap:0!important;
+  align-items:stretch!important;
+}
+.futures-wrap>.trade-head .pair{
+  grid-column:1!important;grid-row:1!important;
+  display:flex!important;align-items:center!important;gap:14px!important;
+  white-space:nowrap!important;font-size:32px!important;line-height:1!important;
+}
+.futures-wrap>.trade-head .price{
+  grid-column:1!important;grid-row:2!important;
+  display:flex!important;align-items:baseline!important;gap:24px!important;
+  margin:34px 0 38px!important;font-size:76px!important;line-height:.95!important;
+  letter-spacing:-3px!important;white-space:nowrap!important;
+}
+.futures-wrap>.trade-head .price .up{
+  display:inline-flex!important;align-items:center!important;margin:0!important;
+  color:#35d6a0!important;font-size:58px!important;letter-spacing:-1.5px!important;
+}
+.futures-wrap>.trade-head .market-stats{
+  grid-column:1!important;grid-row:3!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:0!important;width:100%!important;margin:0!important;
+  border-top:1px solid #244964!important;border-bottom:1px solid #244964!important;
+}
+.futures-wrap>.trade-head .market-stats span{
+  min-height:112px!important;padding:22px 28px!important;border:0!important;
+  border-left:1px solid #244964!important;border-radius:0!important;background:transparent!important;
+  justify-content:center!important;gap:14px!important;font-size:17px!important;line-height:1.25!important;
+}
+.futures-wrap>.trade-head .market-stats span:first-child{border-left:0!important}
+.futures-wrap>.trade-head .market-stats b{
+  font-size:24px!important;line-height:1.15!important;white-space:nowrap!important;
+  color:#edf5ff!important;display:inline-block!important;visibility:visible!important;opacity:1!important;
+}
+.futures-wrap>.trade-head>div>.muted{
+  grid-column:1!important;grid-row:4!important;width:auto!important;
+  margin:0 -42px!important;padding:20px 24px 22px!important;
+  border-top:0!important;text-align:center!important;font-size:14px!important;letter-spacing:.15px!important;
+}
+@media(max-width:760px){
+  .futures-wrap>.trade-head{width:100%!important;min-height:0!important;padding:24px 20px 0!important;border-radius:22px!important}
+  .futures-wrap>.trade-head .pair{font-size:24px!important;gap:10px!important}
+  .futures-wrap>.trade-head .price{font-size:44px!important;gap:14px!important;margin:24px 0 28px!important;letter-spacing:-1.8px!important}
+  .futures-wrap>.trade-head .price .up{font-size:35px!important}
+  .futures-wrap>.trade-head .market-stats{grid-template-columns:1fr!important}
+  .futures-wrap>.trade-head .market-stats span{min-height:0!important;padding:16px 0!important;border-left:0!important;border-top:1px solid #203d59!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important}
+  .futures-wrap>.trade-head .market-stats span:first-child{border-top:0!important}
+  .futures-wrap>.trade-head .market-stats b{font-size:18px!important}
+  .futures-wrap>.trade-head>div>.muted{margin-left:-20px!important;margin-right:-20px!important;font-size:11px!important;padding:16px 12px 18px!important}
+}
