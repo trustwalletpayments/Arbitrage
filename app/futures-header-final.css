@@ -1,74 +1,88 @@
-/* Authoritative fix: one compact horizontal card with five real desktop columns. */
+/* Stable horizontal futures header: one card, left identity/price zone and right three-stat zone. */
 .futures-wrap > .trade-head {
   width: 100% !important;
   max-width: none !important;
   min-width: 0 !important;
+  min-height: 0 !important;
   margin: 0 0 18px !important;
   padding: 22px 28px 0 !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
   border: 1px solid #214967 !important;
   border-radius: 26px !important;
-  background: linear-gradient(135deg,#0b1b2b 0%,#081522 100%) !important;
+  background: linear-gradient(135deg, #0b1b2b 0%, #081522 100%) !important;
 }
 
-/* Actual JSX children are: pair, price, market-stats, muted.
-   display:contents removes the extra stats wrapper from layout so each stat
-   becomes a real horizontal grid column instead of being squeezed/overlapped. */
 .futures-wrap > .trade-head > div {
   display: grid !important;
-  grid-template-columns: minmax(245px, 1.05fr) minmax(250px, 1.15fr) repeat(3, minmax(145px, 1fr)) !important;
-  grid-template-rows: minmax(150px, auto) auto !important;
+  grid-template-columns: minmax(300px, 1.15fr) minmax(0, 2fr) !important;
+  grid-template-rows: auto auto auto !important;
   grid-template-areas:
-    "pair price stat1 stat2 stat3"
-    "footer footer footer footer footer" !important;
-  column-gap: 0 !important;
+    "pair stats"
+    "price stats"
+    "footer footer" !important;
+  column-gap: 24px !important;
   row-gap: 0 !important;
   width: 100% !important;
   min-width: 0 !important;
-  align-items: stretch !important;
+  align-items: center !important;
 }
 
 .futures-wrap > .trade-head > div > .pair {
   grid-area: pair !important;
+  position: static !important;
   display: flex !important;
   align-items: center !important;
-  align-self: start !important;
   gap: 12px !important;
+  width: auto !important;
   min-width: 0 !important;
-  margin: 10px 18px 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   white-space: nowrap !important;
-  font-size: clamp(22px, 2vw, 32px) !important;
+  font-size: clamp(24px, 2.2vw, 34px) !important;
   line-height: 1 !important;
 }
 
 .futures-wrap > .trade-head > div > .price {
   grid-area: price !important;
+  position: static !important;
   display: flex !important;
-  align-items: center !important;
-  align-self: center !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
   flex-wrap: nowrap !important;
-  gap: 12px !important;
+  gap: 14px !important;
+  width: auto !important;
   min-width: 0 !important;
-  margin: 0 18px 0 0 !important;
+  margin: 24px 0 28px !important;
+  padding: 0 !important;
   white-space: nowrap !important;
   overflow: visible !important;
-  font-size: clamp(38px, 3.2vw, 58px) !important;
+  font-size: clamp(42px, 4vw, 64px) !important;
   line-height: .95 !important;
-  letter-spacing: -2px !important;
+  letter-spacing: -2.5px !important;
 }
 
 .futures-wrap > .trade-head > div > .price .up {
+  position: static !important;
   flex: 0 0 auto !important;
   margin: 0 !important;
+  padding: 0 !important;
   white-space: nowrap !important;
   color: #35d6a0 !important;
-  font-size: clamp(24px, 2.1vw, 36px) !important;
+  font-size: clamp(26px, 2.6vw, 42px) !important;
   line-height: 1 !important;
 }
 
 .futures-wrap > .trade-head > div > .market-stats {
-  display: contents !important;
+  grid-area: stats !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
 }
 
 .futures-wrap > .trade-head > div > .market-stats > span {
@@ -77,9 +91,10 @@
   justify-content: center !important;
   align-items: flex-start !important;
   gap: 7px !important;
+  width: auto !important;
   min-width: 0 !important;
-  min-height: 150px !important;
-  padding: 16px 18px !important;
+  min-height: 128px !important;
+  padding: 14px 16px !important;
   box-sizing: border-box !important;
   border: 0 !important;
   border-left: 1px solid #244964 !important;
@@ -91,10 +106,6 @@
   white-space: normal !important;
   overflow: hidden !important;
 }
-
-.futures-wrap > .trade-head > div > .market-stats > span:nth-child(1) { grid-area: stat1 !important; }
-.futures-wrap > .trade-head > div > .market-stats > span:nth-child(2) { grid-area: stat2 !important; }
-.futures-wrap > .trade-head > div > .market-stats > span:nth-child(3) { grid-area: stat3 !important; }
 
 .futures-wrap > .trade-head > div > .market-stats > span > b {
   display: block !important;
@@ -120,15 +131,16 @@
   line-height: 1.3 !important;
 }
 
-@media (max-width: 1250px) and (min-width: 761px) {
+@media (max-width: 1100px) and (min-width: 761px) {
   .futures-wrap > .trade-head { padding: 20px 20px 0 !important; }
   .futures-wrap > .trade-head > div {
-    grid-template-columns: minmax(205px, 1fr) minmax(220px, 1.05fr) repeat(3, minmax(115px, 1fr)) !important;
+    grid-template-columns: minmax(260px, 1.05fr) minmax(0, 1.65fr) !important;
+    column-gap: 16px !important;
   }
-  .futures-wrap > .trade-head > div > .pair { font-size: 25px !important; margin-right: 12px !important; }
-  .futures-wrap > .trade-head > div > .price { font-size: 44px !important; gap: 8px !important; margin-right: 12px !important; }
-  .futures-wrap > .trade-head > div > .price .up { font-size: 29px !important; }
-  .futures-wrap > .trade-head > div > .market-stats > span { padding: 12px 10px !important; font-size: 11px !important; }
+  .futures-wrap > .trade-head > div > .pair { font-size: 26px !important; }
+  .futures-wrap > .trade-head > div > .price { margin: 20px 0 22px !important; font-size: 48px !important; gap: 10px !important; }
+  .futures-wrap > .trade-head > div > .price .up { font-size: 32px !important; }
+  .futures-wrap > .trade-head > div > .market-stats > span { padding: 12px 9px !important; font-size: 11px !important; }
   .futures-wrap > .trade-head > div > .market-stats > span > b { font-size: 16px !important; }
   .futures-wrap > .trade-head > div > .muted { margin-left: -20px !important; margin-right: -20px !important; }
 }
@@ -136,16 +148,15 @@
 @media (max-width: 760px) {
   .futures-wrap > .trade-head { padding: 20px 18px 0 !important; border-radius: 22px !important; }
   .futures-wrap > .trade-head > div {
-    display: grid !important;
     grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto auto auto auto !important;
-    grid-template-areas: "pair" "price" "stat1" "stat2" "stat3" "footer" !important;
+    grid-template-rows: auto auto auto auto !important;
+    grid-template-areas: "pair" "price" "stats" "footer" !important;
     row-gap: 0 !important;
   }
-  .futures-wrap > .trade-head > div > .pair { margin: 0 0 12px !important; font-size: 24px !important; }
-  .futures-wrap > .trade-head > div > .price { margin: 0 0 14px !important; font-size: 44px !important; gap: 10px !important; }
+  .futures-wrap > .trade-head > div > .pair { font-size: 24px !important; }
+  .futures-wrap > .trade-head > div > .price { margin: 14px 0 16px !important; font-size: 44px !important; gap: 10px !important; }
   .futures-wrap > .trade-head > div > .price .up { font-size: 32px !important; }
-  .futures-wrap > .trade-head > div > .market-stats { display: contents !important; }
+  .futures-wrap > .trade-head > div > .market-stats { grid-template-columns: 1fr !important; }
   .futures-wrap > .trade-head > div > .market-stats > span { min-height: 0 !important; padding: 13px 0 !important; border-left: 0 !important; border-top: 1px solid #203d59 !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
   .futures-wrap > .trade-head > div > .market-stats > span:first-child { border-top: 0 !important; }
   .futures-wrap > .trade-head > div > .market-stats > span > b { width: auto !important; font-size: 18px !important; }
