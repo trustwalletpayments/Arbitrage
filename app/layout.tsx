@@ -17,7 +17,6 @@ import "./components/mobile-nav.css";
 import "./usdt-bnb-logo.css";
 import "./qr-fix.css";
 import "./futures-page.css";
-import MobileNav from "./components/MobileNav";
 import ScrollGuard from "./components/ScrollGuard";
 
 export const metadata: Metadata = {
@@ -90,7 +89,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ScrollGuard />
         {children}
-        <MobileNav />
         <script dangerouslySetInnerHTML={{ __html: enhanceScript }} />
       </body>
     </html>
