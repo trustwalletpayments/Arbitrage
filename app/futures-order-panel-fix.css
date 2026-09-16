@@ -1,82 +1,63 @@
-/* Futures page scrolling: the document is the page scroll owner. */
+/* Futures page: exactly one main document scrollbar. */
 html {
-  overflow-x: clip !important;
-  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
   scroll-behavior: smooth !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
 }
 
-html::-webkit-scrollbar {
-  display: block !important;
-  width: 10px !important;
-  height: 10px !important;
-}
-
-html::-webkit-scrollbar-track {
-  background: #06090e !important;
-}
-
-html::-webkit-scrollbar-thumb {
-  background: #526176 !important;
-  border-radius: 999px !important;
-  border: 2px solid #06090e !important;
-}
-
-html::-webkit-scrollbar-thumb:hover {
-  background: #71839d !important;
-}
-
+/* Body must never become a second scrolling element. */
 body {
   min-height: 100vh !important;
-  overflow-x: clip !important;
-  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
   overscroll-behavior-y: auto !important;
 }
 
-body::-webkit-scrollbar {
+/* Restore one native scrollbar on the document only. */
+html::-webkit-scrollbar {
   display: block !important;
   width: 10px !important;
-  height: 10px !important;
-}
-
-body::-webkit-scrollbar-track {
-  background: #06090e !important;
-}
-
-body::-webkit-scrollbar-thumb {
-  background: #526176 !important;
-  border-radius: 999px !important;
-  border: 2px solid #06090e !important;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-  background: #71839d !important;
-}
-
-/* Never turn the main shell or Futures wrappers into scroll containers. */
-html body .app-shell {
-  min-height: 100vh !important;
   height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
 }
 
+html::-webkit-scrollbar-track {
+  background: #080d14 !important;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #526176 !important;
+  border: 2px solid #080d14 !important;
+  border-radius: 999px !important;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #71839c !important;
+}
+
+/* Do not allow layout wrappers or the order panel to create scrollbars. */
+html body .app-shell,
 html body .futures-wrap,
 html body .futures-grid,
 html body .futures-chart-area,
 html body .futures-grid > .order-panel,
 html body .futures-grid > .futures-chart-area > * {
+  height: auto !important;
+  min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
   overflow-x: visible !important;
   overflow-y: visible !important;
   contain: none !important;
   transform: none !important;
-  overscroll-behavior: auto !important;
   scrollbar-gutter: auto !important;
+}
+
+html body .app-shell {
+  min-height: 100vh !important;
 }
 
 html body .futures-wrap {
@@ -90,8 +71,6 @@ html body .futures-grid > .order-panel {
   align-self: start !important;
   justify-self: stretch !important;
   width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
   margin: 0 !important;
 }
 
@@ -100,21 +79,20 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* Markets remains the only intentional inner scroll area. */
+/* Markets list remains the only intentional internal scroll area. */
 html body .futures-wrap > .market-list.futures-market-list,
-html body .futures-wrap > .market-search-wrap .market-search-results {
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
-  scrollbar-width: thin !important;
-}
-
 html body .futures-wrap > .market-search-wrap .market-search-results {
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #526176 transparent !important;
 }
 
 html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar,
 html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar {
+  display: block !important;
   width: 6px !important;
   height: 6px !important;
 }
@@ -133,7 +111,7 @@ html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-sc
 @media (min-width: 1100px) {
   html body .futures-wrap {
     align-items: start !important;
-    overflow-x: clip !important;
+    overflow-x: visible !important;
     overflow-y: visible !important;
   }
 
