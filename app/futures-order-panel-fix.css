@@ -115,3 +115,19 @@ html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-sc
     overflow: visible !important;
   }
 }
+
+/* Hide the main document scrollbar only while the Futures page is mounted. */
+html:has(.futures-wrap),
+html:has(.futures-wrap) body,
+body:has(.futures-wrap) {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html:has(.futures-wrap)::-webkit-scrollbar,
+html:has(.futures-wrap) body::-webkit-scrollbar,
+body:has(.futures-wrap)::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
