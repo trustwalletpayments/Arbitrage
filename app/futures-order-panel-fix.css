@@ -262,8 +262,9 @@ html body .futures-wrap > .market-search-wrap .market-search-empty {
     grid-column: 1 !important;
     grid-row: 1 / span 5 !important;
     align-self: start !important;
-    height: calc(100vh - 150px) !important;
-    min-height: 480px !important;
+    height: 800px !important;
+    min-height: 800px !important;
+    max-height: 800px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
