@@ -53,9 +53,14 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
           .market-search-results.is-expanded{max-height:300px!important;overflow-y:auto!important;}
           .market-search-wrap .futures-expand-button{display:flex;position:relative;z-index:5;flex:0 0 auto;align-items:center;justify-content:center;min-height:46px;margin:4px 4px 10px 0;padding:10px 14px;border:1px solid #315b83;border-radius:12px;background:#102944;color:#9fc8f5;font-size:14px;font-weight:700;letter-spacing:.01em;box-shadow:none;}
           .market-search-wrap .futures-expand-button:hover{background:#16395d;border-color:#3b9cff;}
+
+          /* Keep the collapse control visible while the expanded list scrolls. */
+          .market-search-wrap.is-expanded{padding-bottom:60px;position:relative;}
+          .market-search-wrap.is-expanded .market-search-results{padding-bottom:10px;}
+          .market-search-wrap.is-expanded .futures-expand-button{position:absolute;left:4px;right:4px;bottom:10px;margin:0;min-height:46px;}
         }
       `}</style>
-      <div className="market-search-wrap">
+      <div className={`market-search-wrap${expanded ? " is-expanded" : ""}`}>
         <div className="market-search-box">
           <span aria-hidden="true">⌕</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search markets" aria-label="Search markets" />
