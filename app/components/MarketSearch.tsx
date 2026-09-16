@@ -6,7 +6,7 @@ import { MARKET_SYMBOLS, displayPair } from "../../lib/market-data";
 
 type Props = { selectedPair: string; onSelect: (pair: string) => void };
 
-type Sentiment = { value: number; classification: string; timestamp?: string };
+type Sentiment = { value: number; classification: string; timestamp?: string; yesterday?: number; weekAgo?: number };
 
 function sentimentLabel(value: number) {
   if (value <= 24) return "EXTREME FEAR";
@@ -37,20 +37,31 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
     let cancelled = false;
     const loadSentiment = async () => {
       try {
-        const response = await fetch("https://api.alternative.me/fng/?limit=1", { cache: "no-store" });
+        const response = await fetch(`https://api.alternative.me/fng/?limit=8&_=${Date.now()}`, { cache: "no-store" });
         const data = await response.json();
-        const item = data?.data?.[0];
+        const items = Array.isArray(data?.data) ? data.data : [];
+        const item = items[0];
         const value = Number(item?.value);
         if (!cancelled && Number.isFinite(value)) {
-          setSentiment({ value, classification: item?.value_classification || sentimentLabel(value), timestamp: item?.timestamp });
+          const yesterday = Number(items[1]?.value);
+          const weekAgo = Number(items[7]?.value);
+          setSentiment({
+            value,
+            classification: item?.value_classification || sentimentLabel(value),
+            timestamp: item?.timestamp,
+            yesterday: Number.isFinite(yesterday) ? yesterday : undefined,
+            weekAgo: Number.isFinite(weekAgo) ? weekAgo : undefined,
+          });
           setSentimentError(false);
+        } else if (!cancelled) {
+          setSentimentError(true);
         }
       } catch {
         if (!cancelled) setSentimentError(true);
       }
     };
     loadSentiment();
-    const timer = window.setInterval(loadSentiment, 15 * 60 * 1000);
+    const timer = window.setInterval(loadSentiment, 5 * 60 * 1000);
     return () => { cancelled = true; window.clearInterval(timer); };
   }, []);
 
@@ -62,6 +73,9 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const value = sentiment?.value ?? 0;
   const needleRotation = -90 + value * 1.8;
   const updated = sentiment?.timestamp ? new Date(Number(sentiment.timestamp) * 1000).toLocaleDateString() : "—";
+  const yesterdayChange = sentiment?.yesterday !== undefined ? value - sentiment.yesterday : undefined;
+  const weekChange = sentiment?.weekAgo !== undefined ? value - sentiment.weekAgo : undefined;
+  const formatChange = (change?: number) => change === undefined ? "—" : `${change >= 0 ? "+" : ""}${change}`;
 
   return (
     <>
@@ -102,10 +116,10 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         <div className="fear-greed-gauge"><div className="fear-greed-arc"/><div className="fear-greed-needle" style={{"--needle": `${needleRotation}deg`} as React.CSSProperties}/><div className="fear-greed-score">{sentiment ? value : "—"}</div><div className="fear-greed-state">{sentiment ? sentimentLabel(value) : sentimentError ? "UNAVAILABLE" : "LOADING"}</div></div>
         <div className="fear-greed-scale"><span>Fear</span><span>Greed</span></div>
         <div className="fear-greed-line"/>
-        <div className="fear-greed-row"><span>Yesterday</span><strong>—</strong></div>
-        <div className="fear-greed-row"><span>7d Change</span><strong>—</strong></div>
+        <div className="fear-greed-row"><span>Yesterday</span><strong>{formatChange(yesterdayChange)}</strong></div>
+        <div className="fear-greed-row"><span>7d Change</span><strong>{formatChange(weekChange)}</strong></div>
         <div className="fear-greed-row"><span>Last Updated</span><strong>{updated}</strong></div>
-        <div className="fear-greed-info"><span>ⓘ</span>Higher values indicate more greed in the market, lower values indicate fear.</div>
+        <div className="fear-greed-info"><span>ⓘ</span>Live data from the daily Crypto Fear &amp; Greed Index. Higher values indicate more greed; lower values indicate fear.</div>
       </section>
     </>
   );
