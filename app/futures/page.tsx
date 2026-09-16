@@ -15,6 +15,7 @@ import "../futures-header-fix.css";
 import "../futures-header-final.css";
 import "../futures-layout-root.css";
 import "../futures-order-panel-fix.css";
+import "../futures-market-height.css";
 
 function validPair(value:string|null){const compact=(value||"BTCUSDT").toUpperCase().replace(/[^A-Z0-9]/g,"");return MARKET_SYMBOLS.includes(compact)?displayPair(compact):"BTC/USDT"}
 function priceFrom(data:any){const value=Number(data?.p??data?.markPrice??data?.price);return Number.isFinite(value)&&value>0?value:0}
