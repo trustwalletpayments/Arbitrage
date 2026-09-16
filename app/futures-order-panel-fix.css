@@ -3,29 +3,57 @@ html {
   overflow-x: clip !important;
   overflow-y: auto !important;
   scroll-behavior: smooth !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
 }
 
 html::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: block !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+html::-webkit-scrollbar-track {
+  background: #06090e !important;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #526176 !important;
+  border-radius: 999px !important;
+  border: 2px solid #06090e !important;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #71839d !important;
 }
 
 body {
   min-height: 100vh !important;
   overflow-x: clip !important;
   overflow-y: auto !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
   overscroll-behavior-y: auto !important;
 }
 
 body::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: block !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+body::-webkit-scrollbar-track {
+  background: #06090e !important;
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #526176 !important;
+  border-radius: 999px !important;
+  border: 2px solid #06090e !important;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #71839d !important;
 }
 
 /* Never turn the main shell or Futures wrappers into scroll containers. */
