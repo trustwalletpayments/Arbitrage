@@ -15,17 +15,31 @@ async function getJson(path:string){
   throw lastError instanceof Error?lastError:new Error("Market API unavailable");
 }
 
+async function getOptionalJson(paths:string[]){
+  for(const path of paths){
+    try{return await getJson(path)}catch{}
+  }
+  return [];
+}
+
 export async function GET(request:Request){
   const params=new URL(request.url).searchParams;
   const symbol=(params.get("symbol")||"BTCUSDT").toUpperCase().replace(/[^A-Z0-9]/g,"");
   try{
     if(params.get("market")==="1"){
-      const [depth,recentTrades,dailyTicker,funding]=await Promise.all([
+      const [depthResult,tradesResult,tickerResult,fundingResult]=await Promise.allSettled([
         getJson(`/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`),
-        getJson(`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`),
+        getOptionalJson([`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/fapi/v1/trades?symbol=${encodeURIComponent(symbol)}&limit=20`]),
         getJson(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`),
         getJson(`/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`)
       ]);
+      const depth=depthResult.status==="fulfilled"?depthResult.value:{bids:[],asks:[]};
+      const recentTrades=tradesResult.status==="fulfilled"&&Array.isArray(tradesResult.value)?tradesResult.value:[];
+      const dailyTicker=tickerResult.status==="fulfilled"?tickerResult.value:{};
+      const funding=fundingResult.status==="fulfilled"?fundingResult.value:{};
+      if(!Object.keys(dailyTicker).length&&!Object.keys(funding).length&&!recentTrades.length&&!depth.bids?.length&&!depth.asks?.length){
+        throw new Error("Market data unavailable");
+      }
       return NextResponse.json({ok:true,symbol,depth,recentTrades,dailyTicker,funding},{headers:{"Cache-Control":"no-store, max-age=0"}});
     }
 
