@@ -6,83 +6,62 @@ import { MARKET_SYMBOLS, displayPair } from "../../lib/market-data";
 
 type Props = { selectedPair: string; onSelect: (pair: string) => void };
 
-function FearGreedCard() {
-  const [value, setValue] = useState<number | null>(null);
-  const [label, setLabel] = useState("Loading…");
-  const [updated, setUpdated] = useState("");
+type Sentiment = { value: number; classification: string; timestamp?: string };
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("https://api.alternative.me/fng/?limit=1", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data) => {
-        if (cancelled) return;
-        const item = data?.data?.[0];
-        const score = Number(item?.value);
-        if (!Number.isFinite(score)) throw new Error("Invalid sentiment data");
-        setValue(score);
-        setLabel(item?.value_classification || "Neutral");
-        if (item?.timestamp) setUpdated(new Date(Number(item.timestamp) * 1000).toLocaleDateString());
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setValue(null);
-          setLabel("Unavailable");
-        }
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  const score = value ?? 0;
-  const angle = -90 + (score / 100) * 180;
-
-  return (
-    <section className="fear-greed-card" aria-label="Daily Fear and Greed Index">
-      <div className="fear-greed-head">
-        <div>
-          <div className="fear-greed-label">MARKET SENTIMENT</div>
-          <h2>Fear &amp; Greed Index</h2>
-        </div>
-        <span>Daily</span>
-      </div>
-      <div className="fear-greed-gauge">
-        <div className="fear-greed-arc" />
-        <div className="fear-greed-needle" style={{ transform: `rotate(${angle}deg)` }} />
-        <div className="fear-greed-score">{value ?? "—"}</div>
-        <strong>{label.toUpperCase()}</strong>
-      </div>
-      <div className="fear-greed-scale"><span>Fear</span><span>Greed</span></div>
-      <div className="fear-greed-line"><span>Yesterday</span><b>—</b></div>
-      <div className="fear-greed-line"><span>7d Change</span><b>—</b></div>
-      <div className="fear-greed-line"><span>Last Updated</span><b>{updated || "—"}</b></div>
-      <div className="fear-greed-note">ⓘ Higher values indicate more greed in the market, lower values indicate fear.</div>
-    </section>
-  );
+function sentimentLabel(value: number) {
+  if (value <= 24) return "EXTREME FEAR";
+  if (value <= 44) return "FEAR";
+  if (value <= 55) return "NEUTRAL";
+  if (value <= 74) return "GREED";
+  return "EXTREME GREED";
 }
 
 export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const [query, setQuery] = useState("");
   const [symbols, setSymbols] = useState<string[]>([...MARKET_SYMBOLS]);
+  const [sentiment, setSentiment] = useState<Sentiment | null>(null);
+  const [sentimentError, setSentimentError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/testnet/markets", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => {
-        if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) {
-          setSymbols(data.symbols);
-        }
+        if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) setSymbols(data.symbols);
       })
-      .catch(() => {
-        // Keep the built-in fallback markets if the public exchange API is unavailable.
-      });
+      .catch(() => {});
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadSentiment = async () => {
+      try {
+        const response = await fetch("https://api.alternative.me/fng/?limit=1", { cache: "no-store" });
+        const data = await response.json();
+        const item = data?.data?.[0];
+        const value = Number(item?.value);
+        if (!cancelled && Number.isFinite(value)) {
+          setSentiment({ value, classification: item?.value_classification || sentimentLabel(value), timestamp: item?.timestamp });
+          setSentimentError(false);
+        }
+      } catch {
+        if (!cancelled) setSentimentError(true);
+      }
+    };
+    loadSentiment();
+    const timer = window.setInterval(loadSentiment, 15 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(timer); };
   }, []);
 
   const markets = useMemo(() => {
     const normalized = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
     return symbols.filter((symbol) => !normalized || symbol.includes(normalized));
   }, [query, symbols]);
+
+  const value = sentiment?.value ?? 0;
+  const needleRotation = -90 + value * 1.8;
+  const updated = sentiment?.timestamp ? new Date(Number(sentiment.timestamp) * 1000).toLocaleDateString() : "—";
 
   return (
     <>
@@ -101,22 +80,9 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         .market-coin-icon .coin-logo b{font-size:14px;line-height:1;}
         .market-coin-name{min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .market-search-empty{padding:24px 12px;text-align:center;color:#7890a8;}
-        .fear-greed-card{width:240px;min-height:520px;padding:22px 16px;box-sizing:border-box;border:1px solid #203d59;border-radius:16px;background:linear-gradient(145deg,#0d1b2b,#091321);color:#e8f1fb;overflow:hidden;}
-        .fear-greed-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-        .fear-greed-label{font-size:10px;letter-spacing:.1em;color:#7890a8;}
-        .fear-greed-head h2{margin:7px 0 0;font-size:19px;line-height:1.2;white-space:nowrap;}
-        .fear-greed-head>span{padding:6px 9px;border:1px solid #23435e;border-radius:999px;color:#9bb1c8;font-size:11px;}
-        .fear-greed-gauge{position:relative;width:190px;height:145px;margin:32px auto 0;text-align:center;}
-        .fear-greed-arc{position:absolute;left:5px;top:0;width:180px;height:90px;border-radius:180px 180px 0 0;border:14px solid transparent;border-bottom:0;background:linear-gradient(90deg,#fb4b55,#ffb52e,#f6df45,#34d399) border-box;mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);mask-composite:exclude;}
-        .fear-greed-needle{position:absolute;left:94px;top:80px;width:3px;height:55px;background:#dcecff;transform-origin:50% 0;border-radius:3px;box-shadow:0 0 8px #34d399;}
-        .fear-greed-score{position:absolute;top:52px;left:0;right:0;font-size:34px;font-weight:800;}
-        .fear-greed-gauge strong{position:absolute;top:101px;left:0;right:0;color:#34d399;font-size:13px;letter-spacing:.04em;}
-        .fear-greed-scale{display:flex;justify-content:space-between;color:#9bb1c8;font-size:12px;margin:0 0 20px;}
-        .fear-greed-line{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-top:1px solid #203247;color:#91a5bb;font-size:12px;}
-        .fear-greed-line b{color:#e8f1fb;font-weight:600;text-align:right;}
-        .fear-greed-note{margin-top:18px;padding:12px;border:1px solid #23435e;border-radius:10px;background:#0a1726;color:#91a9c1;font-size:11px;line-height:1.6;}
-        @media(min-width:1100px){.futures-wrap>.fear-greed-card{grid-column:1!important;grid-row:6!important;align-self:start!important;margin:0!important;}}
-        @media(max-width:1099px){.fear-greed-card{width:100%;min-height:0;}}
+        .fear-greed-card{grid-column:1!important;grid-row:6!important;width:100%!important;min-height:500px!important;box-sizing:border-box!important;padding:24px 20px!important;border:1px solid #24445f!important;border-radius:24px!important;background:linear-gradient(160deg,#0b1b2b,#081522)!important;box-shadow:0 16px 36px rgba(0,0,0,.18);overflow:hidden;color:#dbeafe;}
+        .fear-greed-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.fear-greed-kicker{font-size:10px;letter-spacing:.12em;color:#7890a8}.fear-greed-title{margin:8px 0 0;font-size:20px;line-height:1.1;font-weight:800;color:#f1f6ff}.fear-greed-badge{padding:7px 10px;border:1px solid #294963;border-radius:999px;color:#9eb4c9;font-size:11px;white-space:nowrap}
+        .fear-greed-gauge{position:relative;height:178px;margin:22px 0 4px;overflow:hidden}.fear-greed-arc{position:absolute;left:50%;bottom:-42px;width:205px;height:205px;transform:translateX(-50%);border-radius:50%;background:conic-gradient(from 270deg,#ff405b 0deg,#ff9f32 60deg,#ffe14a 125deg,#8ddc63 165deg,#26d98b 180deg);}.fear-greed-arc:after{content:"";position:absolute;inset:20px;border-radius:50%;background:#0a1828}.fear-greed-needle{position:absolute;left:50%;bottom:0;width:3px;height:86px;transform-origin:50% 100%;transform:translateX(-50%) rotate(var(--needle));border-radius:99px;background:#b9fff1;box-shadow:0 0 12px #52e6c4}.fear-greed-needle:before{content:"";position:absolute;top:-5px;left:50%;width:12px;height:12px;transform:translateX(-50%);border-radius:50%;background:#eaffff;box-shadow:0 0 10px #8effe2}.fear-greed-score{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:48px;line-height:1;font-weight:850;color:#f5f9ff}.fear-greed-state{position:absolute;left:0;right:0;bottom:-2px;text-align:center;font-size:15px;font-weight:800;color:#2ee5a4}.fear-greed-scale{display:flex;justify-content:space-between;color:#9db1c5;font-size:12px;margin-top:0}.fear-greed-line{height:1px;background:#20384e;margin:24px 0 0}.fear-greed-row{display:flex;justify-content:space-between;gap:10px;padding:15px 0;border-bottom:1px solid #20384e;color:#9db1c5;font-size:12px}.fear-greed-row strong{color:#eef5ff}.fear-greed-info{margin-top:22px;padding:13px 14px;border:1px solid #24445f;border-radius:14px;color:#8fa8c0;font-size:11px;line-height:1.7;background:#0a1726}.fear-greed-info span{color:#5fb4ff;margin-right:7px}
       `}</style>
       <div className="market-search-wrap">
         <div className="market-search-box">
@@ -131,7 +97,16 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
           })}
         </div>
       </div>
-      <FearGreedCard />
+      <section className="fear-greed-card" aria-label="Daily Fear and Greed Index">
+        <div className="fear-greed-head"><div><div className="fear-greed-kicker">MARKET SENTIMENT</div><h2 className="fear-greed-title">Fear &amp; Greed Index</h2></div><span className="fear-greed-badge">Daily</span></div>
+        <div className="fear-greed-gauge"><div className="fear-greed-arc"/><div className="fear-greed-needle" style={{"--needle": `${needleRotation}deg`} as React.CSSProperties}/><div className="fear-greed-score">{sentiment ? value : "—"}</div><div className="fear-greed-state">{sentiment ? sentimentLabel(value) : sentimentError ? "UNAVAILABLE" : "LOADING"}</div></div>
+        <div className="fear-greed-scale"><span>Fear</span><span>Greed</span></div>
+        <div className="fear-greed-line"/>
+        <div className="fear-greed-row"><span>Yesterday</span><strong>—</strong></div>
+        <div className="fear-greed-row"><span>7d Change</span><strong>—</strong></div>
+        <div className="fear-greed-row"><span>Last Updated</span><strong>{updated}</strong></div>
+        <div className="fear-greed-info"><span>ⓘ</span>Higher values indicate more greed in the market, lower values indicate fear.</div>
+      </section>
     </>
   );
 }
