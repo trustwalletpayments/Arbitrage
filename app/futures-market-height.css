@@ -1,8 +1,8 @@
-/* Futures market selector: fixed 550px height. */
+/* Futures market selector: fixed 540px height. */
 html body .futures-wrap > .market-search-wrap {
-  height: 550px !important;
-  min-height: 550px !important;
-  max-height: 550px !important;
+  height: 540px !important;
+  min-height: 540px !important;
+  max-height: 540px !important;
   box-sizing: border-box !important;
 }
 
