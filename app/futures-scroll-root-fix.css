@@ -1,0 +1,17 @@
+/* Remove the unnecessary page-level nested scrolling viewport. */
+@media (min-width: 761px) {
+  .futures-wrap {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* The coin list remains the only intentional internal scroll area. */
+.futures-wrap > .market-search-wrap {
+  overflow: hidden !important;
+}
+
+.futures-wrap > .market-search-wrap .market-search-results {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
