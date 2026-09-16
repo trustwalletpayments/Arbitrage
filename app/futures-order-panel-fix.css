@@ -1,24 +1,25 @@
-/* Futures page scroll ownership: the document must have one page-level scrollbar. */
+/* Futures page scroll ownership: html is the only page-level scroll container. */
 html {
   overflow-x: clip !important;
-  overflow-y: visible !important;
+  overflow-y: auto !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
 }
 
-body {
-  overflow-x: clip !important;
-  overflow-y: visible !important;
-  scrollbar-width: auto !important;
-  -ms-overflow-style: auto !important;
-}
-
-/* Restore the native document scrollbar after the global scrollbar reset. */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+html::-webkit-scrollbar {
   display: block !important;
   width: auto !important;
   height: auto !important;
+}
+
+body {
+  overflow: visible !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+}
+
+body::-webkit-scrollbar {
+  display: none !important;
 }
 
 html body .app-shell {
