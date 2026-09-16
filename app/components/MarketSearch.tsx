@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CoinIcon from "./CoinIcon";
 import { MARKET_SYMBOLS, displayPair } from "../../lib/market-data";
 
@@ -8,20 +8,32 @@ type Props = { selectedPair: string; onSelect: (pair: string) => void };
 
 export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const [query, setQuery] = useState("");
+  const [symbols, setSymbols] = useState<string[]>([...MARKET_SYMBOLS]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/testnet/markets", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) {
+          setSymbols(data.symbols);
+        }
+      })
+      .catch(() => {
+        // Keep the built-in fallback markets if the public exchange API is unavailable.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const markets = useMemo(() => {
     const normalized = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return MARKET_SYMBOLS.filter((symbol) => !normalized || symbol.includes(normalized));
-  }, [query]);
+    return symbols.filter((symbol) => !normalized || symbol.includes(normalized));
+  }, [query, symbols]);
 
   return (
-    <div
-      className="market-search-wrap"
-      style={{
-        boxSizing: "border-box",
-        overflow: "hidden",
-        minWidth: 0,
-      }}
-    >
+    <div className="market-search-wrap" style={{ boxSizing: "border-box", minWidth: 0 }}>
       <div className="market-search-box">
         <span aria-hidden="true">⌕</span>
         <input
@@ -36,16 +48,7 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
           </button>
         )}
       </div>
-      <div
-        className="market-search-results"
-        style={{
-          flex: "1 1 auto",
-          minHeight: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          scrollbarWidth: "thin",
-        }}
-      >
+      <div className="market-search-results">
         {markets.length === 0 ? (
           <div className="market-search-empty">No markets found</div>
         ) : (
@@ -57,42 +60,11 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
                 type="button"
                 className={pair === selectedPair ? "selected" : ""}
                 onClick={() => onSelect(pair)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  flex: "0 0 auto",
-                  minWidth: 0,
-                  minHeight: 54,
-                  padding: "11px 14px",
-                  borderRadius: 12,
-                  textAlign: "left",
-                }}
               >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 34,
-                    minWidth: 34,
-                    height: 34,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <CoinIcon symbol={symbol.replace("USDT", "")} size={26} />
+                <span className="market-coin-icon" aria-hidden="true">
+                  <CoinIcon symbol={symbol.replace("USDT", "")} size={28} />
                 </span>
-                <span
-                  style={{
-                    minWidth: 0,
-                    flex: "1 1 auto",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {pair}
-                </span>
+                <span className="market-coin-name">{pair}</span>
               </button>
             );
           })
