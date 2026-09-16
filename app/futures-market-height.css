@@ -1,0 +1,10 @@
+/* Futures market selector: fixed desktop height for a clean, predictable scroll area. */
+@media (min-width: 1100px) {
+  html body .futures-wrap > .market-search-wrap,
+  html body .futures-wrap > .market-list.futures-market-list {
+    height: 730px !important;
+    min-height: 730px !important;
+    max-height: 730px !important;
+    box-sizing: border-box !important;
+  }
+}
