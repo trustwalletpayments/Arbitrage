@@ -107,3 +107,37 @@ html body .futures-wrap .market-search-wrap .market-search-results > button > sp
     max-height:300px !important;
   }
 }
+
+/* Final flat terminal treatment: no cards around the market list or market rows. */
+html body .futures-wrap .market-search-wrap,
+html body .futures-wrap .market-search-wrap * {
+  box-shadow:none !important;
+}
+
+html body .futures-wrap .market-search-wrap .market-search-box {
+  border:0 !important;
+  border-bottom:1px solid #263d56 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+html body .futures-wrap .market-search-wrap .market-search-results > button,
+html body .futures-wrap .market-search-wrap .market-search-results > button.selected,
+html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
+  border-top:0 !important;
+  border-right:0 !important;
+  border-bottom:1px solid rgba(38,61,86,.45) !important;
+  border-radius:0 !important;
+  background:transparent !important;
+}
+
+html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
+  background:rgba(16,34,54,.65) !important;
+}
+
+html body .futures-wrap .market-search-wrap .market-search-results > button.selected {
+  border-left:2px solid #3b9cff !important;
+  background:rgba(16,42,69,.75) !important;
+}
