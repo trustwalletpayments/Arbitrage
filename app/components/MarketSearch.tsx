@@ -12,8 +12,6 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    // Desktop always shows the complete market list. Mobile starts compact
-    // and uses the Expand all coins control.
     if (window.matchMedia("(min-width: 761px)").matches) setExpanded(true);
 
     let cancelled = false;
@@ -24,14 +22,8 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
       })
       .catch(() => {});
 
-    const handleDocumentClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest(".futures-expand-button")) setExpanded((value) => !value);
-    };
-    document.addEventListener("click", handleDocumentClick);
     return () => {
       cancelled = true;
-      document.removeEventListener("click", handleDocumentClick);
     };
   }, []);
 
@@ -71,6 +63,9 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
             return <button key={symbol} type="button" className={pair === selectedPair ? "selected" : ""} onClick={() => onSelect(pair)}><span className="market-coin-icon" aria-hidden="true"><CoinIcon symbol={symbol.replace("USDT", "")} size={30} /></span><span className="market-coin-name">{pair}</span></button>;
           })}
         </div>
+        <button type="button" className="futures-expand-button" onClick={() => setExpanded((value) => !value)}>
+          {expanded ? "Collapse coins" : "Expand all coins"}<span>{expanded ? "⌃" : "⌄"}</span>
+        </button>
       </div>
     </>
   );
