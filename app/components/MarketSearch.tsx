@@ -19,11 +19,15 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) setSymbols(data.symbols);
       })
       .catch(() => {});
-    const toggle = () => setExpanded((value) => !value);
-    window.addEventListener("futures:toggle-markets", toggle);
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest(".futures-expand-button")) setExpanded((value) => !value);
+    };
+    document.addEventListener("click", handleDocumentClick);
     return () => {
       cancelled = true;
-      window.removeEventListener("futures:toggle-markets", toggle);
+      document.removeEventListener("click", handleDocumentClick);
     };
   }, []);
 
