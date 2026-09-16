@@ -14,8 +14,17 @@
     padding-left: 0 !important;
     padding-right: 28px !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
     overflow-x: clip !important;
     overflow-y: visible !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  html body .futures-wrap::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   html body .futures-wrap > .trade-head {
@@ -97,4 +106,17 @@
     width: 100% !important;
     margin: 0 !important;
   }
+}
+
+/* Final scrollbar correction: the document owns vertical scrolling; the futures wrapper does not. */
+html body .futures-wrap {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html body .futures-wrap::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
