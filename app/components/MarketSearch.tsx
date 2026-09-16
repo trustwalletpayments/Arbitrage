@@ -58,15 +58,41 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
                 className={pair === selectedPair ? "selected" : ""}
                 onClick={() => onSelect(pair)}
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
                   flex: "0 0 auto",
                   minWidth: 0,
-                  minHeight: 48,
-                  borderRadius: 11,
+                  minHeight: 54,
+                  padding: "11px 14px",
+                  borderRadius: 12,
                   textAlign: "left",
                 }}
               >
-                <CoinIcon symbol={symbol.replace("USDT", "")} size={20} />
-                <span>{pair}</span>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 34,
+                    minWidth: 34,
+                    height: 34,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CoinIcon symbol={symbol.replace("USDT", "")} size={26} />
+                </span>
+                <span
+                  style={{
+                    minWidth: 0,
+                    flex: "1 1 auto",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {pair}
+                </span>
               </button>
             );
           })
