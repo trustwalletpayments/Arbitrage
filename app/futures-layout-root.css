@@ -40,18 +40,20 @@
   }
 }
 
-/* Final alignment: the sidebar occupies exactly the TradingView chart row. */
+/* Final alignment: keep the markets card at the top of the main content area,
+   while its coin list scrolls internally. */
 @media (min-width: 1100px) {
   .futures-wrap > .market-search-wrap {
     grid-column: 1 !important;
-    grid-row: 2 !important;
+    grid-row: 1 / span 5 !important;
     width: 100% !important;
     min-width: 0 !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
     margin: 0 !important;
-    align-self: stretch !important;
+    align-self: start !important;
+    justify-self: stretch !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
   }
@@ -67,7 +69,7 @@
   }
 }
 
-/* Use the full viewport content width and remove the extra left offset. */
+/* Use the full viewport content width and remove any extra horizontal offset. */
 @media (min-width: 1100px) {
   .futures-wrap {
     width: 100% !important;
