@@ -4,7 +4,11 @@
 @media (min-width:1100px){
   .futures-wrap{
     width:100%!important;
-    max-width:1680px!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:28px!important;
     box-sizing:border-box!important;
     grid-template-columns:minmax(220px,240px) minmax(0,1fr) minmax(320px,360px)!important;
     overflow-x:hidden!important;
@@ -18,80 +22,33 @@
   }
   .futures-wrap>.market-search-wrap{
     grid-column:1!important;
-    grid-row:1 / span 5!important;
+    grid-row:1 / span 2!important;
     width:100%!important;
     min-width:0!important;
-    height:390px!important;
-    min-height:390px!important;
-    max-height:390px!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
     margin:0!important;
-    align-self:start!important;
-  }
-  .futures-wrap>.futures-grid{min-width:0!important}
-  .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart,
-  .futures-wrap>.futures-grid>.futures-chart-area>.futures-stats,
-  .futures-wrap>.futures-grid>.futures-data-grid,
-  .futures-wrap>.futures-grid>.futures-chart-area>.positions-panel{
-    min-width:0!important;
-    max-width:100%!important;
-  }
-}
-
-@media (min-width:1100px){
-  .futures-wrap > .market-search-wrap{
-    grid-column:1!important;
-    grid-row:1 / span 5!important;
-    width:100%!important;
-    min-width:0!important;
-    height:390px!important;
-    min-height:390px!important;
-    max-height:390px!important;
-    margin:0!important;
-    align-self:start!important;
+    align-self:stretch!important;
     justify-self:stretch!important;
     overflow:hidden!important;
     box-sizing:border-box!important;
   }
-  .futures-wrap > .market-search-wrap .market-search-results{
+  .futures-wrap>.market-search-wrap .market-search-results{
     flex:1 1 auto!important;
     min-height:0!important;
     max-height:none!important;
     overflow-y:auto!important;
     overflow-x:hidden!important;
   }
-  .futures-wrap > .market-search-wrap .market-search-results button{flex:0 0 auto!important}
-}
-
-@media (min-width:1100px){
-  .futures-wrap{
-    width:100%!important;
-    max-width:none!important;
-    margin-left:0!important;
-    margin-right:0!important;
-    padding-left:0!important;
-    padding-right:28px!important;
-    box-sizing:border-box!important;
-  }
-  .futures-wrap > .market-search-wrap{
-    margin-left:0!important;
-    justify-self:stretch!important;
-  }
-}
-
-/* Match the Markets card exactly to the TradingView chart grid row. */
-@media (min-width:1100px){
-  .futures-wrap > .market-search-wrap{
-    grid-row:2!important;
-    height:100%!important;
-    min-height:0!important;
-    max-height:none!important;
-    align-self:stretch!important;
-  }
-  .futures-wrap > .market-search-wrap .market-search-results{
-    min-height:0!important;
-    max-height:none!important;
-    flex:1 1 auto!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
+  .futures-wrap>.market-search-wrap .market-search-results button{flex:0 0 auto!important}
+  .futures-wrap>.futures-grid,
+  .futures-wrap>.futures-grid>.futures-chart-area{min-width:0!important}
+  .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart,
+  .futures-wrap>.futures-grid>.futures-chart-area>.futures-stats,
+  .futures-wrap>.futures-data-grid,
+  .futures-wrap>.futures-grid>.futures-chart-area>.positions-panel{
+    min-width:0!important;
+    max-width:100%!important;
   }
 }
