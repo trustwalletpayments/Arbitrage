@@ -1,0 +1,39 @@
+/* Mobile-only Futures layout fixes. Desktop styles remain untouched. */
+@media (max-width: 760px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .app-shell { width: 100%; min-width: 0; overflow-x: hidden; }
+  .appbar { min-height: 74px !important; padding: 14px 18px !important; gap: 12px !important; }
+  .appbar nav { display: none !important; }
+  .appbar .brand { min-width: 0; font-size: 24px !important; }
+  .appbar .btn { margin-left: auto; white-space: nowrap; }
+  .futures-wrap { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; padding: 16px 12px 110px !important; gap: 14px !important; box-sizing: border-box !important; }
+  .futures-wrap > .trade-head { display: block !important; width: 100% !important; min-width: 0 !important; height: auto !important; padding: 20px 18px 0 !important; border-radius: 18px !important; overflow: hidden !important; }
+  .futures-wrap > .trade-head > div { display: flex !important; flex-direction: column !important; width: 100% !important; min-width: 0 !important; gap: 0 !important; }
+  .futures-wrap > .trade-head .pair { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 8px !important; font-size: 21px !important; line-height: 1.2 !important; }
+  .futures-wrap > .trade-head .price { display: flex !important; align-items: baseline !important; flex-wrap: wrap !important; gap: 8px !important; margin: 14px 0 18px !important; font-size: clamp(30px, 9vw, 42px) !important; line-height: 1.05 !important; white-space: normal !important; }
+  .futures-wrap > .trade-head .price .up { margin-left: 0 !important; font-size: .72em !important; }
+  .futures-wrap > .trade-head .market-stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; width: 100% !important; min-width: 0 !important; gap: 0 !important; margin: 0 !important; align-self: stretch !important; }
+  .futures-wrap > .trade-head .market-stats span { display: flex !important; min-width: 0 !important; min-height: 58px !important; padding: 12px 10px !important; border: 0 !important; border-top: 1px solid #203d59 !important; border-left: 1px solid #203d59 !important; border-radius: 0 !important; background: transparent !important; justify-content: center !important; gap: 6px !important; overflow: hidden !important; font-size: 10px !important; line-height: 1.25 !important; text-align: center !important; }
+  .futures-wrap > .trade-head .market-stats span:nth-child(odd) { border-left: 0 !important; }
+  .futures-wrap > .trade-head .market-stats b { display: block !important; max-width: 100% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 14px !important; }
+  .futures-wrap > .trade-head > div > .muted, .futures-wrap > .trade-head > .muted { display: block !important; width: auto !important; margin: 0 -18px !important; padding: 12px 14px !important; border-top: 1px solid #203d59 !important; font-size: 10px !important; line-height: 1.4 !important; text-align: center !important; white-space: normal !important; }
+  .futures-wrap > .market-search-wrap, .futures-wrap > .market-list.futures-market-list { width: 100% !important; min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; }
+  .futures-wrap > .market-search-wrap { height: auto !important; min-height: 0 !important; max-height: none !important; }
+  .futures-wrap > .market-search-wrap .market-search-results { min-width: 0 !important; max-width: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; }
+  .futures-wrap > .futures-expand-button { width: 100% !important; min-height: 48px !important; box-sizing: border-box !important; }
+  .futures-grid, .futures-chart-area { display: flex !important; flex-direction: column !important; width: 100% !important; min-width: 0 !important; gap: 14px !important; }
+  .chart.live-chart { width: 100% !important; min-width: 0 !important; height: 330px !important; min-height: 330px !important; max-height: 330px !important; }
+  .chart.live-chart .tradingview-widget-container { height: 286px !important; max-height: 286px !important; }
+  .futures-stats, .futures-data-grid { width: 100% !important; min-width: 0 !important; grid-template-columns: 1fr !important; }
+  .order-panel, .positions-panel, .market-data-panel, .settlement-panel { width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
+  .order-panel { padding: 16px !important; }
+  .order-panel .control-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .order-panel input, .order-panel select { min-width: 0 !important; font-size: 16px !important; }
+  .positions-panel, .market-data-panel, .settlement-panel { padding: 16px !important; }
+}
+@media (max-width: 380px) {
+  .futures-wrap > .trade-head .market-stats { grid-template-columns: 1fr !important; }
+  .futures-wrap > .trade-head .market-stats span, .futures-wrap > .trade-head .market-stats span:nth-child(odd) { border-left: 0 !important; }
+  .futures-wrap > .trade-head .market-stats span:first-child { border-top: 0 !important; }
+  .order-panel .control-grid { grid-template-columns: 1fr !important; }
+}
