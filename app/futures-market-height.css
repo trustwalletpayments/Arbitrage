@@ -1,8 +1,8 @@
-/* Futures market selector: make the full markets card visibly taller. */
+/* Futures market selector: fixed 600px height. */
 html body .futures-wrap > .market-search-wrap {
-  height: 720px !important;
-  min-height: 720px !important;
-  max-height: 720px !important;
+  height: 600px !important;
+  min-height: 600px !important;
+  max-height: 600px !important;
   box-sizing: border-box !important;
 }
 
