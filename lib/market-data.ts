@@ -13,7 +13,7 @@ export const MARKET_SYMBOLS=[
   "FETUSDT","IMXUSDT","GALAUSDT","SANDUSDT","MANAUSDT","AXSUSDT",
   "ENAUSDT","ONDOUSDT","EIGENUSDT","LDOUSDT","MKRUSDT","CRVUSDT",
   "COMPUSDT","SNXUSDT","DYDXUSDT","GMXUSDT","CAKEUSDT","ALGOUSDT",
-  "XLMUSDT","XMRUSDT","EOSUSDT","ETCUSDT","KASUSDT","RUNEUSDT"
+  "XLMUSDT","XMRUSDT","EOSUSDT","KASUSDT","RUNEUSDT"
 ] as const;
 
 export function displayPair(symbol:string){return symbol.endsWith("USDT")?`${symbol.slice(0,-4)}/USDT`:symbol}
