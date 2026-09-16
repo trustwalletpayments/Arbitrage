@@ -4,7 +4,6 @@ import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
 import MarketChart from "../components/MarketChart";
 import CoinIcon from "../components/CoinIcon";
-import SpotMarketData from "./SpotMarketData";
 import {binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
 import "./spot-mobile.css";
@@ -151,7 +150,6 @@ export default function SpotPage(){
       <section className="chart-area">
         <div className="trade-head"><div><div className="pair">{pair}</div><div className="price">{livePrice?formatPrice(livePrice):"—"} <span className={change<0?"danger":"up"}>{change>=0?"+":""}{change.toFixed(2)}%</span></div><div className="muted tiny">Live Binance spot market data</div></div><Link className="btn" href="/futures">Open Futures</Link></div>
         <MarketChart pair={pair}/>
-        <SpotMarketData symbol={symbol}/>
       </section>
       <section className="order-panel" style={{padding:22,background:"linear-gradient(180deg,#0b1420 0%,#080d14 100%)",border:"1px solid #1d3046",borderRadius:18,boxShadow:"0 18px 50px rgba(0,0,0,.22)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}><div><div className="label">SPOT TRADING</div><h2 style={{margin:"6px 0 0",fontSize:22}}>{pair}</h2></div><span style={{fontSize:12,color:"#7f90a7"}}>Production market</span></div>
