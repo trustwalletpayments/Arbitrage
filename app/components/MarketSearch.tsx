@@ -43,7 +43,10 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         .market-search-results button{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;flex:0 0 auto;padding:10px 14px;border:1px solid #203b56;border-radius:14px;background:#0d1c2d;color:#c5d3e3;font:inherit;font-size:16px;cursor:pointer;box-sizing:border-box;transition:background .15s ease,border-color .15s ease,transform .15s ease;}
         .market-search-results button:hover{background:#142b45;border-color:#315b83;}
         .market-search-results button.selected{background:#16395d;border-color:#3b9cff;color:#fff;box-shadow:inset 3px 0 #3b9cff;}
-        .market-coin-icon{display:inline-flex;align-items:center;justify-content:center;width:38px;min-width:38px;height:38px;}
+        .market-coin-icon{display:flex;align-items:center;justify-content:center;flex:0 0 40px;width:40px;height:40px;min-width:40px;}
+        .market-coin-icon .coin-logo{display:flex!important;align-items:center;justify-content:center;flex:0 0 30px;width:30px!important;height:30px!important;line-height:0;}
+        .market-coin-icon .coin-logo img{display:block;width:30px!important;height:30px!important;object-fit:contain;}
+        .market-coin-icon .coin-logo b{font-size:14px;line-height:1;}
         .market-coin-name{min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .market-search-empty{padding:24px 12px;text-align:center;color:#7890a8;}
       `}</style>
@@ -76,7 +79,7 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
                   onClick={() => onSelect(pair)}
                 >
                   <span className="market-coin-icon" aria-hidden="true">
-                    <CoinIcon symbol={symbol.replace("USDT", "")} size={28} />
+                    <CoinIcon symbol={symbol.replace("USDT", "")} size={30} />
                   </span>
                   <span className="market-coin-name">{pair}</span>
                 </button>
