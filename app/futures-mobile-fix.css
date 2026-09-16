@@ -12,11 +12,11 @@
   .futures-wrap > .trade-head .pair { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 8px !important; font-size: 21px !important; line-height: 1.2 !important; }
   .futures-wrap > .trade-head .price { display: flex !important; align-items: baseline !important; flex-wrap: wrap !important; gap: 8px !important; margin: 14px 0 18px !important; font-size: clamp(30px, 9vw, 42px) !important; line-height: 1.05 !important; white-space: normal !important; }
   .futures-wrap > .trade-head .price .up { margin-left: 0 !important; font-size: .72em !important; }
-  .futures-wrap > .trade-head .market-stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; width: 100% !important; min-width: 0 !important; gap: 0 !important; margin: 0 !important; align-self: stretch !important; }
-  .futures-wrap > .trade-head .market-stats span { display: flex !important; min-width: 0 !important; min-height: 58px !important; padding: 12px 10px !important; border: 0 !important; border-top: 1px solid #203d59 !important; border-left: 1px solid #203d59 !important; border-radius: 0 !important; background: transparent !important; justify-content: center !important; gap: 6px !important; overflow: hidden !important; font-size: 10px !important; line-height: 1.25 !important; text-align: center !important; }
-  .futures-wrap > .trade-head .market-stats span:nth-child(odd) { border-left: 0 !important; }
-  .futures-wrap > .trade-head .market-stats b { display: block !important; max-width: 100% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 14px !important; }
-  .futures-wrap > .trade-head > div > .muted, .futures-wrap > .trade-head > .muted { display: block !important; width: auto !important; margin: 0 -18px !important; padding: 12px 14px !important; border-top: 1px solid #203d59 !important; font-size: 10px !important; line-height: 1.4 !important; text-align: center !important; white-space: normal !important; }
+  .futures-wrap > .trade-head .market-stats { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; grid-auto-rows: minmax(64px, auto) !important; width: 100% !important; min-width: 0 !important; gap: 0 !important; margin: 0 !important; align-self: stretch !important; }
+  .futures-wrap > .trade-head .market-stats > span { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; min-width: 0 !important; min-height: 64px !important; padding: 11px 12px !important; border: 0 !important; border-top: 1px solid #203d59 !important; border-left: 1px solid #203d59 !important; border-radius: 0 !important; background: transparent !important; gap: 5px !important; overflow: hidden !important; font-size: 10px !important; line-height: 1.25 !important; text-align: left !important; box-sizing: border-box !important; }
+  .futures-wrap > .trade-head .market-stats > span:nth-child(odd) { border-left: 0 !important; }
+  .futures-wrap > .trade-head .market-stats > span > b { display: block !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 14px !important; line-height: 1.2 !important; }
+  .futures-wrap > .trade-head > div > .muted { display: block !important; width: auto !important; margin: 0 -18px !important; padding: 12px 14px !important; border-top: 1px solid #203d59 !important; font-size: 10px !important; line-height: 1.4 !important; text-align: center !important; white-space: normal !important; }
   .futures-wrap > .market-search-wrap, .futures-wrap > .market-list.futures-market-list { width: 100% !important; min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; }
   .futures-wrap > .market-search-wrap { height: auto !important; min-height: 0 !important; max-height: none !important; }
   .futures-wrap > .market-search-wrap .market-search-results { min-width: 0 !important; max-width: 100% !important; overflow-y: auto !important; overflow-x: hidden !important; }
@@ -36,4 +36,69 @@
   .futures-wrap > .trade-head .market-stats span, .futures-wrap > .trade-head .market-stats span:nth-child(odd) { border-left: 0 !important; }
   .futures-wrap > .trade-head .market-stats span:first-child { border-top: 0 !important; }
   .order-panel .control-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Final mobile override: market stats must remain in a real grid, not display: contents. */
+@media (max-width: 760px) {
+  html body .futures-wrap > .trade-head > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats,
+  html body .futures-wrap > .trade-head .market-stats > span {
+    position: static !important;
+    float: none !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    grid-auto-flow: row !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 128px !important;
+    max-height: none !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats > span {
+    display: flex !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 64px !important;
+    max-height: none !important;
+    transform: none !important;
+    writing-mode: horizontal-tb !important;
+    white-space: normal !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats > span:nth-child(1),
+  html body .futures-wrap > .trade-head .market-stats > span:nth-child(2) {
+    border-top: 1px solid #203d59 !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats > span:nth-child(3),
+  html body .futures-wrap > .trade-head .market-stats > span:nth-child(4) {
+    border-top: 1px solid #203d59 !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats > span:nth-child(even) {
+    border-left: 1px solid #203d59 !important;
+  }
+
+  html body .futures-wrap > .trade-head .market-stats > span > b {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
 }
