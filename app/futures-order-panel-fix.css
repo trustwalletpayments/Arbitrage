@@ -1,7 +1,8 @@
-/* Futures page scrolling: one smooth document scroll, no nested page scrollbars. */
+/* Futures page scrolling: the document is the page scroll owner. */
 html {
+  overflow-x: clip !important;
+  overflow-y: auto !important;
   scroll-behavior: smooth !important;
-  overflow-x: hidden !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
@@ -13,11 +14,12 @@ html::-webkit-scrollbar {
 }
 
 body {
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
+  min-height: 100vh !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  overscroll-behavior-y: none !important;
+  overscroll-behavior-y: auto !important;
 }
 
 body::-webkit-scrollbar {
@@ -26,7 +28,7 @@ body::-webkit-scrollbar {
   height: 0 !important;
 }
 
-/* Keep the document as the only page-level scroll owner. */
+/* Never turn the main shell or Futures wrappers into scroll containers. */
 html body .app-shell {
   min-height: 100vh !important;
   height: auto !important;
@@ -70,44 +72,46 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* Markets is the only intentional internal scroll area. */
-html body .futures-wrap > .market-list.futures-market-list {
+/* Markets remains the only intentional inner scroll area. */
+html body .futures-wrap > .market-list.futures-market-list,
+html body .futures-wrap > .market-search-wrap .market-search-results {
   overscroll-behavior: contain !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: thin !important;
-  scrollbar-color: #526176 transparent !important;
 }
 
-html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar {
+html body .futures-wrap > .market-search-wrap .market-search-results {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar,
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar {
   width: 6px !important;
   height: 6px !important;
 }
 
-html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-track {
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-track,
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-track {
   background: transparent !important;
 }
 
-html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-thumb {
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-thumb,
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-thumb {
   background: #526176 !important;
   border-radius: 999px !important;
-}
-
-/* Also support a wrapped Markets results container if present. */
-html body .futures-wrap .market-search-results {
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
-  scrollbar-width: thin !important;
 }
 
 @media (min-width: 1100px) {
   html body .futures-wrap {
     align-items: start !important;
-    overflow: visible !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
 
   html body .futures-wrap > .futures-grid > .order-panel {
     grid-column: 3 !important;
-    grid-row: 2 / span 2 !important;
+    grid-row: 2 !important;
     overflow: visible !important;
   }
 }
