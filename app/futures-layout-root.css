@@ -66,3 +66,20 @@
     flex: 0 0 auto !important;
   }
 }
+
+/* Use the full viewport content width and remove the extra left offset. */
+@media (min-width: 1100px) {
+  .futures-wrap {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 28px !important;
+    box-sizing: border-box !important;
+  }
+  .futures-wrap > .market-search-wrap {
+    margin-left: 0 !important;
+    justify-self: stretch !important;
+  }
+}
