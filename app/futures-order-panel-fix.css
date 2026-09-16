@@ -1,135 +1,141 @@
-/* Futures Markets: compact card layout that fits cleanly inside the sidebar. */
-html body .futures-wrap .market-search-wrap,
-html body .futures-wrap .market-search-wrap.expanded {
-  display: flex !important;
-  flex-direction: column !important;
+/* Compact futures order panel: match the supplied professional terminal reference. */
+html body .futures-wrap .futures-grid > .order-panel,
+html body .futures-wrap > .futures-grid > .order-panel {
   width: 100% !important;
   min-width: 0 !important;
-  height: calc(100vh - 150px) !important;
-  min-height: 420px !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 12px !important;
   box-sizing: border-box !important;
-  border: 1px solid #263d56 !important;
-  border-radius: 16px !important;
-  background: #071321 !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
-  overflow: hidden !important;
+  padding: 18px !important;
+  border: 1px solid #203d59 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(145deg, #0d1b2b 0%, #091522 100%) !important;
+  overflow: visible !important;
 }
 
-html body .futures-wrap .market-search-wrap .market-search-box {
-  flex: 0 0 auto !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  height: 48px !important;
-  box-sizing: border-box !important;
-  margin: 0 0 12px !important;
-  padding: 0 14px !important;
-  border: 1px solid #2a4561 !important;
-  border-radius: 10px !important;
-  background: #0c1c2d !important;
-  overflow: hidden !important;
-}
-
-html body .futures-wrap .market-search-wrap .market-search-results {
-  flex: 1 1 auto !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  padding: 0 4px 0 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
-}
-
-/* Individual market cards. */
-html body .futures-wrap .market-search-wrap .market-search-results > button {
-  flex: 0 0 auto !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 54px !important;
-  height: 54px !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 0 14px !important;
-  border: 1px solid #20384f !important;
-  border-radius: 10px !important;
-  background: #0c1b2b !important;
-  color: #b8c7d9 !important;
-  box-shadow: none !important;
-  justify-content: flex-start !important;
+html body .order-panel .panel-title {
+  margin: 0 0 14px !important;
   align-items: center !important;
-  gap: 12px !important;
-  font-size: 14px !important;
-  line-height: 1 !important;
-  overflow: hidden !important;
-  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease !important;
 }
 
-html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
-  background: #122943 !important;
-  border-color: #315779 !important;
-  color: #f4f8ff !important;
-  transform: translateY(-1px) !important;
+html body .order-panel .panel-title .label {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .04em !important;
 }
 
-html body .futures-wrap .market-search-wrap .market-search-results > button.selected {
-  border-color: #3b9cff !important;
-  background: #153452 !important;
-  color: #ffffff !important;
-  box-shadow: inset 3px 0 0 #3b9cff !important;
+html body .order-panel .panel-title h2 {
+  margin: 6px 0 0 !important;
+  font-size: 30px !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.03em !important;
 }
 
-html body .futures-wrap .market-search-wrap .market-search-results > button > span {
-  min-width: 0 !important;
-  margin-left: auto !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+html body .order-panel .testnet-pill {
+  padding: 7px 11px !important;
+  font-size: 10px !important;
   white-space: nowrap !important;
 }
 
+html body .order-panel .balance-strip {
+  min-height: 42px !important;
+  margin: 0 0 14px !important;
+  padding: 10px 12px !important;
+  border: 1px solid #1e3b56 !important;
+  border-radius: 10px !important;
+  background: #102a45 !important;
+  font-size: 12px !important;
+}
+
+html body .order-panel .control-grid {
+  gap: 10px !important;
+}
+
+html body .order-panel label {
+  margin-bottom: 12px !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .02em !important;
+}
+
+html body .order-panel input,
+html body .order-panel select {
+  height: 42px !important;
+  margin-top: 7px !important;
+  padding: 0 12px !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+}
+
+html body .order-panel .tabs {
+  margin: 2px 0 12px !important;
+  border-bottom: 1px solid #203d59 !important;
+}
+
+html body .order-panel .tabs button {
+  min-height: 42px !important;
+  font-size: 13px !important;
+}
+
+html body .order-panel .order-type-tabs {
+  margin: 0 0 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #203d59 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+html body .order-panel .order-type-tabs button {
+  min-height: 38px !important;
+  font-size: 12px !important;
+  border-right: 0 !important;
+}
+
+html body .order-panel .percentage-row {
+  gap: 6px !important;
+  margin: -2px 0 12px !important;
+}
+
+html body .order-panel .percentage-row button {
+  height: 28px !important;
+  border-radius: 7px !important;
+  font-size: 10px !important;
+}
+
+html body .order-panel .order-summary {
+  gap: 7px !important;
+  margin-top: 14px !important;
+  padding: 12px 0 !important;
+}
+
+html body .order-panel .order-summary div {
+  font-size: 11px !important;
+}
+
+html body .order-panel .submit-futures {
+  min-height: 44px !important;
+  margin-top: 14px !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+}
+
+html body .order-panel .disclaimer {
+  margin: 10px 0 0 !important;
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
 @media (min-width: 1100px) {
-  html body .futures-wrap > .market-search-wrap,
-  html body .futures-wrap > .market-search-wrap.expanded {
-    grid-column: 1 !important;
-    grid-row: 1 / span 5 !important;
-    width: 100% !important;
-    max-width: 340px !important;
-    height: calc(100vh - 150px) !important;
-    min-height: 420px !important;
-    margin: 0 !important;
-    align-self: start !important;
+  html body .futures-wrap > .futures-grid > .order-panel {
+    max-width: 360px !important;
     justify-self: stretch !important;
   }
 }
 
-@media (max-width: 1099px) {
-  html body .futures-wrap .market-search-wrap,
-  html body .futures-wrap .market-search-wrap.expanded {
-    height: auto !important;
-    min-height: 0 !important;
-  }
-}
-
 @media (max-width: 760px) {
-  html body .futures-wrap .market-search-wrap,
-  html body .futures-wrap .market-search-wrap.expanded {
-    padding: 10px !important;
-    border-radius: 12px !important;
+  html body .futures-wrap .futures-grid > .order-panel,
+  html body .futures-wrap > .futures-grid > .order-panel {
+    padding: 16px !important;
   }
-
-  html body .futures-wrap .market-search-wrap .market-search-results {
-    max-height: 320px !important;
+  html body .order-panel .panel-title h2 {
+    font-size: 26px !important;
   }
 }
