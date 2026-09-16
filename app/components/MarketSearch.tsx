@@ -49,7 +49,9 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         .market-search-empty{padding:24px 12px;text-align:center;color:#7890a8;}
         .futures-expand-button{display:none;}
         @media(max-width:760px){
-          .market-search-results .futures-expand-button{display:flex;align-items:center;justify-content:center;min-height:46px;margin:4px 0 0;padding:10px 14px;border:1px solid #315b83;border-radius:12px;background:#102944;color:#9fc8f5;font-size:14px;font-weight:700;letter-spacing:.01em;}
+          .market-search-results{max-height:330px!important;padding-bottom:8px;}
+          .market-search-results.is-expanded{max-height:360px!important;}
+          .market-search-results .futures-expand-button{display:flex;position:sticky;bottom:0;z-index:5;align-items:center;justify-content:center;min-height:46px;margin:4px 0 0;padding:10px 14px;border:1px solid #315b83;border-radius:12px;background:#102944;color:#9fc8f5;font-size:14px;font-weight:700;letter-spacing:.01em;box-shadow:0 -10px 18px rgba(7,18,31,.92);}
           .market-search-results .futures-expand-button:hover{background:#16395d;border-color:#3b9cff;}
         }
       `}</style>
@@ -59,7 +61,7 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search markets" aria-label="Search markets" />
           {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search">×</button>}
         </div>
-        <div className="market-search-results">
+        <div className={`market-search-results${expanded ? " is-expanded" : ""}`}>
           {markets.length === 0 ? <div className="market-search-empty">No markets found</div> : markets.map((symbol) => {
             const pair = displayPair(symbol);
             return <button key={symbol} type="button" className={pair === selectedPair ? "selected" : ""} onClick={() => onSelect(pair)}><span className="market-coin-icon" aria-hidden="true"><CoinIcon symbol={symbol.replace("USDT", "")} size={30} /></span><span className="market-coin-name">{pair}</span></button>;
