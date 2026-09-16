@@ -1,0 +1,44 @@
+/* Root fix for the Buy/Sell futures panel: it must grow with its content.
+   The page owns vertical scrolling; this card must never become a nested scroll viewport. */
+.futures-wrap > .futures-grid > .order-panel {
+  display: block !important;
+  position: static !important;
+  align-self: start !important;
+  justify-self: stretch !important;
+  height: max-content !important;
+  min-height: max-content !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+  min-width: 0 !important;
+  contain: none !important;
+  transform: none !important;
+}
+
+@media (min-width: 1100px) {
+  .futures-wrap {
+    align-items: start !important;
+  }
+
+  .futures-wrap > .futures-grid {
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .futures-wrap > .futures-grid > .order-panel {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    height: max-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* Do not create a scroll viewport on the order card through descendants. */
+.futures-wrap > .futures-grid > .order-panel,
+.futures-wrap > .futures-grid > .order-panel * {
+  scrollbar-gutter: auto !important;
+}
