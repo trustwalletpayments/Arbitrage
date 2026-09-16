@@ -25,7 +25,7 @@
     grid-row:1 / span 2!important;
     width:100%!important;
     min-width:0!important;
-    height:100%!important;
+    height:auto!important;
     min-height:0!important;
     max-height:none!important;
     margin:0!important;
@@ -50,5 +50,33 @@
   .futures-wrap>.futures-grid>.futures-chart-area>.positions-panel{
     min-width:0!important;
     max-width:100%!important;
+  }
+}
+
+/* Final root fix: prevent the spanning sidebar from expanding the first grid row. */
+@media (min-width:1100px){
+  .futures-wrap{
+    grid-template-rows:auto auto auto auto auto!important;
+    align-items:stretch!important;
+    min-width:0!important;
+  }
+  .futures-wrap>.trade-head{
+    align-self:start!important;
+  }
+  .futures-wrap>.market-search-wrap{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    align-self:stretch!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+  .futures-wrap>.market-search-wrap .market-search-results{
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+  .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart{
+    align-self:start!important;
   }
 }
