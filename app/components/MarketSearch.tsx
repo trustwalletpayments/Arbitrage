@@ -13,7 +13,6 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
 
   useEffect(() => {
     if (window.matchMedia("(min-width: 761px)").matches) setExpanded(true);
-
     let cancelled = false;
     fetch("/api/testnet/markets", { cache: "no-store" })
       .then((response) => response.json())
@@ -21,17 +20,15 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) setSymbols(data.symbols);
       })
       .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  const markets = useMemo(() => {
-    const normalized = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    const filtered = symbols.filter((symbol) => !normalized || symbol.includes(normalized));
-    return expanded || normalized ? filtered : filtered.slice(0, 2);
-  }, [query, symbols, expanded]);
+  const normalized = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const filtered = useMemo(
+    () => symbols.filter((symbol) => !normalized || symbol.includes(normalized)),
+    [symbols, normalized]
+  );
+  const markets = expanded || normalized ? filtered : filtered.slice(0, 2);
 
   return (
     <>
@@ -50,6 +47,11 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         .market-coin-icon .coin-logo b{font-size:14px;line-height:1;}
         .market-coin-name{min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .market-search-empty{padding:24px 12px;text-align:center;color:#7890a8;}
+        .futures-expand-button{display:none;}
+        @media(max-width:760px){
+          .market-search-results .futures-expand-button{display:flex;align-items:center;justify-content:center;min-height:46px;margin:4px 0 0;padding:10px 14px;border:1px solid #315b83;border-radius:12px;background:#102944;color:#9fc8f5;font-size:14px;font-weight:700;letter-spacing:.01em;}
+          .market-search-results .futures-expand-button:hover{background:#16395d;border-color:#3b9cff;}
+        }
       `}</style>
       <div className="market-search-wrap">
         <div className="market-search-box">
@@ -62,10 +64,12 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
             const pair = displayPair(symbol);
             return <button key={symbol} type="button" className={pair === selectedPair ? "selected" : ""} onClick={() => onSelect(pair)}><span className="market-coin-icon" aria-hidden="true"><CoinIcon symbol={symbol.replace("USDT", "")} size={30} /></span><span className="market-coin-name">{pair}</span></button>;
           })}
+          {!normalized && filtered.length > 2 && (
+            <button type="button" className="futures-expand-button" onClick={() => setExpanded((value) => !value)}>
+              {expanded ? "Collapse coins" : "Expand all coins"}<span>{expanded ? "⌃" : "⌄"}</span>
+            </button>
+          )}
         </div>
-        <button type="button" className="futures-expand-button" onClick={() => setExpanded((value) => !value)}>
-          {expanded ? "Collapse coins" : "Expand all coins"}<span>{expanded ? "⌃" : "⌄"}</span>
-        </button>
       </div>
     </>
   );
