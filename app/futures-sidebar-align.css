@@ -1,20 +1,50 @@
-/* Keep the markets sidebar aligned with the TradingView chart row. */
+/* Stable desktop futures layout: one compact header row followed by one chart row. */
 @media (min-width: 1100px) {
-  .futures-wrap > .market-search-wrap {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-    width: 100% !important;
+  html body .futures-wrap {
+    display: grid !important;
+    grid-template-columns: minmax(220px, 240px) minmax(0, 1fr) minmax(320px, 360px) !important;
+    grid-template-rows: auto 390px auto auto auto !important;
+    column-gap: 18px !important;
+    row-gap: 5px !important;
+    align-items: start !important;
     min-width: 0 !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
+    width: 100% !important;
+    max-width: none !important;
     margin: 0 !important;
-    align-self: stretch !important;
-    overflow: hidden !important;
+    padding-left: 0 !important;
+    padding-right: 28px !important;
     box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
-  .futures-wrap > .market-search-wrap .market-search-results {
+  /* Header occupies only the first row and never affects the chart row height. */
+  html body .futures-wrap > .trade-head {
+    grid-column: 2 / 4 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  /* Sidebar and chart share exactly the same second grid row. */
+  html body .futures-wrap > .market-search-wrap {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  html body .futures-wrap > .market-search-wrap .market-search-results {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     max-height: none !important;
@@ -22,7 +52,52 @@
     overflow-x: hidden !important;
   }
 
-  .futures-wrap > .market-search-wrap .market-search-results button {
+  html body .futures-wrap > .market-search-wrap .market-search-results button {
     flex: 0 0 auto !important;
+  }
+
+  html body .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Keep the trading panel in the right column without spanning the chart row. */
+  html body .futures-wrap > .futures-grid > .order-panel {
+    grid-column: 3 !important;
+    grid-row: 2 !important;
+    align-self: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Remaining sections follow below the chart instead of creating a tall first row. */
+  html body .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  html body .futures-wrap > .futures-grid > .futures-chart-area > .futures-data-grid {
+    grid-column: 2 !important;
+    grid-row: 4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  html body .futures-wrap > .futures-grid > .futures-chart-area > .positions-panel {
+    grid-column: 2 !important;
+    grid-row: 5 !important;
+    width: 100% !important;
+    margin: 0 !important;
   }
 }
