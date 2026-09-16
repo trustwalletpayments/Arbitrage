@@ -243,3 +243,9 @@
   .chart-area>.trade-head .price{font-size:30px!important}
   .chart-area>.trade-head .btn{padding:9px!important;font-size:11px!important}
 }
+
+/* Keep the Spot order form as one normal page-flow card, never an inner scroll area. */
+.trade-layout>.order-panel{
+  max-height:none!important;
+  overflow:visible!important;
+}
