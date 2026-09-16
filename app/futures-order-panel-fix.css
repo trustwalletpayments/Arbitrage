@@ -1,143 +1,135 @@
-/* Final Markets flattening override: MarketSearch is the real component used by Futures. */
+/* Futures Markets: compact card layout that fits cleanly inside the sidebar. */
 html body .futures-wrap .market-search-wrap,
 html body .futures-wrap .market-search-wrap.expanded {
-  display:flex !important;
-  flex-direction:column !important;
-  width:100% !important;
-  min-width:0 !important;
-  height:calc(100vh - 150px) !important;
-  min-height:480px !important;
-  max-height:none !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  overflow:visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: calc(100vh - 150px) !important;
+  min-height: 420px !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #263d56 !important;
+  border-radius: 16px !important;
+  background: #071321 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
+  overflow: hidden !important;
 }
 
 html body .futures-wrap .market-search-wrap .market-search-box {
-  flex:0 0 auto !important;
-  width:100% !important;
-  box-sizing:border-box !important;
-  margin:0 0 14px !important;
-  border:1px solid #263d56 !important;
-  border-radius:10px !important;
-  background:#0b1726 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
+  margin: 0 0 12px !important;
+  padding: 0 14px !important;
+  border: 1px solid #2a4561 !important;
+  border-radius: 10px !important;
+  background: #0c1c2d !important;
+  overflow: hidden !important;
 }
 
 html body .futures-wrap .market-search-wrap .market-search-results {
-  flex:1 1 auto !important;
-  width:100% !important;
-  min-height:0 !important;
-  max-height:none !important;
-  box-sizing:border-box !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:0 !important;
-  padding:0 8px 0 0 !important;
-  margin:0 !important;
-  border:0 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  overflow-y:auto !important;
-  overflow-x:hidden !important;
-  overscroll-behavior:contain !important;
-  -webkit-overflow-scrolling:touch !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 0 4px 0 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
+/* Individual market cards. */
 html body .futures-wrap .market-search-wrap .market-search-results > button {
-  flex:0 0 auto !important;
-  width:100% !important;
-  min-height:48px !important;
-  height:48px !important;
-  box-sizing:border-box !important;
-  margin:0 !important;
-  padding:0 12px !important;
-  border:0 !important;
-  border-left:2px solid transparent !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  color:#b8c7d9 !important;
-  box-shadow:none !important;
-  justify-content:flex-start !important;
-  gap:12px !important;
-  font-size:14px !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 54px !important;
+  height: 54px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid #20384f !important;
+  border-radius: 10px !important;
+  background: #0c1b2b !important;
+  color: #b8c7d9 !important;
+  box-shadow: none !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  overflow: hidden !important;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease !important;
 }
 
 html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
-  background:#102236 !important;
-  color:#f4f8ff !important;
+  background: #122943 !important;
+  border-color: #315779 !important;
+  color: #f4f8ff !important;
+  transform: translateY(-1px) !important;
 }
 
 html body .futures-wrap .market-search-wrap .market-search-results > button.selected {
-  border-left-color:#3b9cff !important;
-  background:#102a45 !important;
-  color:#fff !important;
+  border-color: #3b9cff !important;
+  background: #153452 !important;
+  color: #ffffff !important;
+  box-shadow: inset 3px 0 0 #3b9cff !important;
 }
 
 html body .futures-wrap .market-search-wrap .market-search-results > button > span {
-  margin-left:auto !important;
-  white-space:nowrap !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
-/* Place the actual MarketSearch component in the left grid column from the very top. */
-@media (min-width:1100px) {
+@media (min-width: 1100px) {
   html body .futures-wrap > .market-search-wrap,
   html body .futures-wrap > .market-search-wrap.expanded {
-    grid-column:1 !important;
-    grid-row:1 / span 5 !important;
-    width:240px !important;
-    height:calc(100vh - 150px) !important;
-    min-height:480px !important;
-    margin:0 !important;
-    align-self:start !important;
-    justify-self:start !important;
+    grid-column: 1 !important;
+    grid-row: 1 / span 5 !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    height: calc(100vh - 150px) !important;
+    min-height: 420px !important;
+    margin: 0 !important;
+    align-self: start !important;
+    justify-self: stretch !important;
   }
 }
 
-@media (max-width:760px) {
+@media (max-width: 1099px) {
   html body .futures-wrap .market-search-wrap,
   html body .futures-wrap .market-search-wrap.expanded {
-    height:auto !important;
-    min-height:0 !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
+}
+
+@media (max-width: 760px) {
+  html body .futures-wrap .market-search-wrap,
+  html body .futures-wrap .market-search-wrap.expanded {
+    padding: 10px !important;
+    border-radius: 12px !important;
+  }
+
   html body .futures-wrap .market-search-wrap .market-search-results {
-    max-height:300px !important;
+    max-height: 320px !important;
   }
-}
-
-/* Final flat terminal treatment: no cards around the market list or market rows. */
-html body .futures-wrap .market-search-wrap,
-html body .futures-wrap .market-search-wrap * {
-  box-shadow:none !important;
-}
-
-html body .futures-wrap .market-search-wrap .market-search-box {
-  border:0 !important;
-  border-bottom:1px solid #263d56 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  padding-left:0 !important;
-  padding-right:0 !important;
-}
-
-html body .futures-wrap .market-search-wrap .market-search-results > button,
-html body .futures-wrap .market-search-wrap .market-search-results > button.selected,
-html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
-  border-top:0 !important;
-  border-right:0 !important;
-  border-bottom:1px solid rgba(38,61,86,.45) !important;
-  border-radius:0 !important;
-  background:transparent !important;
-}
-
-html body .futures-wrap .market-search-wrap .market-search-results > button:hover {
-  background:rgba(16,34,54,.65) !important;
-}
-
-html body .futures-wrap .market-search-wrap .market-search-results > button.selected {
-  border-left:2px solid #3b9cff !important;
-  background:rgba(16,42,69,.75) !important;
 }
