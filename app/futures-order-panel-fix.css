@@ -1,28 +1,24 @@
-/* Futures page scroll ownership: keep one document-level scrollbar only. */
+/* Futures page scroll ownership: the document must have one page-level scrollbar. */
 html {
+  overflow-x: clip !important;
   overflow-y: visible !important;
-  overflow-x: hidden !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
-}
-
-html::-webkit-scrollbar {
-  display: initial !important;
-  width: initial !important;
-  height: initial !important;
 }
 
 body {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
 }
 
+/* Restore the native document scrollbar after the global scrollbar reset. */
+html::-webkit-scrollbar,
 body::-webkit-scrollbar {
-  display: initial !important;
-  width: initial !important;
-  height: initial !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 html body .app-shell {
@@ -72,9 +68,9 @@ html body .futures-wrap > .market-list.futures-market-list {
 }
 
 html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar {
-  display: initial !important;
-  width: initial !important;
-  height: initial !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 @media (min-width: 1100px) {
