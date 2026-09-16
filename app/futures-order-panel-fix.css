@@ -18,7 +18,6 @@ html::-webkit-scrollbar-track { background:#080d14 !important; }
 html::-webkit-scrollbar-thumb { background:#526176 !important; border:2px solid #080d14 !important; border-radius:999px !important; }
 html::-webkit-scrollbar-thumb:hover { background:#71839c !important; }
 
-/* Never create nested page scroll containers. */
 html body .app-shell,
 html body .futures-wrap,
 html body .futures-grid,
@@ -54,69 +53,24 @@ html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-tr
 html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-thumb { background:#526176 !important; border-radius:999px !important; }
 
 /* Connected terminal styling: fewer cards, more dividers. */
-html body .futures-wrap > .trade-head {
-  border:0 !important;
-  border-bottom:1px solid #1b2a3a !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  padding:10px 0 18px !important;
-  margin-bottom:0 !important;
-  box-shadow:none !important;
-}
-html body .futures-wrap > .trade-head > div {
-  grid-template-columns:minmax(260px,1.05fr) minmax(520px,1.95fr) !important;
-  column-gap:24px !important;
-}
+html body .futures-wrap > .trade-head { border:0 !important; border-bottom:1px solid #1b2a3a !important; border-radius:0 !important; background:transparent !important; padding:10px 0 18px !important; margin-bottom:0 !important; box-shadow:none !important; }
+html body .futures-wrap > .trade-head > div { grid-template-columns:minmax(260px,1.05fr) minmax(520px,1.95fr) !important; column-gap:24px !important; }
 html body .futures-wrap > .trade-head .pair { font-size:24px !important; gap:9px !important; }
 html body .futures-wrap > .trade-head .price { font-size:48px !important; margin-top:12px !important; letter-spacing:-.035em !important; }
 html body .futures-wrap > .trade-head .market-stats { grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:0 !important; }
-html body .futures-wrap > .trade-head .market-stats span {
-  min-height:54px !important;
-  padding:5px 18px !important;
-  border:0 !important;
-  border-left:1px solid #1b2f43 !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  gap:7px !important;
-  font-size:11px !important;
-}
+html body .futures-wrap > .trade-head .market-stats span { min-height:54px !important; padding:5px 18px !important; border:0 !important; border-left:1px solid #1b2f43 !important; border-radius:0 !important; background:transparent !important; gap:7px !important; font-size:11px !important; }
 html body .futures-wrap > .trade-head .market-stats span:first-child { border-left:0 !important; }
 html body .futures-wrap > .trade-head .market-stats b { font-size:15px !important; }
 html body .futures-wrap > .trade-head > .muted { margin:18px 0 0 !important; padding:10px 0 0 !important; border-top:1px solid #142536 !important; text-align:left !important; font-size:11px !important; }
 
 /* Flat Markets list. */
-html body .futures-wrap > .market-list.futures-market-list {
-  padding:12px 10px 12px 0 !important;
-  border:0 !important;
-  border-right:1px solid #1b2a3a !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  gap:3px !important;
-}
-html body .futures-wrap > .market-list.futures-market-list button {
-  min-height:44px !important;
-  padding:9px 12px !important;
-  border:0 !important;
-  border-left:2px solid transparent !important;
-  border-radius:5px !important;
-  background:transparent !important;
-  color:#9aabbd !important;
-  transition:background .16s ease,color .16s ease,border-color .16s ease !important;
-}
+html body .futures-wrap > .market-list.futures-market-list { padding:12px 10px 12px 0 !important; border:0 !important; border-right:1px solid #1b2a3a !important; border-radius:0 !important; background:transparent !important; gap:3px !important; }
+html body .futures-wrap > .market-list.futures-market-list button { min-height:44px !important; padding:9px 12px !important; border:0 !important; border-left:2px solid transparent !important; border-radius:5px !important; background:transparent !important; color:#9aabbd !important; transition:background .16s ease,color .16s ease,border-color .16s ease !important; }
 html body .futures-wrap > .market-list.futures-market-list button:hover { background:#0d1a28 !important; color:#e8f1fb !important; }
 html body .futures-wrap > .market-list.futures-market-list button.selected { border-left-color:#3b9cff !important; background:#10253b !important; color:#fff !important; }
 
 /* Larger chart with restrained frame. */
-html body .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart {
-  height:520px !important;
-  min-height:520px !important;
-  max-height:520px !important;
-  margin:0 !important;
-  border:1px solid #1b2f43 !important;
-  border-radius:6px !important;
-  background:#080d14 !important;
-  box-shadow:none !important;
-}
+html body .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart { height:520px !important; min-height:520px !important; max-height:520px !important; margin:0 !important; border:1px solid #1b2f43 !important; border-radius:6px !important; background:#080d14 !important; box-shadow:none !important; }
 html body .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart .chart-toolbar { height:46px !important; min-height:46px !important; padding:0 14px !important; background:#0a111b !important; border-bottom:1px solid #1b2f43 !important; }
 
 /* Flatten lower information sections. */
@@ -125,13 +79,7 @@ html body .futures-wrap .futures-data-grid { gap:0 !important; }
 html body .futures-wrap .futures-stat,
 html body .futures-wrap .positions-panel,
 html body .futures-wrap .market-data-panel,
-html body .futures-wrap .settlement-panel {
-  border:0 !important;
-  border-top:1px solid #1b2a3a !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
+html body .futures-wrap .settlement-panel { border:0 !important; border-top:1px solid #1b2a3a !important; border-radius:0 !important; background:transparent !important; box-shadow:none !important; }
 html body .futures-wrap .futures-stat { min-height:68px !important; padding:13px 16px 13px 0 !important; }
 html body .futures-wrap .futures-stat + .futures-stat { border-left:1px solid #1b2a3a !important; padding-left:16px !important; }
 html body .futures-wrap .positions-panel,
@@ -139,14 +87,7 @@ html body .futures-wrap .market-data-panel,
 html body .futures-wrap .settlement-panel { padding:18px 18px 18px 0 !important; }
 
 /* Order panel becomes a connected right column. */
-html body .futures-wrap > .futures-grid > .order-panel {
-  padding:12px 0 0 22px !important;
-  border:0 !important;
-  border-left:1px solid #1b2a3a !important;
-  border-radius:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-}
+html body .futures-wrap > .futures-grid > .order-panel { padding:12px 0 0 22px !important; border:0 !important; border-left:1px solid #1b2a3a !important; border-radius:0 !important; background:transparent !important; box-shadow:none !important; }
 html body .futures-wrap .panel-title { padding-bottom:16px !important; border-bottom:1px solid #1b2a3a !important; margin-bottom:16px !important; }
 html body .futures-wrap .panel-title h2 { font-size:28px !important; margin-top:8px !important; }
 html body .futures-wrap .balance-strip { margin-bottom:16px !important; padding:12px 0 !important; border:0 !important; border-bottom:1px solid #1b2a3a !important; border-radius:0 !important; background:transparent !important; }
@@ -176,3 +117,59 @@ html body .futures-wrap .submit-futures { min-height:46px !important; margin-top
   html body .futures-wrap > .market-list.futures-market-list { padding:10px 0 !important; border-right:0 !important; border-bottom:1px solid #1b2a3a !important; }
   html body .futures-wrap > .futures-grid > .futures-chart-area > .chart.live-chart { height:430px !important; min-height:430px !important; max-height:430px !important; }
 }
+
+/* MarketSearch component: flat rows instead of individual market cards. */
+html body .futures-wrap > .market-search-wrap {
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+html body .futures-wrap > .market-search-wrap .market-search-box {
+  margin:0 0 12px !important;
+  min-height:46px !important;
+  padding:0 12px !important;
+  border:1px solid #263d56 !important;
+  border-radius:10px !important;
+  background:#0b1726 !important;
+  box-shadow:none !important;
+}
+html body .futures-wrap > .market-search-wrap .market-search-results {
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  scrollbar-width:thin !important;
+  scrollbar-color:#526176 transparent !important;
+}
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar { display:block !important; width:6px !important; height:6px !important; }
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-track { background:transparent !important; }
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-thumb { background:#526176 !important; border-radius:999px !important; }
+html body .futures-wrap > .market-search-wrap .market-search-results > button {
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  width:100% !important;
+  min-height:52px !important;
+  padding:10px 12px !important;
+  border:0 !important;
+  border-left:2px solid transparent !important;
+  border-radius:6px !important;
+  background:transparent !important;
+  color:#b8c7d9 !important;
+  box-shadow:none !important;
+  font:inherit !important;
+  font-size:14px !important;
+  cursor:pointer !important;
+  transition:background .16s ease,color .16s ease,border-color .16s ease !important;
+}
+html body .futures-wrap > .market-search-wrap .market-search-results > button:hover { background:#102236 !important; color:#f4f8ff !important; }
+html body .futures-wrap > .market-search-wrap .market-search-results > button.selected { border-left-color:#3b9cff !important; background:#102a45 !important; color:#fff !important; }
+html body .futures-wrap > .market-search-wrap .market-search-results > button > span { margin-left:auto !important; white-space:nowrap !important; }
+html body .futures-wrap > .market-search-wrap .market-search-empty { padding:20px 12px !important; color:#71869d !important; background:transparent !important; }
