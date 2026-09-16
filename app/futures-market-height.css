@@ -1,10 +1,17 @@
 /* Futures market selector: fixed desktop height for a clean, predictable scroll area. */
 @media (min-width: 1100px) {
-  html body .futures-wrap > .market-search-wrap,
-  html body .futures-wrap > .market-list.futures-market-list {
+  html body .futures-wrap > .market-search-wrap {
     height: 730px !important;
     min-height: 730px !important;
     max-height: 730px !important;
+    box-sizing: border-box !important;
+  }
+
+  html body .futures-wrap > .market-search-wrap .market-search-results {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     box-sizing: border-box !important;
   }
 }
