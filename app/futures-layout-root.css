@@ -91,7 +91,7 @@
   }
   .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart,
   .futures-wrap>.futures-grid>.futures-chart-area>.futures-stats,
-  .futures-wrap>.futures-grid>.futures-chart-area>.futures-data-grid,
+  .futures-wrap>.futures-grid>.futures-data-grid,
   .futures-wrap>.futures-grid>.futures-chart-area>.positions-panel,
   .futures-wrap>.futures-grid>.order-panel,
   .futures-wrap>.futures-grid>.futures-chart-area>.settlement-panel{
@@ -102,4 +102,51 @@
 @media (max-width:1099px){
   .futures-wrap{row-gap:5px!important}
   .futures-wrap>.trade-head{margin-bottom:0!important}
+}
+
+/* Correct desktop structure: sidebar starts beside the header and ends with the chart row. */
+@media (min-width:1100px){
+  .futures-wrap{
+    grid-template-rows:auto 390px auto auto auto!important;
+    align-items:start!important;
+  }
+  .futures-wrap>.trade-head{
+    grid-column:2 / 4!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  .futures-wrap>.market-search-wrap{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    align-self:stretch!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
+  .futures-wrap>.market-search-wrap .market-search-results{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart{
+    grid-column:2!important;
+    grid-row:2!important;
+    align-self:start!important;
+    height:390px!important;
+    min-height:390px!important;
+    max-height:390px!important;
+  }
+  .futures-wrap>.futures-grid>.order-panel{
+    grid-column:3!important;
+    grid-row:2!important;
+    align-self:start!important;
+    margin:0!important;
+  }
 }
