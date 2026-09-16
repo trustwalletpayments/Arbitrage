@@ -74,7 +74,7 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         </div>
         {!normalized && filtered.length > 2 && (
           <button type="button" className="futures-expand-button" onClick={() => setExpanded((value) => !value)}>
-            {expanded ? "Collapse coins" : "Expand all coins"}<span>{expanded ? "⌃" : "⌄"}</span>
+            {expanded ? "Collapse coins" : "Expand all coins"}
           </button>
         )}
       </div>
