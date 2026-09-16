@@ -12,6 +12,10 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
+    // Desktop always shows the complete market list. Mobile starts compact
+    // and uses the Expand all coins control.
+    if (window.matchMedia("(min-width: 761px)").matches) setExpanded(true);
+
     let cancelled = false;
     fetch("/api/testnet/markets", { cache: "no-store" })
       .then((response) => response.json())
