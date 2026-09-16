@@ -8,6 +8,7 @@ import SpotMarketData from "./SpotMarketData";
 import {binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
 import "./spot-mobile.css";
+import "./spot-pro.css";
 
 type MarketItem={symbol:string;baseAsset:string;quoteAsset:string;marketCapRank:number;coinId?:string;logo?:string};
 
