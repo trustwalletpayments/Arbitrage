@@ -92,3 +92,26 @@
 .app-shell .chart-area>div:last-child{margin-top:12px}
 .app-shell .order-panel{box-sizing:border-box}
 }
+
+/* Mobile-only spot market expansion: keep the list compact and separate it from the selected coin card. */
+@media (max-width:760px){
+  .app-shell .market-list.expanded .market-scroll{
+    max-height:260px!important;
+    height:260px!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .app-shell .market-list.expanded{
+    margin-bottom:24px!important;
+  }
+
+  .app-shell .chart-area{
+    padding-top:0!important;
+  }
+
+  .app-shell .chart-area .trade-head{
+    margin-top:0!important;
+  }
+}
