@@ -15,11 +15,26 @@ async function getJson(path:string){
   throw lastError instanceof Error?lastError:new Error("Market API unavailable");
 }
 
-async function getOptionalJson(paths:string[]){
+async function getPublicSpotJson(path:string){
+  const response=await fetch(`https://api.binance.com${path}`,{cache:"no-store",headers:{accept:"application/json"}});
+  if(!response.ok)throw new Error(`Public market API returned ${response.status}`);
+  return response.json();
+}
+
+async function getOptionalJson(paths:string[],spotPaths:string[]=[]){
   for(const path of paths){
     try{return await getJson(path)}catch{}
   }
+  for(const path of spotPaths){
+    try{return await getPublicSpotJson(path)}catch{}
+  }
   return [];
+}
+
+async function getDepth(symbol:string){
+  try{return await getJson(`/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`)}catch{}
+  try{return await getPublicSpotJson(`/api/v3/depth?symbol=${encodeURIComponent(symbol)}&limit=12`)}catch{}
+  return {bids:[],asks:[]};
 }
 
 export async function GET(request:Request){
@@ -28,12 +43,12 @@ export async function GET(request:Request){
   try{
     if(params.get("market")==="1"){
       const [depthResult,tradesResult,tickerResult,fundingResult]=await Promise.allSettled([
-        getJson(`/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`),
-        getOptionalJson([`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/fapi/v1/trades?symbol=${encodeURIComponent(symbol)}&limit=20`]),
+        getDepth(symbol),
+        getOptionalJson([`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/fapi/v1/trades?symbol=${encodeURIComponent(symbol)}&limit=20`],[`/api/v3/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/api/v3/trades?symbol=${encodeURIComponent(symbol)}&limit=20`]),
         getJson(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`),
         getJson(`/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`)
       ]);
-      const depth=depthResult.status==="fulfilled"?depthResult.value:{bids:[],asks:[]};
+      const depth=depthResult.status==="fulfilled"&&depthResult.value?depthResult.value:{bids:[],asks:[]};
       const recentTrades=tradesResult.status==="fulfilled"&&Array.isArray(tradesResult.value)?tradesResult.value:[];
       const dailyTicker=tickerResult.status==="fulfilled"?tickerResult.value:{};
       const funding=fundingResult.status==="fulfilled"?fundingResult.value:{};
