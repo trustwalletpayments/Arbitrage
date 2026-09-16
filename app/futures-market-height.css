@@ -209,3 +209,35 @@ html body .futures-wrap > .market-search-wrap .market-search-results {
     border-right: 0 !important;
   }
 }
+
+/* Mobile-only fix: keep the collapse button directly below a short scrollable list. */
+@media (max-width: 760px) {
+  html body .futures-wrap > .market-search-wrap.is-expanded {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: 10px !important;
+  }
+
+  html body .futures-wrap > .market-search-wrap.is-expanded .market-search-results,
+  html body .futures-wrap > .market-search-wrap.is-expanded .market-search-results.is-expanded {
+    height: 300px !important;
+    min-height: 0 !important;
+    max-height: 300px !important;
+    flex: 0 0 300px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  html body .futures-wrap > .market-search-wrap.is-expanded .futures-expand-button {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+    min-height: 46px !important;
+    flex: 0 0 auto !important;
+  }
+}
