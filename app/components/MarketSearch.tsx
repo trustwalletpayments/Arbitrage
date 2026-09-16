@@ -9,6 +9,7 @@ type Props = { selectedPair: string; onSelect: (pair: string) => void };
 export default function MarketSearch({ selectedPair, onSelect }: Props) {
   const [query, setQuery] = useState("");
   const [symbols, setSymbols] = useState<string[]>([...MARKET_SYMBOLS]);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -18,13 +19,19 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         if (!cancelled && Array.isArray(data?.symbols) && data.symbols.length > 0) setSymbols(data.symbols);
       })
       .catch(() => {});
-    return () => { cancelled = true; };
+    const toggle = () => setExpanded((value) => !value);
+    window.addEventListener("futures:toggle-markets", toggle);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("futures:toggle-markets", toggle);
+    };
   }, []);
 
   const markets = useMemo(() => {
     const normalized = query.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    return symbols.filter((symbol) => !normalized || symbol.includes(normalized));
-  }, [query, symbols]);
+    const filtered = symbols.filter((symbol) => !normalized || symbol.includes(normalized));
+    return expanded || normalized ? filtered : filtered.slice(0, 2);
+  }, [query, symbols, expanded]);
 
   return (
     <>
