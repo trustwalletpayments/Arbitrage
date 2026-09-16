@@ -1,5 +1,6 @@
-/* Futures page scroll ownership: keep one native page scrollbar, but make it slim. */
-html {
+/* Futures page: use one slim native document scrollbar. */
+html,
+:root {
   overflow-x: clip !important;
   overflow-y: auto !important;
   scrollbar-width: thin !important;
@@ -7,16 +8,19 @@ html {
   -ms-overflow-style: auto !important;
 }
 
-html::-webkit-scrollbar {
+html::-webkit-scrollbar,
+:root::-webkit-scrollbar {
   width: 6px !important;
   height: 6px !important;
 }
 
-html::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+:root::-webkit-scrollbar-track {
   background: transparent !important;
 }
 
-html::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+:root::-webkit-scrollbar-thumb {
   background: #526176 !important;
   border-radius: 999px !important;
 }
@@ -40,7 +44,7 @@ html body .app-shell {
   overflow: visible !important;
 }
 
-/* No nested page scrollbar in the Futures layout or Buy/Sell panel. */
+/* Prevent nested page scrollbars in the Futures layout and order panel. */
 html body .futures-wrap,
 html body .futures-grid,
 html body .futures-chart-area,
@@ -71,7 +75,7 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* Preserve only the Markets results list as an intentional internal scroll area. */
+/* Keep the Markets list as the only intentional internal scroll area. */
 html body .futures-wrap > .market-search-wrap .market-search-results {
   min-height: 0 !important;
   max-height: none !important;
