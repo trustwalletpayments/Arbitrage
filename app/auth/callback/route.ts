@@ -6,17 +6,24 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const tokenHash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") || "email";
-  const next = url.searchParams.get("next") || "/dashboard";
+  const nextParam = url.searchParams.get("next") || "/dashboard";
+  const loginUrl = new URL("/login", url.origin);
+
+  if (url.searchParams.get("error")) {
+    loginUrl.searchParams.set("error", "confirmation_failed");
+    return NextResponse.redirect(loginUrl);
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.redirect(new URL("/login?error=auth_config", url.origin));
+    loginUrl.searchParams.set("error", "auth_config");
+    return NextResponse.redirect(loginUrl);
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
 
   let error: Error | null = null;
@@ -35,11 +42,15 @@ export async function GET(request: Request) {
   }
 
   if (error) {
-    const errorUrl = new URL("/login", url.origin);
-    errorUrl.searchParams.set("error", "confirmation_failed");
-    return NextResponse.redirect(errorUrl);
+    loginUrl.searchParams.set("error", "confirmation_failed");
+    return NextResponse.redirect(loginUrl);
   }
 
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
-  return NextResponse.redirect(new URL(safeNext, url.origin));
+  const safeNext = nextParam.startsWith("/") && !nextParam.startsWith("//")
+    ? nextParam
+    : "/dashboard";
+
+  loginUrl.searchParams.set("confirmed", "1");
+  loginUrl.searchParams.set("next", safeNext);
+  return NextResponse.redirect(loginUrl);
 }
