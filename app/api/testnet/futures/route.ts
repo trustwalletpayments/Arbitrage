@@ -21,6 +21,14 @@ async function getPublicSpotJson(path:string){
   return response.json();
 }
 
+async function getBybitJson(path:string){
+  const response=await fetch(`https://api.bybit.com${path}`,{cache:"no-store",headers:{accept:"application/json"}});
+  if(!response.ok)throw new Error(`Bybit market API returned ${response.status}`);
+  const data=await response.json();
+  if(data?.retCode!==0)throw new Error(data?.retMsg||"Bybit market API unavailable");
+  return data.result;
+}
+
 async function getOptionalJson(paths:string[],spotPaths:string[]=[]){
   for(const path of paths){
     try{return await getJson(path)}catch{}
@@ -34,7 +42,31 @@ async function getOptionalJson(paths:string[],spotPaths:string[]=[]){
 async function getDepth(symbol:string){
   try{return await getJson(`/fapi/v1/depth?symbol=${encodeURIComponent(symbol)}&limit=12`)}catch{}
   try{return await getPublicSpotJson(`/api/v3/depth?symbol=${encodeURIComponent(symbol)}&limit=12`)}catch{}
+  try{
+    const data=await getBybitJson(`/v5/market/orderbook?category=linear&symbol=${encodeURIComponent(symbol)}&limit=25`);
+    return {bids:Array.isArray(data?.b)?data.b:[],asks:Array.isArray(data?.a)?data.a:[]};
+  }catch{}
   return {bids:[],asks:[]};
+}
+
+async function getRecentTrades(symbol:string){
+  const binance=await getOptionalJson([
+    `/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,
+    `/fapi/v1/trades?symbol=${encodeURIComponent(symbol)}&limit=20`
+  ],[
+    `/api/v3/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,
+    `/api/v3/trades?symbol=${encodeURIComponent(symbol)}&limit=20`
+  ]);
+  if(Array.isArray(binance)&&binance.length)return binance;
+  try{
+    const data=await getBybitJson(`/v5/market/recent-trade?category=linear&symbol=${encodeURIComponent(symbol)}&limit=20`);
+    return Array.isArray(data?.list)?data.list.map((trade:any)=>({
+      p:trade.price,
+      q:trade.size,
+      T:Number(trade.time||Date.now()),
+      isBuyerMaker:trade.side!=="Buy"
+    })):[];
+  }catch{return []}
 }
 
 export async function GET(request:Request){
@@ -44,7 +76,7 @@ export async function GET(request:Request){
     if(params.get("market")==="1"){
       const [depthResult,tradesResult,tickerResult,fundingResult]=await Promise.allSettled([
         getDepth(symbol),
-        getOptionalJson([`/fapi/v1/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/fapi/v1/trades?symbol=${encodeURIComponent(symbol)}&limit=20`],[`/api/v3/aggTrades?symbol=${encodeURIComponent(symbol)}&limit=20`,`/api/v3/trades?symbol=${encodeURIComponent(symbol)}&limit=20`]),
+        getRecentTrades(symbol),
         getJson(`/fapi/v1/ticker/24hr?symbol=${encodeURIComponent(symbol)}`),
         getJson(`/fapi/v1/premiumIndex?symbol=${encodeURIComponent(symbol)}`)
       ]);
