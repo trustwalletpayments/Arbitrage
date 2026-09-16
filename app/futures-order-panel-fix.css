@@ -1,15 +1,24 @@
-/* Futures page scroll ownership: keep the document as the only page-level scrollbar. */
+/* Futures page scroll ownership: keep one native page scrollbar, but make it slim. */
 html {
   overflow-x: clip !important;
   overflow-y: auto !important;
-  scrollbar-width: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #526176 transparent !important;
   -ms-overflow-style: auto !important;
 }
 
 html::-webkit-scrollbar {
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
+  width: 6px !important;
+  height: 6px !important;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #526176 !important;
+  border-radius: 999px !important;
 }
 
 body {
@@ -19,9 +28,9 @@ body {
 }
 
 body::-webkit-scrollbar {
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 html body .app-shell {
@@ -68,14 +77,23 @@ html body .futures-wrap > .market-search-wrap .market-search-results {
   max-height: none !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  scrollbar-width: auto !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #526176 transparent !important;
   -ms-overflow-style: auto !important;
 }
 
 html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar {
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
+  width: 6px !important;
+  height: 6px !important;
+}
+
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-thumb {
+  background: #526176 !important;
+  border-radius: 999px !important;
 }
 
 @media (min-width: 1100px) {
