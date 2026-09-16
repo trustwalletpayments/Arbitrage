@@ -1,7 +1,6 @@
 @import "./futures-sidebar-align.css";
 @media (min-width:1100px){.futures-wrap{display:grid!important;grid-template-columns:240px minmax(0,1fr) 360px!important;grid-template-rows:auto auto auto auto auto!important;column-gap:18px!important;row-gap:14px!important;align-items:start!important}.futures-wrap>.trade-head{grid-column:2/4!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important}.futures-wrap>.market-search-wrap{grid-column:1!important;grid-row:2!important;align-self:start!important;width:240px!important;height:390px!important;min-height:390px!important;max-height:390px!important;box-sizing:border-box!important;overflow:hidden!important}.futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart{grid-column:2!important;grid-row:2!important}.futures-wrap>.futures-grid>.futures-chart-area>.futures-stats{grid-column:2!important;grid-row:3!important;width:100%!important}.futures-wrap>.futures-grid>.futures-chart-area>.futures-data-grid{grid-column:2!important;grid-row:4!important;width:100%!important}.futures-wrap>.futures-grid>.futures-chart-area>.positions-panel{grid-column:2!important;grid-row:5!important;width:100%!important}.futures-wrap>.futures-grid>.order-panel{grid-column:3!important;grid-row:2/span 2!important;width:100%!important;margin:0!important;align-self:start!important}.futures-wrap>.market-search-wrap .market-search-results{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important}.futures-wrap>.market-search-wrap .market-search-results button{flex:0 0 auto!important}}.market-search-wrap{display:flex;flex-direction:column;gap:10px;padding:10px;border:1px solid #20364d;border-radius:12px;background:#09131f;box-sizing:border-box;overflow:hidden}.market-search-box{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 11px;border:1px solid #29445f;border-radius:9px;background:#0d1b2a;color:#7890a8;box-sizing:border-box}.market-search-box input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#e8f1fb;font:inherit;font-size:13px}.market-search-box input::placeholder{color:#7890a8}.market-search-box button{border:0;background:transparent;color:#9eb3c8;font-size:20px;line-height:1;cursor:pointer}.market-search-results{display:flex;flex-direction:column;gap:8px;min-height:0;max-height:calc(100vh - 235px);overflow-y:auto;scrollbar-width:thin}.market-search-results button{display:flex;align-items:center;gap:8px;width:100%;min-height:42px;padding:9px 11px;border:1px solid #1d3045;border-radius:9px;background:#0d1b2a;color:#b8c7d9;font:inherit;font-size:13px;cursor:pointer;text-align:left}.market-search-results button span{margin-left:auto}.market-search-results button:hover{background:#142a43;border-color:#31577e}.market-search-empty{padding:16px 8px;color:#7890a8;font-size:12px;text-align:center}@media(max-width:1099px) and (min-width:761px){.futures-wrap>.trade-head{width:100%!important;max-width:none!important}.futures-wrap>.market-search-wrap{width:100%!important;max-width:none!important}}@media(max-width:760px){.futures-wrap>.market-search-wrap{width:100%!important;max-width:none!important}.market-search-results{max-height:360px}}
 
-/* Correct desktop parent layout: sidebar, header and content share the same origin. */
 @media (min-width:1100px){
   .futures-wrap{
     width:100%!important;
@@ -28,9 +27,7 @@
     margin:0!important;
     align-self:start!important;
   }
-  .futures-wrap>.futures-grid{
-    min-width:0!important;
-  }
+  .futures-wrap>.futures-grid{min-width:0!important}
   .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart,
   .futures-wrap>.futures-grid>.futures-chart-area>.futures-stats,
   .futures-wrap>.futures-grid>.futures-data-grid,
@@ -40,48 +37,61 @@
   }
 }
 
-/* Final alignment: keep the markets card at the top of the main content area,
-   while its coin list scrolls internally. */
-@media (min-width: 1100px) {
-  .futures-wrap > .market-search-wrap {
-    grid-column: 1 !important;
-    grid-row: 1 / span 5 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 390px !important;
-    min-height: 390px !important;
-    max-height: 390px !important;
-    margin: 0 !important;
-    align-self: start !important;
-    justify-self: stretch !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
+@media (min-width:1100px){
+  .futures-wrap > .market-search-wrap{
+    grid-column:1!important;
+    grid-row:1 / span 5!important;
+    width:100%!important;
+    min-width:0!important;
+    height:390px!important;
+    min-height:390px!important;
+    max-height:390px!important;
+    margin:0!important;
+    align-self:start!important;
+    justify-self:stretch!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
   }
-  .futures-wrap > .market-search-wrap .market-search-results {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+  .futures-wrap > .market-search-wrap .market-search-results{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
   }
-  .futures-wrap > .market-search-wrap .market-search-results button {
-    flex: 0 0 auto !important;
+  .futures-wrap > .market-search-wrap .market-search-results button{flex:0 0 auto!important}
+}
+
+@media (min-width:1100px){
+  .futures-wrap{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:28px!important;
+    box-sizing:border-box!important;
+  }
+  .futures-wrap > .market-search-wrap{
+    margin-left:0!important;
+    justify-self:stretch!important;
   }
 }
 
-/* Use the full viewport content width and remove any extra horizontal offset. */
-@media (min-width: 1100px) {
-  .futures-wrap {
-    width: 100% !important;
-    max-width: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 28px !important;
-    box-sizing: border-box !important;
+/* Match the Markets card exactly to the TradingView chart grid row. */
+@media (min-width:1100px){
+  .futures-wrap > .market-search-wrap{
+    grid-row:2!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    align-self:stretch!important;
   }
-  .futures-wrap > .market-search-wrap {
-    margin-left: 0 !important;
-    justify-self: stretch !important;
+  .futures-wrap > .market-search-wrap .market-search-results{
+    min-height:0!important;
+    max-height:none!important;
+    flex:1 1 auto!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
   }
 }
