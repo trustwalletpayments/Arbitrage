@@ -1,8 +1,28 @@
-/* Futures page scroll ownership: the document is the only page-level viewport. */
-html,
-body {
+/* Futures page scroll ownership: keep one document-level scrollbar only. */
+html {
+  overflow-y: visible !important;
   overflow-x: hidden !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+}
+
+html::-webkit-scrollbar {
+  display: initial !important;
+  width: initial !important;
+  height: initial !important;
+}
+
+body {
   overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+}
+
+body::-webkit-scrollbar {
+  display: initial !important;
+  width: initial !important;
+  height: initial !important;
 }
 
 html body .app-shell {
@@ -12,7 +32,7 @@ html body .app-shell {
   overflow: visible !important;
 }
 
-/* Remove nested scrolling from the Futures layout and Buy/Sell card. */
+/* Remove nested page scrolling from the Futures layout and Buy/Sell card. */
 html body .futures-wrap,
 html body .futures-grid,
 html body .futures-chart-area,
@@ -43,32 +63,18 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* The Markets list is intentionally the only internal scroll area. */
-html body .futures-wrap > .market-search-wrap {
-  overflow: hidden !important;
-}
-
-html body .futures-wrap > .market-search-wrap .market-search-results {
+/* Preserve the Markets list as the only intentional internal scroll area. */
+html body .futures-wrap > .market-list.futures-market-list {
   overflow-y: auto !important;
   overflow-x: hidden !important;
-}
-
-/* Explicitly remove scrollbar styling from the old wrapper workaround. */
-html body .futures-wrap,
-html body .futures-grid,
-html body .futures-chart-area,
-html body .futures-grid > .order-panel {
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
 }
 
-html body .futures-wrap::-webkit-scrollbar,
-html body .futures-grid::-webkit-scrollbar,
-html body .futures-chart-area::-webkit-scrollbar,
-html body .futures-grid > .order-panel::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar {
+  display: initial !important;
+  width: initial !important;
+  height: initial !important;
 }
 
 @media (min-width: 1100px) {
