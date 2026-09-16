@@ -1,4 +1,4 @@
-/* Futures page scroll ownership: html is the only page-level scroll container. */
+/* Futures page scroll ownership: keep the document as the only page-level scrollbar. */
 html {
   overflow-x: clip !important;
   overflow-y: auto !important;
@@ -19,7 +19,9 @@ body {
 }
 
 body::-webkit-scrollbar {
-  display: none !important;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 html body .app-shell {
@@ -29,7 +31,7 @@ html body .app-shell {
   overflow: visible !important;
 }
 
-/* Remove nested page scrolling from the Futures layout and Buy/Sell card. */
+/* No nested page scrollbar in the Futures layout or Buy/Sell panel. */
 html body .futures-wrap,
 html body .futures-grid,
 html body .futures-chart-area,
@@ -60,15 +62,17 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* Preserve the Markets list as the only intentional internal scroll area. */
-html body .futures-wrap > .market-list.futures-market-list {
+/* Preserve only the Markets results list as an intentional internal scroll area. */
+html body .futures-wrap > .market-search-wrap .market-search-results {
+  min-height: 0 !important;
+  max-height: none !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   scrollbar-width: auto !important;
   -ms-overflow-style: auto !important;
 }
 
-html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar {
+html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar {
   display: block !important;
   width: auto !important;
   height: auto !important;
