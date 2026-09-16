@@ -148,3 +148,65 @@
   .futures-wrap > .trade-head .market-stats > span > b { width:auto !important; font-size:17px !important; }
   .futures-wrap > .trade-head > div > .muted { margin-left:-16px !important; margin-right:-16px !important; }
 }
+
+/* Fix the TradingView wrapper height so the chart does not leave a large empty area. */
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart {
+  position: relative !important;
+  display: flex !important;
+  flex: 0 0 390px !important;
+  width: 100% !important;
+  height: 390px !important;
+  min-height: 390px !important;
+  max-height: 390px !important;
+  align-self: start !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .chart-toolbar {
+  flex: 0 0 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  box-sizing: border-box !important;
+}
+
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .tradingview-widget-container {
+  position: relative !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 346px !important;
+  min-height: 346px !important;
+  max-height: 346px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .tradingview-widget-container__widget,
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .tradingview-widget-container iframe {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  border: 0 !important;
+}
+
+.futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .chart-placeholder {
+  position: absolute !important;
+  inset: 44px 0 0 !important;
+  z-index: 2 !important;
+}
+
+@media (max-width:760px) {
+  .futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart {
+    flex-basis: 330px !important;
+    height: 330px !important;
+    min-height: 330px !important;
+    max-height: 330px !important;
+  }
+  .futures-wrap .futures-grid > .futures-chart-area > .chart.live-chart .tradingview-widget-container {
+    height: 286px !important;
+    min-height: 286px !important;
+    max-height: 286px !important;
+  }
+}
