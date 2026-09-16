@@ -1,55 +1,88 @@
-/* The Buy/Sell panel is a normal document-flow card.
-   The browser page owns vertical scrolling; the panel must never become
-   a nested scroll viewport. */
-.futures-wrap .order-panel {
-  display: block !important;
-  position: static !important;
-  align-self: start !important;
-  justify-self: stretch !important;
-  width: 100% !important;
+/* Futures page scroll ownership: the document is the only page-level viewport. */
+html,
+body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+html body .app-shell {
   height: auto !important;
-  min-height: auto !important;
+  min-height: 100vh !important;
   max-height: none !important;
   overflow: visible !important;
-  overflow-y: visible !important;
+}
+
+/* Remove nested scrolling from the Futures layout and Buy/Sell card. */
+html body .futures-wrap,
+html body .futures-grid,
+html body .futures-chart-area,
+html body .futures-grid > .order-panel {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
   overflow-x: visible !important;
-  min-width: 0 !important;
+  overflow-y: visible !important;
+  position: static !important;
   contain: none !important;
   transform: none !important;
   overscroll-behavior: auto !important;
   scrollbar-gutter: auto !important;
 }
 
-/* Do not let the grid/flex ancestors create a second viewport around it. */
-.futures-wrap .futures-grid,
-.futures-wrap .futures-chart-area {
-  min-height: 0 !important;
+html body .futures-grid > .order-panel {
+  display: block !important;
+  align-self: start !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+html body .futures-grid > .order-panel > * {
   max-height: none !important;
   overflow: visible !important;
 }
 
-.futures-wrap .order-panel > * {
-  max-height: none !important;
+/* The Markets list is intentionally the only internal scroll area. */
+html body .futures-wrap > .market-search-wrap {
+  overflow: hidden !important;
+}
+
+html body .futures-wrap > .market-search-wrap .market-search-results {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Explicitly remove scrollbar styling from the old wrapper workaround. */
+html body .futures-wrap,
+html body .futures-grid,
+html body .futures-chart-area,
+html body .futures-grid > .order-panel {
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+}
+
+html body .futures-wrap::-webkit-scrollbar,
+html body .futures-grid::-webkit-scrollbar,
+html body .futures-chart-area::-webkit-scrollbar,
+html body .futures-grid > .order-panel::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 @media (min-width: 1100px) {
-  .futures-wrap {
+  html body .futures-wrap {
     align-items: start !important;
+    overflow: visible !important;
   }
 
-  .futures-wrap > .futures-grid > .order-panel {
+  html body .futures-wrap > .futures-grid > .order-panel {
     grid-column: 3 !important;
     grid-row: 2 !important;
-    align-self: start !important;
     height: auto !important;
-    min-height: auto !important;
+    min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
   }
-}
-
-/* Explicitly preserve the Markets list's independent scrolling. */
-.futures-wrap .market-search-results,
-.futures-wrap .market-list.futures-market-list {
-  overflow-y: auto !important;
 }
