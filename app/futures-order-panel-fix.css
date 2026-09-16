@@ -1,65 +1,58 @@
-/* Futures page: use one slim native document scrollbar. */
-html,
-:root {
-  overflow-x: clip !important;
-  overflow-y: auto !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: #526176 transparent !important;
-  -ms-overflow-style: auto !important;
+/* Futures page scrolling: one smooth document scroll, no nested page scrollbars. */
+html {
+  scroll-behavior: smooth !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
-html::-webkit-scrollbar,
-:root::-webkit-scrollbar {
-  width: 6px !important;
-  height: 6px !important;
-}
-
-html::-webkit-scrollbar-track,
-:root::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-html::-webkit-scrollbar-thumb,
-:root::-webkit-scrollbar-thumb {
-  background: #526176 !important;
-  border-radius: 999px !important;
+html::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 body {
-  overflow: visible !important;
-  scrollbar-width: auto !important;
-  -ms-overflow-style: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overscroll-behavior-y: none !important;
 }
 
 body::-webkit-scrollbar {
+  display: none !important;
   width: 0 !important;
   height: 0 !important;
-  display: none !important;
 }
 
+/* Keep the document as the only page-level scroll owner. */
 html body .app-shell {
-  height: auto !important;
   min-height: 100vh !important;
+  height: auto !important;
   max-height: none !important;
   overflow: visible !important;
 }
 
-/* Prevent nested page scrollbars in the Futures layout and order panel. */
 html body .futures-wrap,
 html body .futures-grid,
 html body .futures-chart-area,
-html body .futures-grid > .order-panel {
-  height: auto !important;
-  min-height: 0 !important;
+html body .futures-grid > .order-panel,
+html body .futures-grid > .futures-chart-area > * {
   max-height: none !important;
   overflow: visible !important;
   overflow-x: visible !important;
   overflow-y: visible !important;
-  position: static !important;
   contain: none !important;
   transform: none !important;
   overscroll-behavior: auto !important;
   scrollbar-gutter: auto !important;
+}
+
+html body .futures-wrap {
+  min-height: calc(100vh - 64px) !important;
+  padding-bottom: 56px !important;
+  scroll-margin-top: 80px !important;
 }
 
 html body .futures-grid > .order-panel {
@@ -67,6 +60,8 @@ html body .futures-grid > .order-panel {
   align-self: start !important;
   justify-self: stretch !important;
   width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
   margin: 0 !important;
 }
 
@@ -75,29 +70,33 @@ html body .futures-grid > .order-panel > * {
   overflow: visible !important;
 }
 
-/* Keep the Markets list as the only intentional internal scroll area. */
-html body .futures-wrap > .market-search-wrap .market-search-results {
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+/* Markets is the only intentional internal scroll area. */
+html body .futures-wrap > .market-list.futures-market-list {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
   scrollbar-width: thin !important;
   scrollbar-color: #526176 transparent !important;
-  -ms-overflow-style: auto !important;
 }
 
-html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar {
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar {
   width: 6px !important;
   height: 6px !important;
 }
 
-html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-track {
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-track {
   background: transparent !important;
 }
 
-html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-scrollbar-thumb {
+html body .futures-wrap > .market-list.futures-market-list::-webkit-scrollbar-thumb {
   background: #526176 !important;
   border-radius: 999px !important;
+}
+
+/* Also support a wrapped Markets results container if present. */
+html body .futures-wrap .market-search-results {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
 }
 
 @media (min-width: 1100px) {
@@ -108,26 +107,7 @@ html body .futures-wrap > .market-search-wrap .market-search-results::-webkit-sc
 
   html body .futures-wrap > .futures-grid > .order-panel {
     grid-column: 3 !important;
-    grid-row: 2 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
+    grid-row: 2 / span 2 !important;
     overflow: visible !important;
   }
-}
-
-/* Hide the main document scrollbar only while the Futures page is mounted. */
-html:has(.futures-wrap),
-html:has(.futures-wrap) body,
-body:has(.futures-wrap) {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-html:has(.futures-wrap)::-webkit-scrollbar,
-html:has(.futures-wrap) body::-webkit-scrollbar,
-body:has(.futures-wrap)::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
 }
