@@ -155,3 +155,21 @@
 @media (min-width:1100px){
   .futures-wrap{overflow-x:clip!important;overflow-y:visible!important;}
 }
+
+/* The trading panel must grow naturally with its fields. Never create an inner scrollbar. */
+html body .futures-wrap > .futures-grid > .order-panel,
+html body .futures-wrap .order-panel {
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  overflow-y:visible!important;
+  overflow-x:visible!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+html body .futures-wrap .order-panel::-webkit-scrollbar {
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
