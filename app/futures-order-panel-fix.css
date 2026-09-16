@@ -1,12 +1,14 @@
-/* Root fix for the Buy/Sell futures panel: it must grow with its content.
-   The page owns vertical scrolling; this card must never become a nested scroll viewport. */
-.futures-wrap > .futures-grid > .order-panel {
+/* The Buy/Sell panel is a normal document-flow card.
+   The browser page owns vertical scrolling; the panel must never become
+   a nested scroll viewport. */
+.futures-wrap .order-panel {
   display: block !important;
   position: static !important;
   align-self: start !important;
   justify-self: stretch !important;
-  height: max-content !important;
-  min-height: max-content !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: auto !important;
   max-height: none !important;
   overflow: visible !important;
   overflow-y: visible !important;
@@ -14,6 +16,20 @@
   min-width: 0 !important;
   contain: none !important;
   transform: none !important;
+  overscroll-behavior: auto !important;
+  scrollbar-gutter: auto !important;
+}
+
+/* Do not let the grid/flex ancestors create a second viewport around it. */
+.futures-wrap .futures-grid,
+.futures-wrap .futures-chart-area {
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.futures-wrap .order-panel > * {
+  max-height: none !important;
 }
 
 @media (min-width: 1100px) {
@@ -21,24 +37,19 @@
     align-items: start !important;
   }
 
-  .futures-wrap > .futures-grid {
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
   .futures-wrap > .futures-grid > .order-panel {
     grid-column: 3 !important;
     grid-row: 2 !important;
     align-self: start !important;
-    height: max-content !important;
+    height: auto !important;
+    min-height: auto !important;
     max-height: none !important;
     overflow: visible !important;
   }
 }
 
-/* Do not create a scroll viewport on the order card through descendants. */
-.futures-wrap > .futures-grid > .order-panel,
-.futures-wrap > .futures-grid > .order-panel * {
-  scrollbar-gutter: auto !important;
+/* Explicitly preserve the Markets list's independent scrolling. */
+.futures-wrap .market-search-results,
+.futures-wrap .market-list.futures-market-list {
+  overflow-y: auto !important;
 }
