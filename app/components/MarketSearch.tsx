@@ -30,7 +30,11 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
           placeholder="Search markets"
           aria-label="Search markets"
         />
-        {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search">×</button>}
+        {query && (
+          <button type="button" onClick={() => setQuery("")} aria-label="Clear search">
+            ×
+          </button>
+        )}
       </div>
       <div
         className="market-search-results"
@@ -45,7 +49,7 @@ export default function MarketSearch({ selectedPair, onSelect }: Props) {
         {markets.length === 0 ? (
           <div className="market-search-empty">No markets found</div>
         ) : (
-          markets.slice(0, 30).map((symbol) => {
+          markets.map((symbol) => {
             const pair = displayPair(symbol);
             return (
               <button
