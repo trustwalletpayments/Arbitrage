@@ -14,10 +14,10 @@
     padding-left: 0 !important;
     padding-right: 28px !important;
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
   }
 
-  /* Header occupies only the first row and never affects the chart row height. */
   html body .futures-wrap > .trade-head {
     grid-column: 2 / 4 !important;
     grid-row: 1 !important;
@@ -28,7 +28,6 @@
     margin: 0 !important;
   }
 
-  /* Sidebar and chart share exactly the same second grid row. */
   html body .futures-wrap > .market-search-wrap {
     grid-column: 1 !important;
     grid-row: 2 !important;
@@ -68,7 +67,6 @@
     box-sizing: border-box !important;
   }
 
-  /* Keep the trading panel in the right column without spanning the chart row. */
   html body .futures-wrap > .futures-grid > .order-panel {
     grid-column: 3 !important;
     grid-row: 2 !important;
@@ -79,7 +77,6 @@
     box-sizing: border-box !important;
   }
 
-  /* Remaining sections follow below the chart instead of creating a tall first row. */
   html body .futures-wrap > .futures-grid > .futures-chart-area > .futures-stats {
     grid-column: 2 !important;
     grid-row: 3 !important;
