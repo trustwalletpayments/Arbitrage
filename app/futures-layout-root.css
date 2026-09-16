@@ -80,3 +80,26 @@
     align-self:start!important;
   }
 }
+
+/* Compact vertical spacing between the main futures cards. */
+@media (min-width:1100px){
+  .futures-wrap{
+    row-gap:5px!important;
+  }
+  .futures-wrap>.trade-head{
+    margin-bottom:0!important;
+  }
+  .futures-wrap>.futures-grid>.futures-chart-area>.chart.live-chart,
+  .futures-wrap>.futures-grid>.futures-chart-area>.futures-stats,
+  .futures-wrap>.futures-grid>.futures-chart-area>.futures-data-grid,
+  .futures-wrap>.futures-grid>.futures-chart-area>.positions-panel,
+  .futures-wrap>.futures-grid>.order-panel,
+  .futures-wrap>.futures-grid>.futures-chart-area>.settlement-panel{
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+}
+@media (max-width:1099px){
+  .futures-wrap{row-gap:5px!important}
+  .futures-wrap>.trade-head{margin-bottom:0!important}
+}
