@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [hidden, setHidden] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [markets, setMarkets] = useState<Market[]>(initialMarkets);
 
   useEffect(() => {
@@ -43,19 +44,15 @@ export default function Dashboard() {
 
     const load = async () => {
       try {
-        // Read the persisted browser session first; this avoids waiting on a
-        // network request before rendering an already-authenticated dashboard.
         const sessionResult = await Promise.race([
           supabase.auth.getSession(),
           new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 5000)),
         ]);
-
         if (!mounted) return;
         if (sessionResult && "data" in sessionResult && sessionResult.data.session?.user) {
           finishWithUser(sessionResult.data.session.user);
           return;
         }
-
         const userResult = await Promise.race([
           supabase.auth.getUser(),
           new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 5000)),
@@ -65,9 +62,6 @@ export default function Dashboard() {
           finishWithUser(userResult.data.user);
           return;
         }
-
-        // A missing session after the timeout means the user needs to sign in.
-        // Never leave the page permanently stuck on “Checking your account…”.
         setLoading(false);
         router.replace("/login?next=/dashboard");
       } catch {
@@ -84,11 +78,7 @@ export default function Dashboard() {
         finishWithUser(session.user);
         return;
       }
-      // Only an explicit SIGNED_OUT event is allowed to redirect after the
-      // initial auth check has completed.
-      if (event === "SIGNED_OUT" && checked) {
-        router.replace("/login?next=/dashboard");
-      }
+      if (event === "SIGNED_OUT" && checked) router.replace("/login?next=/dashboard");
     });
 
     return () => { mounted = false; subscription.unsubscribe(); };
@@ -133,7 +123,16 @@ export default function Dashboard() {
         </div>
       </header>
       <div className="member-main">
-        <section className="account-top"><div className="account-title"><div className="eyebrow">ACCOUNT OVERVIEW</div><h1>Good to see you</h1></div><button className="more-button" aria-label="More options"><MoreHorizontal size={21} /></button></section>
+        <section className="account-top">
+          <div className="account-title"><div className="eyebrow">ACCOUNT OVERVIEW</div><h1>Good to see you</h1></div>
+          <div style={{ position: "relative" }}>
+            <button type="button" className="more-button" aria-label="More options" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}><MoreHorizontal size={21} /></button>
+            {moreOpen && <div role="menu" style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, width: 210, padding: 8, borderRadius: 14, border: "1px solid #263b56", background: "#0b1420", boxShadow: "0 18px 50px rgba(0,0,0,.45)", zIndex: 50 }}>
+              <Link href="/referral" role="menuitem" onClick={() => setMoreOpen(false)} style={{ display: "block", padding: "12px 14px", borderRadius: 9, color: "#e8f0fb", textDecoration: "none", fontSize: 14 }}>Referral Program</Link>
+              <Link href="/airdrop" role="menuitem" onClick={() => setMoreOpen(false)} style={{ display: "block", padding: "12px 14px", borderRadius: 9, color: "#e8f0fb", textDecoration: "none", fontSize: 14 }}>Airdrop Program</Link>
+            </div>}
+          </div>
+        </section>
         <section className="hero-balance"><div className="hero-left"><div className="balance-heading"><span>Estimated total value</span><button onClick={() => setHidden(!hidden)} aria-label={hidden ? "Show balance" : "Hide balance"}>{hidden ? <EyeOff size={20} /> : <Eye size={20} />}</button></div><div className="balance-number">{money} <small>USD <ChevronRight size={16} /></small></div><div className="pnl-line"><span>Today's P&amp;L</span><strong>+$0.00 (+0.00%)</strong><ChevronRight size={17} /></div></div></section>
         <section className="quick-actions" aria-label="Account actions"><Link href="/wallet/deposit" className="quick-action"><span className="quick-action-icon"><ArrowDown aria-hidden="true" /></span><b>Add funds</b></Link><Link href="/wallet/send" className="quick-action"><span className="quick-action-icon"><ArrowUp aria-hidden="true" /></span><b>Send</b></Link><Link href="/wallet/transfer" className="quick-action"><span className="quick-action-icon"><ArrowLeftRight aria-hidden="true" /></span><b>Transfer</b></Link><Link href="/trade" className="quick-action"><span className="quick-action-icon"><ArrowUpRight aria-hidden="true" /></span><b>Trade</b></Link></section>
         <section className="market-highlight"><div className="section-heading"><div><span>Markets</span><strong>Trending now</strong></div><Link href="/markets">See all <ChevronRight size={16} /></Link></div><div className="market-strip">{markets.map(({ symbol, price, change }) => <Link href={`/trade?pair=${symbol}/USDT`} className="market-chip" key={symbol}><div><CoinIcon symbol={symbol} size={30} /><span>{symbol}/USDT</span></div><strong>${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 8 })}</strong><em className={change < 0 ? "down" : "up"}>{change >= 0 ? "+" : ""}{change.toFixed(2)}%</em></Link>)}</div></section>
