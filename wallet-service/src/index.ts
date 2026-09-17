@@ -58,7 +58,7 @@ function deriveEvmAddress(index: number) {
 app.get('/health', (_req, res) => res.json({ ok: true, service: 'orbitex-wallet-service', mode: 'multichain-hd', evmNetworks: Object.keys(NETWORKS), evmXpubConfigured: Boolean(process.env.EVM_XPUB) }));
 
 app.post('/provision/:userId', authorized, async (req, res) => {
-  const userId = req.params.userId;
+  const userId = String(req.params.userId);
   const asset = String(req.body?.asset || '').trim().toUpperCase();
   const network = String(req.body?.network || '').trim().toLowerCase();
   if (!validateUserId(userId)) return res.status(400).json({ error: 'Invalid user id' });
