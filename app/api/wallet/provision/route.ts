@@ -11,8 +11,18 @@ const walletServiceKey =
   process.env.WALLET_SERVICE_API_KEY || process.env.ADMIN_API_KEY;
 
 export async function POST(request: NextRequest) {
-  if (!supabaseUrl || !serviceRoleKey || !walletServiceUrl || !walletServiceKey) {
-    return NextResponse.json({ error: "Wallet provisioning is not configured." }, { status: 503 });
+  const missing = [
+    !supabaseUrl ? "SUPABASE_URL" : null,
+    !serviceRoleKey ? "SUPABASE_SERVICE_ROLE_KEY" : null,
+    !walletServiceUrl ? "WALLET_SERVICE_URL" : null,
+    !walletServiceKey ? "WALLET_SERVICE_API_KEY" : null,
+  ].filter((value): value is string => Boolean(value));
+
+  if (missing.length) {
+    return NextResponse.json(
+      { error: "Wallet provisioning is not configured.", missing },
+      { status: 503 }
+    );
   }
 
   const authorization = request.headers.get("authorization") || "";
@@ -30,16 +40,23 @@ export async function POST(request: NextRequest) {
   const network = String(body?.network || "").trim().toLowerCase();
   if (!asset || !network) return NextResponse.json({ error: "Asset and network are required." }, { status: 400 });
 
-  const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/provision/${data.user.id}`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-wallet-service-key": walletServiceKey,
-    },
-    body: JSON.stringify({ asset, network }),
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/provision/${data.user.id}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-wallet-service-key": walletServiceKey,
+      },
+      body: JSON.stringify({ asset, network }),
+      cache: "no-store",
+    });
 
-  const result = await response.json().catch(() => ({ error: "Wallet service returned an invalid response." }));
-  return NextResponse.json(result, { status: response.status });
+    const result = await response.json().catch(() => ({ error: "Wallet service returned an invalid response." }));
+    return NextResponse.json(result, { status: response.status });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? `Wallet service connection failed: ${error.message}` : "Wallet service connection failed." },
+      { status: 502 }
+    );
+  }
 }
