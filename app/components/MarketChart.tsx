@@ -27,12 +27,12 @@ function syncHeaderPrice(symbol:string,price:number){
   header.appendChild(live);
 }
 
-export default function MarketChart({pair,marketType="futures"}:{pair:string;marketType?:MarketType}){
+export default function MarketChart({pair,marketType}:{pair:string;marketType?:MarketType}){
   const containerRef=useRef<HTMLDivElement|null>(null);
   const [interval,setInterval]=useState<ChartInterval>("1m");
   const [ready,setReady]=useState(false);
   const symbol=binanceSymbol(pair);
-  const isSpot=marketType==="spot";
+  const isSpot=marketType==="spot"||(typeof window!=="undefined"&&window.location.pathname==="/trade");
   const tradingViewSymbol=isSpot?`BINANCE:${symbol}`:`BINANCE:${symbol}.P`;
 
   useEffect(()=>{
@@ -89,7 +89,7 @@ export default function MarketChart({pair,marketType="futures"}:{pair:string;mar
     let socket:WebSocket|undefined;
     const apply=(value:number)=>{
       if(cancelled||!Number.isFinite(value)||value<=0)return;
-      syncHeaderPrice(symbol,value);
+      if(!isSpot)syncHeaderPrice(symbol,value);
     };
     const restBase=isSpot?"https://api.binance.com/api/v3/ticker/price":"https://fapi.binance.com/fapi/v1/ticker/price";
     const streamBase=isSpot?"wss://stream.binance.com:9443/ws":"wss://fstream.binance.com/ws";
