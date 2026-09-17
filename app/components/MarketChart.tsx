@@ -18,9 +18,6 @@ function syncFuturesHeaderPrice(symbol:string,price:number){
   const header=document.querySelector<HTMLElement>(".trade-head .price");
   if(!header)return;
 
-  // Always replace the displayed value for the currently mounted market.
-  // The previous data-priceSymbol guard could permanently keep the old
-  // coin's price after switching from BTC to another futures pair.
   header.dataset.priceSymbol=symbol;
   header.replaceChildren(document.createTextNode(`${formatPrice(price)} `));
   const live=document.createElement("span");
@@ -56,7 +53,7 @@ export default function MarketChart({pair}:{pair:string}){
       script.async=true;
       script.innerHTML=JSON.stringify({
         autosize:true,
-        symbol:`BINANCE:${symbol}`,
+        symbol:`BINANCE:${symbol}.P`,
         interval:tradingViewInterval[interval],
         timezone:"Etc/UTC",
         theme:"dark",
@@ -72,7 +69,7 @@ export default function MarketChart({pair}:{pair:string}){
       });
       script.onload=()=>{if(!cancelled)setReady(true)};
       container.appendChild(script);
-      const timer=window.setTimeout(()=>{if(!cancelled)setReady(true)},2500);
+      const timer=window.setTimeout(()=>{if(!cancelled)setReady(true)},5000);
       return()=>window.clearTimeout(timer);
     };
 
@@ -116,9 +113,9 @@ export default function MarketChart({pair}:{pair:string}){
         {intervals.map(value=><button key={value} type="button" role="tab" aria-selected={interval===value} className={interval===value?"active":""} onClick={()=>setInterval(value)} style={{appearance:"none",border:"1px solid",borderColor:interval===value?"#3b82f6":"#263244",background:interval===value?"#2563eb":"#111a27",color:interval===value?"#fff":"#91a0b5",borderRadius:7,padding:"6px 10px",fontSize:12,fontWeight:600,lineHeight:1,cursor:"pointer"}}>{value}</button>)}
       </div>
       <strong style={{marginLeft:"auto",fontSize:14,color:"#e8eef7"}}>{pair}</strong>
-      <span className="tradingview-label" style={{color:"#7f8da1",fontSize:11}}>TradingView</span>
+      <span className="tradingview-label" style={{color:"#7f8da1",fontSize:11}}>TradingView Futures</span>
     </div>
-    <div ref={containerRef} className="tradingview-widget-container" style={{height:"auto",minHeight:0,flex:"1 1 auto",width:"100%",position:"relative"}} />
+    <div ref={containerRef} className="tradingview-widget-container" style={{height:"calc(100% - 44px)",minHeight:0,flex:"1 1 0",width:"100%",position:"relative"}} />
     {!ready&&<div className="chart-placeholder" style={{position:"absolute",inset:"44px 0 0",display:"grid",placeItems:"center",pointerEvents:"none"}}>Loading TradingView chart…</div>}
   </div>;
 }
