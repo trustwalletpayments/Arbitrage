@@ -1,40 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Eye, EyeOff, History, WalletCards, BarChart3, TrendingUp, Plus, Bitcoin, CircleDollarSign, Clock3 } from "lucide-react";
+import { ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Copy, Eye, EyeOff, History, WalletCards, BarChart3, TrendingUp, Clock3, CheckCircle2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import MobileNav from "../components/MobileNav";
-import CoinIcon from "../components/CoinIcon";
-import { getTestnetBalances, type TestnetWallet } from "../../lib/testnet-wallet";
+import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 import "./wallet.css";
 
 type FundingTab = "all" | "deposits" | "withdrawals" | "transfers";
-const assetNames: Record<string, string> = { USDT: "TetherUS", BTC: "Bitcoin", ETH: "Ethereum", BNB: "BNB", SOL: "Solana", XRP: "XRP", DOGE: "Dogecoin" };
+type WalletAccount = { id: string; asset: string; network: string; deposit_address: string | null; status: string };
+type Transaction = { id: string; created_at: string; amount: number; status: string; tx_hash?: string | null; type: "Deposit" | "Withdrawal" };
+
+const formatAmount = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 8 });
 
 export default function WalletPage() {
+  const supabase = createSupabaseBrowserClient();
   const [hidden, setHidden] = useState(false);
-  const [query, setQuery] = useState("");
-  const [balances, setBalances] = useState<TestnetWallet[]>([]);
+  const [account, setAccount] = useState<WalletAccount | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState(0);
   const [fundingTab, setFundingTab] = useState<FundingTab>("all");
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const refresh = () => setBalances(getTestnetBalances());
-    refresh();
-    window.addEventListener("storage", refresh);
-    window.addEventListener("wallet-balances-updated", refresh);
-    return () => {
-      window.removeEventListener("storage", refresh);
-      window.removeEventListener("wallet-balances-updated", refresh);
-    };
-  }, []);
+    let mounted = true;
+    const loadWallet = async () => {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { if (mounted) setLoading(false); return; }
 
-  const total = balances.reduce((sum, item) => sum + item.spot + item.futures, 0);
-  const visibleAssets = useMemo(() => balances.filter((asset) => {
-    const balance = asset.spot + asset.futures;
-    return balance > 0 && `${asset.asset} ${assetNames[asset.asset] || asset.asset}`.toLowerCase().includes(query.toLowerCase());
-  }), [balances, query]);
-  const formatAmount = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 8 });
-  const fundingLabels: Record<FundingTab, string> = { all: "All", deposits: "Deposits", withdrawals: "Withdrawals", transfers: "Transfers" };
+      const [{ data: wallet }, { data: deposits }, { data: withdrawals }, { data: ledger }] = await Promise.all([
+        supabase.from("wallet_accounts").select("id, asset, network, deposit_address, status").eq("user_id", user.id).maybeSingle(),
+        supabase.from("wallet_deposits").select("id, created_at, amount, status, tx_hash").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("wallet_withdrawals").select("id, created_at, amount, status, tx_hash").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("wallet_ledger_entries").select("amount").eq("user_id", user.id).eq("asset", "USDT"),
+      ]);
+
+      if (!mounted) return;
+      const rows: Transaction[] = [
+        ...((deposits || []).map((item) => ({ ...item, amount: Number(item.amount), type: "Deposit" as const }))),
+        ...((withdrawals || []).map((item) => ({ ...item, amount: Number(item.amount), type: "Withdrawal" as const }))),
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setAccount(wallet as WalletAccount | null);
+      setTransactions(rows);
+      setBalance((ledger || []).reduce((sum, item) => sum + Number(item.amount || 0), 0));
+      setLoading(false);
+    };
+    loadWallet();
+    return () => { mounted = false; };
+  }, [supabase]);
+
+  const filteredTransactions = useMemo(() => transactions.filter((item) => fundingTab === "all" || (fundingTab === "deposits" && item.type === "Deposit") || (fundingTab === "withdrawals" && item.type === "Withdrawal")), [transactions, fundingTab]);
+  const copyAddress = async () => {
+    if (!account?.deposit_address) return;
+    await navigator.clipboard.writeText(account.deposit_address);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
 
   return (
     <main className="wallet-page">
@@ -51,18 +74,17 @@ export default function WalletPage() {
         </div>
 
         <section className="wallet-balance-card">
-          <div className="balance-copy"><span>Funding balance <button onClick={() => setHidden(!hidden)} aria-label="Toggle balance visibility">{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button></span><strong>{hidden ? "••••••" : `${formatAmount(total)} USDT`}</strong><small>≈ {hidden ? "••••" : `$${formatAmount(total)}`}</small></div>
-          <div className="balance-side"><span>Today’s PNL</span><strong>+0.00 USDT</strong><small>+0.00%</small></div>
+          <div className="balance-copy"><span>Funding balance <button onClick={() => setHidden(!hidden)} aria-label="Toggle balance visibility">{hidden ? <EyeOff size={18} /> : <Eye size={18} />}</button></span><strong>{loading || hidden ? (loading ? "Loading..." : "••••••") : `${formatAmount(balance)} USDT`}</strong><small>≈ {hidden || loading ? "••••" : `$${formatAmount(balance)}`}</small></div>
+          <div className="balance-side"><span>Wallet status</span><strong>{account?.status === "active" ? "Active" : "Pending setup"}</strong><small>USDT · BEP20</small></div>
         </section>
+
+        {account?.deposit_address ? <section className="wallet-panel deposit-address-panel"><div className="panel-top"><div><span className="wallet-kicker">DEPOSIT ADDRESS</span><h2>USDT on BNB Smart Chain</h2><p className="panel-subtitle">Send only USDT through the BEP20 network to this address.</p></div></div><div className="deposit-address-box"><code>{account.deposit_address}</code><button type="button" onClick={copyAddress}>{copied ? <CheckCircle2 size={17} /> : <Copy size={17} />} {copied ? "Copied" : "Copy"}</button></div><p className="wallet-inline-warning">Depositing another asset or using another network may permanently lose funds.</p></section> : <section className="wallet-panel"><div className="empty-assets"><div className="empty-wallet-icon"><WalletCards size={54} /></div><strong>Wallet setup pending</strong><span>Your unique USDT BEP20 deposit address will appear here after wallet provisioning is completed.</span></div></section>}
 
         <div className="wallet-tabs"><Link className="active" href="/wallet">Overview</Link><Link href="/orders">Trading history</Link></div>
 
-        <section className="wallet-panel"><div className="panel-top"><div><span className="wallet-kicker">FUNDING BALANCES</span><h2>{visibleAssets.length ? "Your assets" : "No assets yet"}</h2><p className="panel-subtitle">Your available assets and balances</p></div><label className="asset-search"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search assets" /></label></div>{visibleAssets.length > 0 ? <><div className="asset-table-head"><span>Asset</span><span>Balance</span><span>Value</span><span>24h change</span><span></span></div><div className="asset-list">{visibleAssets.map((asset) => { const amount = asset.spot + asset.futures; return <div className="asset-row" key={asset.asset}><div className="asset-identity"><CoinIcon symbol={asset.asset} size={38} /><div><strong>{asset.asset}</strong><span>{assetNames[asset.asset] || asset.asset}</span></div></div><strong>{hidden ? "••••" : formatAmount(amount)}</strong><strong>{hidden ? "••••" : `$${formatAmount(amount)}`}</strong><span className="asset-change">0.00%</span><span className="asset-arrow">›</span></div>; })}</div></> : <div className="empty-assets"><div className="empty-wallet-art"><span className="empty-coin empty-bitcoin"><Bitcoin size={23} /></span><span className="empty-coin empty-ethereum">◆</span><span className="empty-coin empty-usdt"><CircleDollarSign size={22} /></span><div className="empty-wallet-icon"><WalletCards size={54} /></div></div><strong>No assets yet</strong><span>Your deposited assets will appear here once funds are credited to your account.</span><div className="empty-actions"><Link href="/wallet/deposit" className="empty-primary"><ArrowDownToLine size={18} /> Deposit funds</Link></div></div>}</section>
-
-        <section className="funding-history-panel" aria-label="Funding history"><div className="funding-history-heading"><div><span className="wallet-kicker">FUNDING HISTORY</span><h2>Deposit &amp; withdrawal history</h2><p>Track deposits, withdrawals, and transfers in one place.</p></div></div><div className="funding-history-tabs" role="tablist">{(Object.keys(fundingLabels) as FundingTab[]).map((tab) => <button type="button" role="tab" aria-selected={fundingTab === tab} key={tab} className={fundingTab === tab ? "active" : ""} onClick={() => setFundingTab(tab)}>{fundingLabels[tab]}</button>)}</div><div className="funding-history-table"><div className="funding-history-table-head"><span>Date</span><span>Type</span><span>Asset</span><span>Amount</span><span>Status</span><span>Transaction</span></div><div className="funding-history-empty"><div className="funding-empty-icon"><Clock3 size={20} /></div><strong>No transactions yet</strong><span>Your {fundingTab === "all" ? "funding activity" : fundingLabels[fundingTab].toLowerCase()} will appear here.</span></div></div></section>
+        <section className="funding-history-panel" aria-label="Funding history"><div className="funding-history-heading"><div><span className="wallet-kicker">FUNDING HISTORY</span><h2>Deposit &amp; withdrawal history</h2><p>Track deposits, withdrawals, and transfers in one place.</p></div></div><div className="funding-history-tabs" role="tablist">{(["all", "deposits", "withdrawals", "transfers"] as FundingTab[]).map((tab) => <button type="button" role="tab" aria-selected={fundingTab === tab} key={tab} className={fundingTab === tab ? "active" : ""} onClick={() => setFundingTab(tab)}>{tab[0].toUpperCase() + tab.slice(1)}</button>)}</div><div className="funding-history-table"><div className="funding-history-table-head"><span>Date</span><span>Type</span><span>Asset</span><span>Amount</span><span>Status</span><span>Transaction</span></div>{filteredTransactions.length ? filteredTransactions.map((item) => <div className="funding-history-row" key={`${item.type}-${item.id}`}><span>{new Date(item.created_at).toLocaleString()}</span><span>{item.type}</span><span>USDT</span><strong>{item.type === "Withdrawal" ? "-" : "+"}{formatAmount(item.amount)}</strong><span>{item.status}</span><span>{item.tx_hash ? `${item.tx_hash.slice(0, 8)}...` : "—"}</span></div>) : <div className="funding-history-empty"><div className="funding-empty-icon"><Clock3 size={20} /></div><strong>No transactions yet</strong><span>Your {fundingTab === "all" ? "funding activity" : fundingTab} will appear here.</span></div>}</div></section>
 
         <section className="wallet-trading-section"><div><span className="wallet-kicker">TRADE WITH YOUR BALANCE</span><h2>Trading</h2><p>Move funds into trading when you are ready to buy, sell, or open positions.</p></div><div className="wallet-trading-actions"><Link href="/trade" className="trading-card"><span><BarChart3 size={22} /></span><div><strong>Spot Trading</strong><small>Buy and sell coins in the spot market.</small></div><b>→</b></Link><Link href="/futures" className="trading-card"><span><TrendingUp size={22} /></span><div><strong>Futures Trading</strong><small>Open and manage leveraged positions.</small></div><b>→</b></Link></div></section>
-
         <div className="wallet-notice"><WalletCards size={19} /><div><strong>Keep your funds secure</strong><span>Always verify the selected network and wallet address before confirming a deposit or withdrawal.</span></div></div>
       </div><MobileNav />
     </main>
