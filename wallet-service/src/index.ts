@@ -37,7 +37,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.post('/provision/:userId', authorized, async (req, res) => {
-  const userId = req.params.userId;
+  const userId = String(req.params.userId || '');
   if (!/^[0-9a-f-]{36}$/i.test(userId)) {
     return res.status(400).json({ error: 'Invalid user id' });
   }
