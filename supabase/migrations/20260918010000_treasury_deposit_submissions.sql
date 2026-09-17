@@ -13,3 +13,19 @@ alter table public.wallet_deposits
 
 create index if not exists wallet_deposits_tx_hash_idx
   on public.wallet_deposits(tx_hash);
+
+-- Users may submit only their own pending transaction claims.
+grant insert on public.wallet_deposits to authenticated;
+
+drop policy if exists "Users can submit own wallet deposits" on public.wallet_deposits;
+create policy "Users can submit own wallet deposits"
+on public.wallet_deposits
+for insert
+to authenticated
+with check (
+  (select auth.uid()) = user_id
+  and status = 'submitted'
+  and wallet_account_id is null
+  and asset = 'USDT'
+  and network = 'BEP20'
+);
