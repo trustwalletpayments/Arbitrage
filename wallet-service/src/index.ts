@@ -53,12 +53,12 @@ app.post('/provision/:userId', authorized, async (req, res) => {
   if (existing.error) return res.status(500).json({ error: existing.error.message });
   if (existing.data?.deposit_address) return res.json({ wallet: existing.data, created: false });
 
-  const countResult = await supabase
-    .from('wallet_accounts')
-    .select('id', { count: 'exact', head: true });
+  const allocation = await supabase.rpc('allocate_wallet_derivation_index');
+  if (allocation.error || allocation.data === null || allocation.data === undefined) {
+    return res.status(500).json({ error: allocation.error?.message || 'Unable to allocate wallet index' });
+  }
 
-  if (countResult.error) return res.status(500).json({ error: countResult.error.message });
-  const derivationIndex = countResult.count ?? 0;
+  const derivationIndex = Number(allocation.data);
   const address = deriveAddress(derivationIndex);
 
   const inserted = await supabase
@@ -74,7 +74,7 @@ app.post('/provision/:userId', authorized, async (req, res) => {
     .single();
 
   if (inserted.error) return res.status(500).json({ error: inserted.error.message });
-  return res.status(201).json({ wallet: inserted.data, created: true });
+  return res.status(201).json({ wallet: inserted.data, created: true, derivationIndex });
 });
 
 app.listen(port, '0.0.0.0', () => {
