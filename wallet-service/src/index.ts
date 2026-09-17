@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
-import { HDNodeWallet, getAddress, JsonRpcProvider, Interface, parseUnits, formatUnits } from 'ethers';
+import { getAddress, JsonRpcProvider, Interface, parseUnits, formatUnits } from 'ethers';
 
-const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'WALLET_XPUB', 'ADMIN_API_KEY'];
+const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'ADMIN_API_KEY'];
 for (const key of required) {
   if (!process.env[key]) throw new Error(`Missing environment variable: ${key}`);
 }
@@ -17,7 +17,6 @@ const supabase = createClient(
   { auth: { persistSession: false, autoRefreshToken: false } }
 );
 
-const root = HDNodeWallet.fromExtendedKey(process.env.WALLET_XPUB!);
 const apiKey = process.env.ADMIN_API_KEY!;
 const port = Number(process.env.PORT || 8080);
 const rpc = new JsonRpcProvider(process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org');
@@ -31,27 +30,12 @@ function authorized(req: express.Request, res: express.Response, next: express.N
   next();
 }
 
-function deriveAddress(index: number): string {
-  return getAddress(root.deriveChild(index).address);
-}
-
 app.get('/health', (_req, res) => {
-  res.json({ ok: true, service: 'orbitex-wallet-service', network: 'BEP20', asset: 'USDT' });
+  res.json({ ok: true, service: 'orbitex-wallet-service', network: 'BEP20', asset: 'USDT', custody: 'common-treasury' });
 });
 
-app.post('/provision/:userId', authorized, async (req, res) => {
-  const userId = String(req.params.userId || '');
-  if (!/^[0-9a-f-]{36}$/i.test(userId)) return res.status(400).json({ error: 'Invalid user id' });
-  const existing = await supabase.from('wallet_accounts').select('id,user_id,deposit_address,status').eq('user_id', userId).eq('asset', 'USDT').eq('network', 'BEP20').maybeSingle();
-  if (existing.error) return res.status(500).json({ error: existing.error.message });
-  if (existing.data?.deposit_address) return res.json({ wallet: existing.data, created: false });
-  const allocation = await supabase.rpc('allocate_wallet_derivation_index');
-  if (allocation.error || allocation.data === null || allocation.data === undefined) return res.status(500).json({ error: allocation.error?.message || 'Unable to allocate wallet index' });
-  const derivationIndex = Number(allocation.data);
-  const address = deriveAddress(derivationIndex);
-  const inserted = await supabase.from('wallet_accounts').insert({ user_id: userId, asset: 'USDT', network: 'BEP20', deposit_address: address, status: 'active' }).select('id,user_id,asset,network,deposit_address,status,created_at').single();
-  if (inserted.error) return res.status(500).json({ error: inserted.error.message });
-  return res.status(201).json({ wallet: inserted.data, created: true, derivationIndex });
+app.post('/provision/:userId', authorized, async (_req, res) => {
+  return res.status(410).json({ error: 'Per-user wallet provisioning is disabled. Orbitex uses the common treasury address.' });
 });
 
 app.post('/verify-deposit', authorized, async (req, res) => {
@@ -62,7 +46,7 @@ app.post('/verify-deposit', authorized, async (req, res) => {
   if (!/^0x[a-f0-9]{64}$/.test(txHash)) return res.status(400).json({ error: 'Invalid transaction hash' });
   if (!/^\d+(\.\d{1,18})?$/.test(submittedAmount) || Number(submittedAmount) <= 0) return res.status(400).json({ error: 'Invalid amount' });
 
-  const existing = await supabase.from('wallet_deposits').select('id,status').eq('network', 'BEP20').eq('asset', 'USDT').eq('tx_hash', txHash).maybeSingle();
+  const existing = await supabase.from('wallet_deposits').select('id,status,user_id').eq('network', 'BEP20').eq('asset', 'USDT').eq('tx_hash', txHash).maybeSingle();
   if (existing.error) return res.status(500).json({ error: existing.error.message });
   if (existing.data) return res.status(409).json({ error: 'This transaction has already been submitted.', deposit: existing.data });
 
