@@ -48,7 +48,7 @@ function DepositAddressContent() {
       if (cancelled) return;
       setLoadingAddress(false);
       if (!response.ok || !result.wallet?.deposit_address) {
-        setError(result.error || "Unable to create your deposit address.");
+        setError([result.error, result.details, result.causeCode ? `Code: ${result.causeCode}` : "", result.endpointHost ? `Host: ${result.endpointHost}` : ""].filter(Boolean).join(" "));
         return;
       }
       setAddress(result.wallet.deposit_address);
