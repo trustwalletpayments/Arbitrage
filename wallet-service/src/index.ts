@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
-import { getAddress, HDNodeWallet, JsonRpcProvider, Interface, parseUnits, formatUnits } from 'ethers';
+import { getAddress, HDNodeWallet, Wallet, JsonRpcProvider, Interface, Contract, parseUnits, formatUnits } from 'ethers';
 
 const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'ADMIN_API_KEY'];
 for (const key of required) {
@@ -55,7 +55,101 @@ function deriveEvmAddress(index: number) {
   return getAddress(root.derivePath(`0/${index}`).address);
 }
 
-app.get('/health', (_req, res) => res.json({ ok: true, service: 'orbitex-wallet-service', mode: 'multichain-hd', evmNetworks: Object.keys(NETWORKS), evmXpubConfigured: Boolean(process.env.EVM_XPUB) }));
+app.get('/health', (_req, res) => res.json({
+  ok: true,
+  service: 'orbitex-wallet-service',
+  mode: 'multichain-hd',
+  evmNetworks: Object.keys(NETWORKS),
+  evmXpubConfigured: Boolean(process.env.EVM_XPUB),
+  sweepConfigured: Boolean(process.env.EVM_XPRIV && process.env.TREASURY_PRIVATE_KEY && process.env.TREASURY_ADDRESS),
+  sweepEnabled: process.env.SWEEP_ENABLED === 'true',
+}));
+
+function getSweepConfig() {
+  const xpriv = process.env.EVM_XPRIV?.trim();
+  const treasuryKey = process.env.TREASURY_PRIVATE_KEY?.trim();
+  const treasuryAddress = process.env.TREASURY_ADDRESS?.trim();
+  if (!xpriv || !treasuryKey || !treasuryAddress) {
+    throw new Error('Sweep is not configured. Add EVM_XPRIV, TREASURY_PRIVATE_KEY and TREASURY_ADDRESS to the wallet service.');
+  }
+  return { xpriv, treasuryKey, treasuryAddress: getAddress(treasuryAddress) };
+}
+
+async function sweepBscUsdt(walletAccountId: string) {
+  const config = getSweepConfig();
+  const account = await supabase.from('wallet_accounts').select('id,user_id,asset,network,deposit_address,derivation_index,status').eq('id', walletAccountId).maybeSingle();
+  if (account.error) throw new Error(account.error.message);
+  if (!account.data) throw new Error('Wallet account not found.');
+  if (account.data.asset !== 'USDT' || account.data.network !== 'bsc') throw new Error('Only USDT on BNB Smart Chain is supported by this sweep worker.');
+  if (account.data.status !== 'active' || account.data.derivation_index === null || !account.data.deposit_address) throw new Error('Wallet account is not ready for sweeping.');
+
+  const provider = new JsonRpcProvider(process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org', 56);
+  const source = HDNodeWallet.fromExtendedKey(config.xpriv).derivePath(`0/${Number(account.data.derivation_index)}`).connect(provider);
+  const sourceAddress = getAddress(source.address);
+  if (sourceAddress.toLowerCase() !== getAddress(account.data.deposit_address).toLowerCase()) throw new Error('Derived signer does not match the provisioned deposit address.');
+
+  const treasury = new Wallet(config.treasuryKey, provider);
+  if (getAddress(treasury.address).toLowerCase() !== config.treasuryAddress.toLowerCase()) throw new Error('TREASURY_PRIVATE_KEY does not match TREASURY_ADDRESS.');
+
+  const usdtAddress = getAddress(process.env.USDT_CONTRACT || '0x55d398326f99059fF775485246999027B3197955');
+  const usdt = new Contract(usdtAddress, ['function balanceOf(address) view returns (uint256)','function transfer(address to,uint256 amount) returns (bool)'], source);
+  const balance = BigInt((await usdt.balanceOf(sourceAddress)).toString());
+  if (balance <= 0n) return { ok: true, status: 'nothing_to_sweep', walletAccountId, address: sourceAddress };
+
+  const gasEstimate = await provider.estimateGas({
+    from: sourceAddress,
+    to: usdtAddress,
+    data: usdt.interface.encodeFunctionData('transfer', [config.treasuryAddress, balance]),
+  });
+  const feeData = await provider.getFeeData();
+  const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
+  if (!gasPrice) throw new Error('Unable to determine BSC gas price.');
+  const requiredGas = gasEstimate * gasPrice;
+  const gasBuffer = requiredGas + requiredGas / 2n;
+  const sourceNative = await provider.getBalance(sourceAddress);
+
+  let gasTxHash: string | null = null;
+  if (sourceNative < gasBuffer) {
+    const treasuryNative = await provider.getBalance(treasury.address);
+    if (treasuryNative < gasBuffer) throw new Error(`Treasury does not have enough BNB to fund sweep gas. Required approximately ${formatUnits(gasBuffer, 18)} BNB.`);
+    const gasTx = await treasury.sendTransaction({ to: sourceAddress, value: gasBuffer - sourceNative });
+    gasTxHash = gasTx.hash;
+    await gasTx.wait(1);
+  }
+
+  const sweep = await supabase.from('wallet_sweeps').insert({
+    wallet_account_id: account.data.id,
+    user_id: account.data.user_id,
+    asset: 'USDT',
+    network: 'bsc',
+    amount: formatUnits(balance, 18),
+    gas_funded_amount: formatUnits(gasBuffer > sourceNative ? gasBuffer - sourceNative : 0n, 18),
+    gas_tx_hash: gasTxHash,
+    status: 'processing',
+  }).select('id').single();
+  if (sweep.error) throw new Error(sweep.error.message);
+
+  try {
+    const tx = await usdt.transfer(config.treasuryAddress, balance);
+    const receipt = await tx.wait(1);
+    if (!receipt || receipt.status !== 1) throw new Error('USDT sweep transaction failed.');
+    await supabase.from('wallet_sweeps').update({ status: 'completed', sweep_tx_hash: tx.hash, updated_at: new Date().toISOString() }).eq('id', sweep.data.id);
+    return { ok: true, status: 'completed', walletAccountId, address: sourceAddress, amount: formatUnits(balance, 18), gasTxHash, sweepTxHash: tx.hash };
+  } catch (error) {
+    await supabase.from('wallet_sweeps').update({ status: 'failed', error_message: error instanceof Error ? error.message : 'Sweep failed', updated_at: new Date().toISOString() }).eq('id', sweep.data.id);
+    throw error;
+  }
+}
+
+app.post('/admin/sweep/bsc/usdt/:walletAccountId', authorized, async (req, res) => {
+  if (process.env.SWEEP_ENABLED !== 'true') return res.status(503).json({ error: 'Sweep worker is disabled. Set SWEEP_ENABLED=true after configuring the signer and treasury.' });
+  try {
+    const result = await sweepBscUsdt(String(req.params.walletAccountId));
+    return res.json(result);
+  } catch (error) {
+    return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to sweep wallet.' });
+  }
+});
 
 app.post('/provision/:userId', authorized, async (req, res) => {
   const userId = String(req.params.userId);
