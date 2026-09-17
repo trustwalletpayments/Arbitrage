@@ -62,7 +62,10 @@ function DepositAddressContent() {
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(result.error || "Deposit verification failed. Please check the transaction details.");
+      const missing = Array.isArray(result.missing) && result.missing.length
+        ? ` Missing: ${result.missing.join(", ")}.`
+        : "";
+      setError(`${result.error || "Deposit verification failed. Please check the transaction details."}${missing}`);
       return;
     }
 
