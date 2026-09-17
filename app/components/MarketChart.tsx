@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from "react";
 import {binanceSymbol,formatPrice} from "../../lib/market-data";
 
 type ChartInterval="1m"|"15m"|"1h"|"4h"|"1d";
+type MarketType="spot"|"futures";
 
 const tradingViewInterval:Record<ChartInterval,string>={
   "1m":"1",
@@ -13,7 +14,7 @@ const tradingViewInterval:Record<ChartInterval,string>={
   "1d":"D",
 };
 
-function syncFuturesHeaderPrice(symbol:string,price:number){
+function syncHeaderPrice(symbol:string,price:number){
   if(typeof document==="undefined"||!Number.isFinite(price)||price<=0)return;
   const header=document.querySelector<HTMLElement>(".trade-head .price");
   if(!header)return;
@@ -26,11 +27,13 @@ function syncFuturesHeaderPrice(symbol:string,price:number){
   header.appendChild(live);
 }
 
-export default function MarketChart({pair}:{pair:string}){
+export default function MarketChart({pair,marketType="futures"}:{pair:string;marketType?:MarketType}){
   const containerRef=useRef<HTMLDivElement|null>(null);
   const [interval,setInterval]=useState<ChartInterval>("1m");
   const [ready,setReady]=useState(false);
   const symbol=binanceSymbol(pair);
+  const isSpot=marketType==="spot";
+  const tradingViewSymbol=isSpot?`BINANCE:${symbol}`:`BINANCE:${symbol}.P`;
 
   useEffect(()=>{
     let cancelled=false;
@@ -53,7 +56,7 @@ export default function MarketChart({pair}:{pair:string}){
       script.async=true;
       script.innerHTML=JSON.stringify({
         autosize:true,
-        symbol:`BINANCE:${symbol}.P`,
+        symbol:tradingViewSymbol,
         interval:tradingViewInterval[interval],
         timezone:"Etc/UTC",
         theme:"dark",
@@ -79,31 +82,34 @@ export default function MarketChart({pair}:{pair:string}){
       if(typeof cleanup==="function")cleanup();
       if(containerRef.current)containerRef.current.innerHTML="";
     };
-  },[symbol,interval]);
+  },[tradingViewSymbol,interval]);
 
   useEffect(()=>{
     let cancelled=false;
     let socket:WebSocket|undefined;
     const apply=(value:number)=>{
       if(cancelled||!Number.isFinite(value)||value<=0)return;
-      syncFuturesHeaderPrice(symbol,value);
+      syncHeaderPrice(symbol,value);
     };
+    const restBase=isSpot?"https://api.binance.com/api/v3/ticker/price":"https://fapi.binance.com/fapi/v1/ticker/price";
+    const streamBase=isSpot?"wss://stream.binance.com:9443/ws":"wss://fstream.binance.com/ws";
+    const streamSuffix=isSpot?"@ticker":"@markPrice@1s";
 
-    fetch(`https://fapi.binance.com/fapi/v1/ticker/price?symbol=${symbol}`,{cache:"no-store"})
+    fetch(`${restBase}?symbol=${symbol}`,{cache:"no-store"})
       .then(response=>response.ok?response.json():null)
       .then(data=>{const value=Number(data?.price);if(value>0)apply(value)})
       .catch(()=>{});
 
     try{
-      socket=new WebSocket(`wss://fstream.binance.com/ws/${symbol.toLowerCase()}@markPrice@1s`);
-      socket.onmessage=event=>{try{apply(Number(JSON.parse(event.data)?.p))}catch{}};
+      socket=new WebSocket(`${streamBase}/${symbol.toLowerCase()}${streamSuffix}`);
+      socket.onmessage=event=>{try{const data=JSON.parse(event.data);apply(Number(isSpot?data?.c:data?.p))}catch{}};
     }catch{}
 
     return()=>{
       cancelled=true;
       socket?.close();
     };
-  },[symbol]);
+  },[symbol,isSpot]);
 
   const intervals:ChartInterval[]=["1m","15m","1h","4h","1d"];
 
@@ -113,7 +119,7 @@ export default function MarketChart({pair}:{pair:string}){
         {intervals.map(value=><button key={value} type="button" role="tab" aria-selected={interval===value} className={interval===value?"active":""} onClick={()=>setInterval(value)} style={{appearance:"none",border:"1px solid",borderColor:interval===value?"#3b82f6":"#263244",background:interval===value?"#2563eb":"#111a27",color:interval===value?"#fff":"#91a0b5",borderRadius:7,padding:"6px 10px",fontSize:12,fontWeight:600,lineHeight:1,cursor:"pointer"}}>{value}</button>)}
       </div>
       <strong style={{marginLeft:"auto",fontSize:14,color:"#e8eef7"}}>{pair}</strong>
-      <span className="tradingview-label" style={{color:"#7f8da1",fontSize:11}}>TradingView Futures</span>
+      <span className="tradingview-label" style={{color:"#7f8da1",fontSize:11}}>{isSpot?"TradingView Spot":"TradingView Futures"}</span>
     </div>
     <div ref={containerRef} className="tradingview-widget-container" style={{height:"calc(100% - 44px)",minHeight:0,flex:"1 1 0",width:"100%",position:"relative"}} />
     {!ready&&<div className="chart-placeholder" style={{position:"absolute",inset:"44px 0 0",display:"grid",placeItems:"center",pointerEvents:"none"}}>Loading TradingView chart…</div>}
