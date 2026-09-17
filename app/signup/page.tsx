@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, UserRound, Gift } from "lucide-react";
 import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 import "../auth.css";
 
@@ -10,9 +10,15 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const referralFromUrl = new URLSearchParams(window.location.search).get("ref");
+    if (referralFromUrl) setReferralCode(referralFromUrl.toUpperCase());
+  }, []);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,7 +35,10 @@ export default function Signup() {
         email: email.trim(),
         password,
         options: {
-          data: { full_name: name.trim() },
+          data: {
+            full_name: name.trim(),
+            referral_code: referralCode.trim().toUpperCase() || null,
+          },
           emailRedirectTo,
         },
       });
@@ -134,6 +143,20 @@ export default function Signup() {
               >
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
+            </div>
+          </label>
+
+          <label>
+            Referral code <span className="muted">(optional)</span>
+            <div className="auth-input">
+              <Gift />
+              <input
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                placeholder="Enter referral code"
+                autoComplete="off"
+                maxLength={50}
+              />
             </div>
           </label>
 
