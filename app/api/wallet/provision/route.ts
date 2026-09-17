@@ -10,6 +10,11 @@ const walletServiceUrl = process.env.WALLET_SERVICE_URL;
 const walletServiceKey =
   process.env.WALLET_SERVICE_API_KEY || process.env.ADMIN_API_KEY;
 
+function normalizeWalletServiceUrl(value: string) {
+  const trimmed = value.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 export async function POST(request: NextRequest) {
   const missing = [
     !supabaseUrl ? "SUPABASE_URL" : null,
@@ -40,8 +45,11 @@ export async function POST(request: NextRequest) {
   const network = String(body?.network || "").trim().toLowerCase();
   if (!asset || !network) return NextResponse.json({ error: "Asset and network are required." }, { status: 400 });
 
+  const serviceUrl = normalizeWalletServiceUrl(walletServiceUrl);
+  const endpoint = `${serviceUrl.replace(/\/$/, "")}/provision/${data.user.id}`;
+
   try {
-    const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/provision/${data.user.id}`, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -49,13 +57,21 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({ asset, network }),
       cache: "no-store",
+      signal: AbortSignal.timeout(15000),
     });
 
     const result = await response.json().catch(() => ({ error: "Wallet service returned an invalid response." }));
     return NextResponse.json(result, { status: response.status });
   } catch (error) {
+    const cause = error instanceof Error && error.cause instanceof Error ? error.cause : null;
     return NextResponse.json(
-      { error: error instanceof Error ? `Wallet service connection failed: ${error.message}` : "Wallet service connection failed." },
+      {
+        error: "Wallet service connection failed.",
+        details: error instanceof Error ? error.message : "Unknown fetch error.",
+        cause: cause?.message || null,
+        causeCode: cause && typeof cause === "object" && "code" in cause ? String((cause as { code?: unknown }).code) : null,
+        endpointHost: (() => { try { return new URL(serviceUrl).host; } catch { return "invalid-url"; } })(),
+      },
       { status: 502 }
     );
   }
