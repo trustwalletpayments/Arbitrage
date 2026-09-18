@@ -10,11 +10,11 @@ const lessons = [
 ] as const;
 
 const faqs = [
-  ["What is crypto arbitrage?", "Crypto arbitrage is the practice of identifying price differences for the same asset across markets and attempting to capture the difference, after considering fees, liquidity and transfer costs."],
-  ["How does ORBITEX arbitrage work?", "ORBITEX is being built around arbitrage-focused market tools that help users compare prices and identify potential opportunities across supported markets."],
-  ["Are arbitrage opportunities guaranteed?", "No. Price differences can disappear quickly, and fees, slippage, liquidity, transfer delays or market movement can affect the result. An opportunity shown on screen is not a guaranteed profit."],
-  ["What fees should I consider?", "Consider trading fees, withdrawal or network fees, spread, slippage and any other applicable costs before acting on an arbitrage opportunity."],
-  ["Do I need to transfer funds between platforms?", "That depends on the arbitrage setup. Some strategies require transfers while others can use balances already available in different markets. Always verify the supported workflow and network before sending assets."],
+  ["What is ORBITEX?", "ORBITEX is a crypto trading and wallet platform designed to give users a clear, straightforward way to manage assets, view markets and place trades."],
+  ["How does ORBITEX work?", "Use the ORBITEX interface to manage your wallet, view supported markets, monitor prices and place spot or futures trades where available."],
+  ["Are trading profits guaranteed?", "No. Crypto prices can move quickly, and trading involves risk. Market movement, fees, liquidity, slippage and other factors can affect the result."],
+  ["What fees should I consider?", "Consider trading fees, withdrawal or network fees, spread, slippage and any other applicable costs before placing a trade or transferring assets."],
+  ["Do I need to transfer funds between platforms?", "Not necessarily. You can use the balances available in your ORBITEX account for supported trading activity. Transfers may be needed when depositing or withdrawing assets."],
   ["Which networks and assets are supported?", "Supported assets, markets and networks can change. Always check the current ORBITEX interface before depositing or transferring funds, and make sure the sending and receiving networks match."]
 ] as const;
 
