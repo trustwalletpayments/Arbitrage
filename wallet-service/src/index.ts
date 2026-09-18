@@ -3,6 +3,7 @@ import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { getAddress, HDNodeWallet, Wallet, JsonRpcProvider, Interface, Contract, parseUnits, formatUnits } from 'ethers';
 import { getConfiguredTokenContract } from './token-contracts.js';
+import { registerBitcoinRoutes } from './chains/bitcoin-routes.js';
 
 const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'ADMIN_API_KEY'];
 for (const key of required) {
@@ -235,5 +236,7 @@ app.post('/verify-deposit', authorized, async (req, res) => {
     return res.status(201).json({ ok: true, status, confirmations, requiredConfirmations: confirmationsRequired, deposit: inserted.data });
   } catch (error) { return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to verify transaction' }); }
 });
+
+registerBitcoinRoutes(app, authorized);
 
 app.listen(port, '0.0.0.0', () => console.log(`Orbitex wallet service listening on port ${port}`));
