@@ -102,9 +102,9 @@ export async function buildBitcoinSweep(args: { index: number; treasuryAddress: 
   if (amount < 546n) throw new Error('Bitcoin sweep output would be dust.');
   const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
   for (const utxo of args.utxos) {
-    psbt.addInput({ hash: utxo.txid, index: utxo.vout, witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: Number(utxo.valueSats) } });
+    psbt.addInput({ hash: utxo.txid, index: utxo.vout, witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: utxo.valueSats } });
   }
-  psbt.addOutput({ address: args.treasuryAddress, value: Number(amount) });
+  psbt.addOutput({ address: args.treasuryAddress, value: amount });
   for (let i = 0; i < args.utxos.length; i++) psbt.signInput(i, derived.node);
   psbt.finalizeAllInputs();
   const tx = psbt.extractTransaction();
