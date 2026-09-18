@@ -24,14 +24,19 @@ export function getConfiguredTokenContracts(): Record<string, Record<string, str
     for (const [network, assets] of Object.entries(configured)) {
       merged[network] = { ...(merged[network] || {}), ...(assets || {}) };
     }
+  } catch (error) {
+    console.error('[tokens] EVM_TOKEN_CONTRACTS_JSON is invalid JSON; using built-in EVM token defaults instead.', error instanceof Error ? error.message : error);
+    return merged;
+  }
+  try {
     for (const [network, assets] of Object.entries(merged)) {
       for (const [asset, address] of Object.entries(assets)) {
         if (!address) delete assets[asset];
         else assets[asset] = getAddress(address);
       }
     }
-  } catch {
-    throw new Error('EVM_TOKEN_CONTRACTS_JSON is not valid JSON.');
+  } catch (error) {
+    throw new Error(`Invalid EVM token contract address: ${error instanceof Error ? error.message : String(error)}`);
   }
   return merged;
 }
