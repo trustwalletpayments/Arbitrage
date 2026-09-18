@@ -6,7 +6,7 @@ export const DEFAULT_EVM_TOKEN_CONTRACTS: Record<string, Record<string, string>>
   polygon: { USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
   arbitrum: { USDT: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9' },
   optimism: { USDT: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58' },
-  base: { USDT: '0xfde4C96c8593536e31f229ea8f37b2ada2699bb2' },
+  base: { USDT: '0xfde4c96c8593536e31f229ea8f37b2ada2699bb2' },
   avalanche: { USDT: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7' },
   fantom: { USDT: '0x049d68029688eabf473097a2fc38ef61633a3c7a' },
   cronos: { USDT: '0x66e428c3f67a68878562e79A0234c1F83c208770' },
