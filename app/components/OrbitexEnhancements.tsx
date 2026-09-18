@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { addLearningSection } from "./orbitexLearning";
 
 const faqs = [
   ["What is ORBITEX?", "ORBITEX is a digital-asset trading platform designed to bring spot and futures markets, market data and wallet tools together in one account."],
@@ -97,7 +96,8 @@ export default function OrbitexEnhancements() {
 
     const enhance = () => {
       document.querySelectorAll(".premium-footer .footer-group[open]").forEach((group) => group.removeAttribute("open"));
-      addLearningSection();
+      // The LearnKnowledge component already renders the learning cards.
+      // Do not inject a second copy here.
       addFaq();
       enhanceStoreButtons();
     };
