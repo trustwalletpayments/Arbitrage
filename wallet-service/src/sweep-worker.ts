@@ -4,12 +4,7 @@ import { Contract, HDNodeWallet, JsonRpcProvider, Wallet, getAddress, formatUnit
 import './index.js';
 import { getConfiguredTokenContracts } from './token-contracts.js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false, autoRefreshToken: false } },
-);
-
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
 const NETWORKS: Record<string, { rpcEnv: string; chainId: number; nativeAsset: string }> = {
   ethereum: { rpcEnv: 'ETHEREUM_RPC_URL', chainId: 1, nativeAsset: 'ETH' },
   bsc: { rpcEnv: 'BSC_RPC_URL', chainId: 56, nativeAsset: 'BNB' },
@@ -22,203 +17,15 @@ const NETWORKS: Record<string, { rpcEnv: string; chainId: number; nativeAsset: s
   cronos: { rpcEnv: 'CRONOS_RPC_URL', chainId: 25, nativeAsset: 'CRO' },
   linea: { rpcEnv: 'LINEA_RPC_URL', chainId: 59144, nativeAsset: 'ETH' },
 };
-
 const INTERVAL_MS = Math.max(10_000, Number(process.env.SWEEP_INTERVAL_MS || 30_000));
 const MAX_ACCOUNTS = Math.max(1, Number(process.env.SWEEP_MAX_ACCOUNTS_PER_RUN || 50));
-const TRANSFER_ABI = [
-  'function balanceOf(address) view returns (uint256)',
-  'function decimals() view returns (uint8)',
-  'function transfer(address to,uint256 amount) returns (bool)',
-];
-
+const TRANSFER_ABI = ['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function transfer(address to,uint256 amount) returns (bool)'];
 let running = false;
-
-function requireSweepConfig() {
-  const xpriv = process.env.EVM_XPRIV?.trim();
-  const treasuryKey = process.env.TREASURY_PRIVATE_KEY?.trim();
-  const treasuryAddress = process.env.TREASURY_ADDRESS?.trim();
-  if (!xpriv || !treasuryKey || !treasuryAddress) {
-    throw new Error('Automatic sweep disabled: EVM_XPRIV, TREASURY_PRIVATE_KEY and TREASURY_ADDRESS are required.');
-  }
-  return { xpriv, treasuryKey, treasuryAddress: getAddress(treasuryAddress) };
-}
-
-function tokenMap(): Record<string, Record<string, string>> {
-  return getConfiguredTokenContracts();
-}
-
-function providerFor(network: string) {
-  const config = NETWORKS[network];
-  if (!config) throw new Error(`Unsupported network ${network}.`);
-  const rpc = process.env[config.rpcEnv]?.trim();
-  if (!rpc) throw new Error(`${config.rpcEnv} is not configured.`);
-  return new JsonRpcProvider(rpc, config.chainId);
-}
-
-function sourceAndTreasury(account: any, provider: JsonRpcProvider) {
-  const config = requireSweepConfig();
-  if (account.status !== 'active' || account.derivation_index === null || !account.deposit_address) return null;
-  const source = HDNodeWallet.fromExtendedKey(config.xpriv)
-    .derivePath(`0/${Number(account.derivation_index)}`)
-    .connect(provider);
-  const sourceAddress = getAddress(source.address);
-  if (sourceAddress.toLowerCase() !== getAddress(account.deposit_address).toLowerCase()) {
-    throw new Error(`Derived signer mismatch for wallet ${account.id}.`);
-  }
-  const treasury = new Wallet(config.treasuryKey, provider);
-  if (getAddress(treasury.address).toLowerCase() !== config.treasuryAddress.toLowerCase()) {
-    throw new Error('TREASURY_PRIVATE_KEY does not match TREASURY_ADDRESS.');
-  }
-  return { config, source, sourceAddress, treasury };
-}
-
-async function recordSweep(account: any, asset: string, network: string, amount: string, gasFunded: bigint, gasTxHash: string | null, send: () => Promise<{ hash: string; wait: (confirmations?: number) => Promise<any> }>) {
-  const sweep = await supabase.from('wallet_sweeps').insert({
-    wallet_account_id: account.id,
-    user_id: account.user_id,
-    asset,
-    network,
-    amount,
-    gas_funded_amount: formatUnits(gasFunded, 18),
-    gas_tx_hash: gasTxHash,
-    status: 'processing',
-  }).select('id').single();
-  if (sweep.error) throw new Error(sweep.error.message);
-  try {
-    const tx = await send();
-    const receipt = await tx.wait(1);
-    if (!receipt || receipt.status !== 1) throw new Error('Sweep transaction failed.');
-    const updated = await supabase.from('wallet_sweeps').update({ status: 'completed', sweep_tx_hash: tx.hash, updated_at: new Date().toISOString() }).eq('id', sweep.data.id);
-    if (updated.error) throw new Error(updated.error.message);
-    console.log(`[sweep] ${asset} ${network} ${amount} from ${account.deposit_address} -> ${process.env.TREASURY_ADDRESS} tx=${tx.hash}`);
-  } catch (error) {
-    await supabase.from('wallet_sweeps').update({ status: 'failed', error_message: error instanceof Error ? error.message : 'Sweep failed', updated_at: new Date().toISOString() }).eq('id', sweep.data.id);
-    throw error;
-  }
-}
-
-async function sweepNativeAccount(account: any) {
-  const network = String(account.network).toLowerCase();
-  const configNetwork = NETWORKS[network];
-  if (!configNetwork || String(account.asset).toUpperCase() !== configNetwork.nativeAsset) return;
-  const provider = providerFor(network);
-  const prepared = sourceAndTreasury(account, provider);
-  if (!prepared) return;
-  const { config, source, sourceAddress, treasury } = prepared;
-
-  // The deposit wallet's existing native balance is swept in full.
-  // The treasury first funds the source wallet with enough native currency
-  // to pay the sweep transaction, so the user's deposited native balance is
-  // not reduced by the sweep gas cost.
-  const balance = await provider.getBalance(sourceAddress);
-  if (balance <= 0n) return;
-
-  const feeData = await provider.getFeeData();
-  const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
-  if (!gasPrice) throw new Error(`Unable to determine gas price for ${network}.`);
-
-  const gasLimit = 21_000n;
-  const gasCost = gasLimit * gasPrice;
-  const gasBuffer = gasCost + gasCost / 2n;
-  const treasuryNative = await provider.getBalance(treasury.address);
-  if (treasuryNative < gasBuffer) {
-    throw new Error(`Treasury lacks ${configNetwork.nativeAsset} for gas on ${sourceAddress}.`);
-  }
-
-  const gasTx = await treasury.sendTransaction({
-    to: sourceAddress,
-    value: gasBuffer,
-  });
-  await gasTx.wait(1);
-
-  const amountText = formatUnits(balance, 18);
-  await recordSweep(
-    account,
-    configNetwork.nativeAsset,
-    network,
-    amountText,
-    gasBuffer,
-    gasTx.hash,
-    () => source.sendTransaction({ to: config.treasuryAddress, value: balance }),
-  );
-}
-
-async function sweepTokenAccount(account: any, tokenAddress: string) {
-  const network = String(account.network).toLowerCase();
-  const asset = String(account.asset).toUpperCase();
-  const networkConfig = NETWORKS[network];
-  if (!networkConfig) return;
-  const provider = providerFor(network);
-  const prepared = sourceAndTreasury(account, provider);
-  if (!prepared) return;
-  const { config, source, sourceAddress, treasury } = prepared;
-
-  const token = new Contract(tokenAddress, TRANSFER_ABI, source);
-  const balance = BigInt((await token.balanceOf(sourceAddress)).toString());
-  if (balance <= 0n) return;
-  const decimals = Number(await token.decimals());
-  const minimum = process.env.SWEEP_MIN_AMOUNT?.trim();
-  if (minimum) {
-    const minimumRaw = BigInt(Math.floor(Number(minimum) * 10 ** decimals));
-    if (balance < minimumRaw) return;
-  }
-
-  const data = token.interface.encodeFunctionData('transfer', [config.treasuryAddress, balance]);
-  const gasEstimate = await provider.estimateGas({ from: sourceAddress, to: tokenAddress, data });
-  const feeData = await provider.getFeeData();
-  const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
-  if (!gasPrice) throw new Error(`Unable to determine gas price for ${network}.`);
-  const requiredGas = gasEstimate * gasPrice;
-  const gasBuffer = requiredGas + requiredGas / 2n;
-  const sourceNative = await provider.getBalance(sourceAddress);
-  let gasTxHash: string | null = null;
-  let gasFunded = 0n;
-  if (sourceNative < gasBuffer) {
-    const amount = gasBuffer - sourceNative;
-    const treasuryNative = await provider.getBalance(treasury.address);
-    if (treasuryNative < amount) throw new Error(`Treasury lacks ${networkConfig.nativeAsset} for gas on ${sourceAddress}.`);
-    const gasTx = await treasury.sendTransaction({ to: sourceAddress, value: amount });
-    gasTxHash = gasTx.hash;
-    gasFunded = amount;
-    await gasTx.wait(1);
-  }
-
-  await recordSweep(account, asset, network, formatUnits(balance, decimals), gasFunded, gasTxHash, () => token.transfer(config.treasuryAddress, balance));
-}
-
-async function runSweepCycle() {
-  if (running || process.env.SWEEP_ENABLED !== 'true') return;
-  running = true;
-  try {
-    const configured = tokenMap();
-    const accounts = await supabase.from('wallet_accounts').select('id,user_id,asset,network,deposit_address,derivation_index,status').eq('chain_family', 'evm').eq('status', 'active').limit(MAX_ACCOUNTS);
-    if (accounts.error) throw new Error(accounts.error.message);
-
-    for (const account of accounts.data || []) {
-      try {
-        const network = String(account.network).toLowerCase();
-        const nativeAsset = NETWORKS[network]?.nativeAsset;
-        if (nativeAsset && String(account.asset).toUpperCase() === nativeAsset) {
-          await sweepNativeAccount(account);
-          continue;
-        }
-        const tokenAddress = configured[network]?.[String(account.asset).toUpperCase()];
-        if (tokenAddress) await sweepTokenAccount(account, tokenAddress);
-      } catch (error) {
-        console.error(`[sweep] ${account.asset}:${account.network} wallet=${account.id} failed:`, error instanceof Error ? error.message : error);
-      }
-    }
-  } catch (error) {
-    console.error('[sweep] cycle failed:', error instanceof Error ? error.message : error);
-  } finally {
-    running = false;
-  }
-}
-
-if (process.env.SWEEP_ENABLED === 'true') {
-  console.log(`[sweep] automatic EVM sweep worker enabled; interval=${INTERVAL_MS}ms maxAccounts=${MAX_ACCOUNTS}`);
-  void runSweepCycle();
-  setInterval(() => void runSweepCycle(), INTERVAL_MS);
-} else {
-  console.log('[sweep] automatic EVM sweep worker disabled (SWEEP_ENABLED is not true).');
-}
+function requireSweepConfig() { const xpriv=process.env.EVM_XPRIV?.trim(), treasuryKey=process.env.TREASURY_PRIVATE_KEY?.trim(), treasuryAddress=process.env.TREASURY_ADDRESS?.trim(); if(!xpriv||!treasuryKey||!treasuryAddress) throw new Error('Automatic sweep disabled: EVM_XPRIV, TREASURY_PRIVATE_KEY and TREASURY_ADDRESS are required.'); return {xpriv,treasuryKey,treasuryAddress:getAddress(treasuryAddress)}; }
+function providerFor(network:string) { const c=NETWORKS[network]; if(!c) throw new Error(`Unsupported network ${network}.`); const rpc=process.env[c.rpcEnv]?.trim(); if(!rpc) throw new Error(`${c.rpcEnv} is not configured.`); return new JsonRpcProvider(rpc,c.chainId); }
+function sourceAndTreasury(account:any, provider:JsonRpcProvider) { const config=requireSweepConfig(); if(account.status!=='active'||account.derivation_index===null||!account.deposit_address) return null; const source=HDNodeWallet.fromExtendedKey(config.xpriv).derivePath(`0/${Number(account.derivation_index)}`).connect(provider); const sourceAddress=getAddress(source.address); if(sourceAddress.toLowerCase()!==getAddress(account.deposit_address).toLowerCase()) throw new Error(`Derived signer mismatch for wallet ${account.id}.`); const treasury=new Wallet(config.treasuryKey,provider); if(getAddress(treasury.address).toLowerCase()!==config.treasuryAddress.toLowerCase()) throw new Error('TREASURY_PRIVATE_KEY does not match TREASURY_ADDRESS.'); return {config,source,sourceAddress,treasury}; }
+async function recordSweep(account:any,asset:string,network:string,amount:string,gasFunded:bigint,gasTxHash:string|null,send:()=>Promise<any>) { const sweep=await supabase.from('wallet_sweeps').insert({wallet_account_id:account.id,user_id:account.user_id,asset,network,amount,gas_funded_amount:formatUnits(gasFunded,18),gas_tx_hash:gasTxHash,status:'processing'}).select('id').single(); if(sweep.error) throw new Error(sweep.error.message); try { const tx=await send(); const receipt=await tx.wait(1); if(!receipt||receipt.status!==1) throw new Error('Sweep transaction failed.'); const updated=await supabase.from('wallet_sweeps').update({status:'completed',sweep_tx_hash:tx.hash,updated_at:new Date().toISOString()}).eq('id',sweep.data.id); if(updated.error) throw new Error(updated.error.message); console.log(`[sweep] ${asset} ${network} ${amount} from ${account.deposit_address} -> ${process.env.TREASURY_ADDRESS} tx=${tx.hash}`); } catch(error) { await supabase.from('wallet_sweeps').update({status:'failed',error_message:error instanceof Error?error.message:'Sweep failed',updated_at:new Date().toISOString()}).eq('id',sweep.data.id); throw error; } }
+async function sweepNativeAccount(account:any) { const network=String(account.network).toLowerCase(), nc=NETWORKS[network]; if(!nc||String(account.asset).toUpperCase()!==nc.nativeAsset) return; const provider=providerFor(network), p=sourceAndTreasury(account,provider); if(!p)return; const {config,source,sourceAddress,treasury}=p; const balance=await provider.getBalance(sourceAddress); if(balance<=0n)return; const feeData=await provider.getFeeData(), gasPrice=feeData.maxFeePerGas||feeData.gasPrice; if(!gasPrice)throw new Error(`Unable to determine gas price for ${network}.`); const gasLimit=21_000n, gasCost=gasLimit*gasPrice, gasBuffer=gasCost+gasCost/2n, treasuryNative=await provider.getBalance(treasury.address); if(treasuryNative<gasBuffer)throw new Error(`Treasury lacks ${nc.nativeAsset} for gas on ${sourceAddress}.`); const gasTx=await treasury.sendTransaction({to:sourceAddress,value:gasBuffer}); await gasTx.wait(1); await recordSweep(account,nc.nativeAsset,network,formatUnits(balance,18),gasBuffer,gasTx.hash,()=>source.sendTransaction({to:config.treasuryAddress,value:balance})); }
+async function sweepTokenAccount(account:any,tokenAddress:string) { const network=String(account.network).toLowerCase(),asset=String(account.asset).toUpperCase(),nc=NETWORKS[network]; if(!nc)return; const provider=providerFor(network),p=sourceAndTreasury(account,provider); if(!p)return; const {config,source,sourceAddress,treasury}=p; const token=new Contract(tokenAddress,TRANSFER_ABI,source),balance=BigInt((await token.balanceOf(sourceAddress)).toString()); if(balance<=0n)return; const decimals=Number(await token.decimals()),data=token.interface.encodeFunctionData('transfer',[config.treasuryAddress,balance]),gasEstimate=await provider.estimateGas({from:sourceAddress,to:tokenAddress,data}),feeData=await provider.getFeeData(),gasPrice=feeData.maxFeePerGas||feeData.gasPrice; if(!gasPrice)throw new Error(`Unable to determine gas price for ${network}.`); const requiredGas=gasEstimate*gasPrice,gasBuffer=requiredGas+requiredGas/2n,sourceNative=await provider.getBalance(sourceAddress); let gasTxHash:string|null=null,gasFunded=0n; if(sourceNative<gasBuffer){const amount=gasBuffer-sourceNative,treasuryNative=await provider.getBalance(treasury.address); if(treasuryNative<amount)throw new Error(`Treasury lacks ${nc.nativeAsset} for gas on ${sourceAddress}.`); const gasTx=await treasury.sendTransaction({to:sourceAddress,value:amount}); gasTxHash=gasTx.hash; gasFunded=amount; await gasTx.wait(1);} await recordSweep(account,asset,network,formatUnits(balance,decimals),gasFunded,gasTxHash,()=>token.transfer(config.treasuryAddress,balance)); }
+async function runSweepCycle(){ if(running||process.env.SWEEP_ENABLED!=='true')return; running=true; try{const configured=getConfiguredTokenContracts(),accounts=await supabase.from('wallet_accounts').select('id,user_id,asset,network,deposit_address,derivation_index,status').eq('chain_family','evm').eq('status','active').limit(MAX_ACCOUNTS); if(accounts.error)throw new Error(accounts.error.message); for(const account of accounts.data||[]){try{const network=String(account.network).toLowerCase(),native=NETWORKS[network]?.nativeAsset;if(native&&String(account.asset).toUpperCase()===native){await sweepNativeAccount(account);continue;}const tokenAddress=configured[network]?.[String(account.asset).toUpperCase()];if(tokenAddress)await sweepTokenAccount(account,tokenAddress);}catch(error){console.error(`[sweep] ${account.asset}:${account.network} wallet=${account.id} failed:`,error instanceof Error?error.message:error);}}}catch(error){console.error('[sweep] cycle failed:',error instanceof Error?error.message:error);}finally{running=false;} }
+if(process.env.SWEEP_ENABLED==='true'){console.log(`[sweep] automatic EVM sweep worker enabled; interval=${INTERVAL_MS}ms maxAccounts=${MAX_ACCOUNTS}`);void runSweepCycle();setInterval(()=>void runSweepCycle(),INTERVAL_MS);}else console.log('[sweep] automatic EVM sweep worker disabled (SWEEP_ENABLED is not true).');
