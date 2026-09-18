@@ -9,6 +9,7 @@ import {binanceSymbol,displayPair,formatPrice} from "../../lib/market-data";
 import {createSupabaseBrowserClient} from "../../lib/supabase-browser";
 import "./spot-mobile.css";
 import "./spot-pro.css";
+import "./spot-orderbook-width.css";
 
 type MarketItem={symbol:string;baseAsset:string;quoteAsset:string;marketCapRank:number;coinId?:string;logo?:string};
 function validPair(value:string|null){if(!value)return "BTC/USDT";const compact=value.toUpperCase().replace(/[^A-Z0-9]/g,"");if(!compact.endsWith("USDT"))return "BTC/USDT";const base=compact.slice(0,-4);return /^[A-Z0-9]{2,20}$/.test(base)?`${base}/USDT`:"BTC/USDT"}
@@ -27,7 +28,7 @@ export default function SpotPage(){
   const inputStyle={display:"block",width:"100%",boxSizing:"border-box" as const,marginTop:8,padding:"12px 14px",borderRadius:10,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:15,outline:"none"};const labelStyle={display:"block",color:"#a9b7ca",fontSize:12,fontWeight:600,marginBottom:14};
 
   return <main className="app-shell">
-    <header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></nav><Link className="btn" href="/dashboard">Account</Link></header>
+    <header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></Link></nav><Link className="btn" href="/dashboard">Account</Link></header>
     <div className="trade-layout spot-reference-layout">
       <SpotOrderBook pair={pair}/>
       <section className="chart-area">
