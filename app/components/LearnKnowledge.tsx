@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { WalletCards, ChartNoAxesCombined, ChartPie, X } from "lucide-react";
+import { WalletMinimal, ArrowDownToLine, CandlestickChart, ChartPie, X } from "lucide-react";
 
 const lessons = [
   { category: "Getting started", read: "3 min read", title: "Your first crypto deposit", description: "Choose your asset, check the network and follow your transfer from wallet to exchange.", icon: "deposit", subtitle: "A network check makes all the difference.", steps: [["Choose an asset", "Select the asset you want to deposit."], ["Match the network", "The sending and receiving networks must match. Check whether a memo or tag is required."], ["Review and send", "Verify the address and any minimum deposit. A small test transfer can help you check the route."], ["Follow confirmations", "Your deposit becomes available after the required network confirmations."]] },
@@ -9,11 +9,11 @@ const lessons = [
   { category: "Know your assets", read: "3 min read", title: "See the whole portfolio", description: "Follow your balances and allocation with a clearer view of where your assets sit.", icon: "portfolio", subtitle: "Balances are only part of the picture.", steps: [["Balances", "Track what you hold in each account."], ["Allocation", "See the share of each asset in your portfolio."], ["Activity", "Review transfers, deposits and completed trades in context."]] }
 ] as const;
 
-function LessonIcon({ type, size = 42 }: { type: string; size?: number }) {
-  const props = { size, strokeWidth: 1.8, 'aria-hidden': true as const };
-  if (type === "chart") return <ChartNoAxesCombined {...props} />;
+function LessonIcon({ type, size = 34 }: { type: string; size?: number }) {
+  const props = { size, strokeWidth: 1.9, 'aria-hidden': true as const };
+  if (type === "chart") return <CandlestickChart {...props} />;
   if (type === "portfolio") return <ChartPie {...props} />;
-  return <WalletCards {...props} />;
+  return <span className="deposit-icon"><WalletMinimal {...props} /><ArrowDownToLine className="deposit-arrow" size={15} strokeWidth={2.3} aria-hidden="true" /></span>;
 }
 
 export default function LearnKnowledge() {
@@ -69,7 +69,7 @@ export default function LearnKnowledge() {
         .knowledge-heading{text-align:center;max-width:900px;margin:0 auto 24px}.knowledge-heading h2{font-size:44px;line-height:1.08;letter-spacing:-1.6px;margin:8px 0 12px}.knowledge-heading h2 span{color:#60a5fa}.knowledge-heading p{margin:0;color:#9ca8b8;font-size:15px;line-height:1.45}
         .knowledge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}.knowledge-card{height:286px;background:#0b1420;border:1px solid #24405f;border-radius:14px;overflow:hidden;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;min-width:0}.knowledge-card:hover{transform:translateY(-3px);border-color:#3179c7;box-shadow:0 18px 45px rgba(0,0,0,.18)}
         .knowledge-card-button{width:100%;height:100%;padding:18px 20px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:flex-start}
-        .knowledge-icon-wrap{width:56px;height:56px;border-radius:14px;background:#102846;border:1px solid #24548c;display:flex;align-items:center;justify-content:center;color:#60a5fa;margin-bottom:13px;box-shadow:0 0 20px rgba(37,99,235,.12);flex-shrink:0}.knowledge-icon-wrap svg{filter:drop-shadow(0 0 8px rgba(96,165,250,.16))}
+        .knowledge-icon-wrap{width:58px;height:58px;border-radius:15px;background:linear-gradient(145deg,#14345a,#0d2038);border:1px solid #2d6cad;display:flex;align-items:center;justify-content:center;color:#69adff;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(37,99,235,.14);flex-shrink:0;position:relative}.knowledge-icon-wrap:after{content:"";position:absolute;inset:5px;border-radius:11px;border:1px solid rgba(96,165,250,.08);pointer-events:none}.knowledge-icon-wrap svg{filter:drop-shadow(0 0 7px rgba(96,165,250,.22))}.deposit-icon{display:flex;align-items:center;justify-content:center;position:relative;width:36px;height:36px}.deposit-icon .deposit-arrow{position:absolute;left:11px;top:13px}
         .knowledge-meta{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:11px}.knowledge-meta span{color:#60a5fa}.knowledge-meta i{font-style:normal;color:#53657c}.knowledge-meta small{color:#8391a4}
         .knowledge-card h3{font-size:21px;line-height:1.18;margin:0 0 8px;letter-spacing:-.35px;color:#f5f8fc}.knowledge-card p{color:#a8b6c8;font-size:13px;line-height:1.45;margin:0;max-width:360px}.knowledge-read{display:block;color:#f1f5f9;font-size:12px;margin-top:auto;padding-top:10px;font-weight:600}.knowledge-read b{color:#60a5fa;margin-left:7px;font-size:16px;font-weight:400}
         .knowledge-modal-backdrop{position:fixed;inset:0;background:rgba(1,5,10,.78);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:12px;z-index:100;overflow:hidden}
