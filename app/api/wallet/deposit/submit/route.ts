@@ -10,6 +10,8 @@ const walletServiceUrl = process.env.WALLET_SERVICE_URL;
 const walletServiceKey =
   process.env.WALLET_SERVICE_API_KEY || process.env.ADMIN_API_KEY;
 
+const ENABLED_VERIFICATION_ROUTES = new Set(["USDT:bsc"]);
+
 export async function POST(request: NextRequest) {
   const missing: string[] = [];
   if (!supabaseUrl) missing.push("SUPABASE_URL");
@@ -19,10 +21,7 @@ export async function POST(request: NextRequest) {
 
   if (missing.length > 0) {
     return NextResponse.json(
-      {
-        error: "Wallet verification is not configured.",
-        missing,
-      },
+      { error: "Wallet verification is not configured.", missing },
       { status: 503 },
     );
   }
@@ -44,6 +43,16 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const amount = Number(body?.amount);
   const txHash = String(body?.txHash || "").trim().toLowerCase();
+  const asset = String(body?.asset || "").trim().toUpperCase();
+  const network = String(body?.network || "").trim().toLowerCase();
+
+  if (!asset || !network || !ENABLED_VERIFICATION_ROUTES.has(`${asset}:${network}`)) {
+    return NextResponse.json(
+      { error: "Automatic verification is not enabled for this asset/network yet." },
+      { status: 400 },
+    );
+  }
+
   if (!Number.isFinite(amount) || amount <= 0 || !/^0x[a-f0-9]{64}$/.test(txHash)) {
     return NextResponse.json(
       { error: "Enter a valid amount and transaction hash." },
@@ -51,18 +60,35 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/verify-deposit`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-wallet-service-key": walletServiceKey,
-    },
-    body: JSON.stringify({ userId: data.user.id, amount, txHash }),
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/verify-deposit`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-wallet-service-key": walletServiceKey,
+      },
+      body: JSON.stringify({
+        userId: data.user.id,
+        amount,
+        txHash,
+        asset,
+        network,
+      }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(15000),
+    });
 
-  const result = await response
-    .json()
-    .catch(() => ({ error: "Wallet service returned an invalid response." }));
-  return NextResponse.json(result, { status: response.status });
+    const result = await response
+      .json()
+      .catch(() => ({ error: "Wallet service returned an invalid response." }));
+    return NextResponse.json(result, { status: response.status });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Wallet service connection failed.",
+        details: error instanceof Error ? error.message : "Unknown fetch error.",
+      },
+      { status: 502 },
+    );
+  }
 }
