@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { Contract, HDNodeWallet, JsonRpcProvider, Wallet, getAddress, formatUnits } from 'ethers';
 import './index.js';
+import { getConfiguredTokenContracts } from './token-contracts.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -43,13 +44,7 @@ function requireSweepConfig() {
 }
 
 function tokenMap(): Record<string, Record<string, string>> {
-  const raw = process.env.EVM_TOKEN_CONTRACTS_JSON?.trim();
-  if (!raw) return {};
-  const parsed = JSON.parse(raw) as Record<string, Record<string, string>>;
-  for (const [network, assets] of Object.entries(parsed)) {
-    for (const [asset, address] of Object.entries(assets || {})) parsed[network][asset] = getAddress(address);
-  }
-  return parsed;
+  return getConfiguredTokenContracts();
 }
 
 function providerFor(network: string) {
