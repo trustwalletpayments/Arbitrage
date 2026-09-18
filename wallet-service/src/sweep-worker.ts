@@ -1,0 +1,204 @@
+import 'dotenv/config';
+import { createClient } from '@supabase/supabase-js';
+import { Contract, HDNodeWallet, JsonRpcProvider, Wallet, getAddress, formatUnits } from 'ethers';
+import './index.js';
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false, autoRefreshToken: false } },
+);
+
+const NETWORKS: Record<string, { rpcEnv: string; chainId: number; nativeAsset: string }> = {
+  ethereum: { rpcEnv: 'ETHEREUM_RPC_URL', chainId: 1, nativeAsset: 'ETH' },
+  bsc: { rpcEnv: 'BSC_RPC_URL', chainId: 56, nativeAsset: 'BNB' },
+  polygon: { rpcEnv: 'POLYGON_RPC_URL', chainId: 137, nativeAsset: 'POL' },
+  arbitrum: { rpcEnv: 'ARBITRUM_RPC_URL', chainId: 42161, nativeAsset: 'ETH' },
+  optimism: { rpcEnv: 'OPTIMISM_RPC_URL', chainId: 10, nativeAsset: 'ETH' },
+  base: { rpcEnv: 'BASE_RPC_URL', chainId: 8453, nativeAsset: 'ETH' },
+  avalanche: { rpcEnv: 'AVALANCHE_RPC_URL', chainId: 43114, nativeAsset: 'AVAX' },
+  fantom: { rpcEnv: 'FANTOM_RPC_URL', chainId: 250, nativeAsset: 'FTM' },
+  cronos: { rpcEnv: 'CRONOS_RPC_URL', chainId: 25, nativeAsset: 'CRO' },
+  linea: { rpcEnv: 'LINEA_RPC_URL', chainId: 59144, nativeAsset: 'ETH' },
+};
+
+const INTERVAL_MS = Math.max(10_000, Number(process.env.SWEEP_INTERVAL_MS || 30_000));
+const MAX_ACCOUNTS = Math.max(1, Number(process.env.SWEEP_MAX_ACCOUNTS_PER_RUN || 50));
+const GAS_BUFFER_MULTIPLIER = 1.5;
+const TRANSFER_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function transfer(address to,uint256 amount) returns (bool)',
+];
+
+let running = false;
+
+function requireSweepConfig() {
+  const xpriv = process.env.EVM_XPRIV?.trim();
+  const treasuryKey = process.env.TREASURY_PRIVATE_KEY?.trim();
+  const treasuryAddress = process.env.TREASURY_ADDRESS?.trim();
+  if (!xpriv || !treasuryKey || !treasuryAddress) {
+    throw new Error('Automatic sweep disabled: EVM_XPRIV, TREASURY_PRIVATE_KEY and TREASURY_ADDRESS are required.');
+  }
+  return { xpriv, treasuryKey, treasuryAddress: getAddress(treasuryAddress) };
+}
+
+function tokenMap(): Record<string, Record<string, string>> {
+  const raw = process.env.EVM_TOKEN_CONTRACTS_JSON?.trim();
+  if (!raw) return {};
+  const parsed = JSON.parse(raw) as Record<string, Record<string, string>>;
+  for (const [network, assets] of Object.entries(parsed)) {
+    for (const [asset, address] of Object.entries(assets || {})) {
+      parsed[network][asset] = getAddress(address);
+    }
+  }
+  return parsed;
+}
+
+function providerFor(network: string) {
+  const config = NETWORKS[network];
+  if (!config) throw new Error(`Unsupported network ${network}.`);
+  const rpc = process.env[config.rpcEnv]?.trim();
+  if (!rpc) throw new Error(`${config.rpcEnv} is not configured.`);
+  return new JsonRpcProvider(rpc, config.chainId);
+}
+
+async function sweepAccount(account: any, tokenAddress: string) {
+  const config = requireSweepConfig();
+  const network = String(account.network).toLowerCase();
+  const asset = String(account.asset).toUpperCase();
+  const networkConfig = NETWORKS[network];
+  if (!networkConfig) return;
+  if (account.status !== 'active' || account.derivation_index === null || !account.deposit_address) return;
+
+  const provider = providerFor(network);
+  const source = HDNodeWallet.fromExtendedKey(config.xpriv)
+    .derivePath(`0/${Number(account.derivation_index)}`)
+    .connect(provider);
+  const sourceAddress = getAddress(source.address);
+  if (sourceAddress.toLowerCase() !== getAddress(account.deposit_address).toLowerCase()) {
+    throw new Error(`Derived signer mismatch for wallet ${account.id}.`);
+  }
+
+  const treasury = new Wallet(config.treasuryKey, provider);
+  if (getAddress(treasury.address).toLowerCase() !== config.treasuryAddress.toLowerCase()) {
+    throw new Error('TREASURY_PRIVATE_KEY does not match TREASURY_ADDRESS.');
+  }
+
+  const token = new Contract(tokenAddress, TRANSFER_ABI, source);
+  const balance = BigInt((await token.balanceOf(sourceAddress)).toString());
+  if (balance <= 0n) return;
+
+  const decimals = Number(await token.decimals());
+  const minimum = process.env.SWEEP_MIN_AMOUNT?.trim();
+  if (minimum) {
+    const minimumRaw = BigInt(Math.floor(Number(minimum) * 10 ** decimals));
+    if (balance < minimumRaw) return;
+  }
+
+  const data = token.interface.encodeFunctionData('transfer', [config.treasuryAddress, balance]);
+  const gasEstimate = await provider.estimateGas({
+    from: sourceAddress,
+    to: tokenAddress,
+    data,
+  });
+  const feeData = await provider.getFeeData();
+  const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
+  if (!gasPrice) throw new Error(`Unable to determine gas price for ${network}.`);
+
+  const requiredGas = gasEstimate * gasPrice;
+  const gasBuffer = requiredGas + requiredGas / 2n;
+  const sourceNative = await provider.getBalance(sourceAddress);
+  let gasTxHash: string | null = null;
+  let gasFunded = 0n;
+
+  if (sourceNative < gasBuffer) {
+    const amount = gasBuffer - sourceNative;
+    const treasuryNative = await provider.getBalance(treasury.address);
+    if (treasuryNative < amount) {
+      throw new Error(`Treasury lacks ${networkConfig.nativeAsset} for gas on ${sourceAddress}.`);
+    }
+    const gasTx = await treasury.sendTransaction({ to: sourceAddress, value: amount });
+    gasTxHash = gasTx.hash;
+    gasFunded = amount;
+    await gasTx.wait(1);
+  }
+
+  const sweep = await supabase.from('wallet_sweeps').insert({
+    wallet_account_id: account.id,
+    user_id: account.user_id,
+    asset,
+    network,
+    amount: formatUnits(balance, decimals),
+    gas_funded_amount: formatUnits(gasFunded, 18),
+    gas_tx_hash: gasTxHash,
+    status: 'processing',
+  }).select('id').single();
+  if (sweep.error) throw new Error(sweep.error.message);
+
+  try {
+    const tx = await token.transfer(config.treasuryAddress, balance);
+    const receipt = await tx.wait(1);
+    if (!receipt || receipt.status !== 1) throw new Error('Token sweep transaction failed.');
+    const updated = await supabase.from('wallet_sweeps').update({
+      status: 'completed',
+      sweep_tx_hash: tx.hash,
+      updated_at: new Date().toISOString(),
+    }).eq('id', sweep.data.id);
+    if (updated.error) throw new Error(updated.error.message);
+    console.log(`[sweep] ${asset} ${network} ${formatUnits(balance, decimals)} from ${sourceAddress} -> ${config.treasuryAddress} tx=${tx.hash}`);
+  } catch (error) {
+    await supabase.from('wallet_sweeps').update({
+      status: 'failed',
+      error_message: error instanceof Error ? error.message : 'Sweep failed',
+      updated_at: new Date().toISOString(),
+    }).eq('id', sweep.data.id);
+    throw error;
+  }
+}
+
+async function runSweepCycle() {
+  if (running || process.env.SWEEP_ENABLED !== 'true') return;
+  running = true;
+  try {
+    const configured = tokenMap();
+    const pairs = new Map<string, string>();
+    for (const [network, assets] of Object.entries(configured)) {
+      for (const [asset, address] of Object.entries(assets)) {
+        pairs.set(`${network}:${asset.toUpperCase()}`, address);
+      }
+    }
+    if (pairs.size === 0) return;
+
+    const accounts = await supabase
+      .from('wallet_accounts')
+      .select('id,user_id,asset,network,deposit_address,derivation_index,status')
+      .eq('chain_family', 'evm')
+      .eq('status', 'active')
+      .limit(MAX_ACCOUNTS);
+    if (accounts.error) throw new Error(accounts.error.message);
+
+    for (const account of accounts.data || []) {
+      const key = `${String(account.network).toLowerCase()}:${String(account.asset).toUpperCase()}`;
+      const tokenAddress = pairs.get(key);
+      if (!tokenAddress) continue;
+      try {
+        await sweepAccount(account, tokenAddress);
+      } catch (error) {
+        console.error(`[sweep] ${key} wallet=${account.id} failed:`, error instanceof Error ? error.message : error);
+      }
+    }
+  } catch (error) {
+    console.error('[sweep] cycle failed:', error instanceof Error ? error.message : error);
+  } finally {
+    running = false;
+  }
+}
+
+if (process.env.SWEEP_ENABLED === 'true') {
+  console.log(`[sweep] automatic token sweep worker enabled; interval=${INTERVAL_MS}ms maxAccounts=${MAX_ACCOUNTS}`);
+  void runSweepCycle();
+  setInterval(() => void runSweepCycle(), INTERVAL_MS);
+} else {
+  console.log('[sweep] automatic token sweep worker disabled (SWEEP_ENABLED is not true).');
+}
