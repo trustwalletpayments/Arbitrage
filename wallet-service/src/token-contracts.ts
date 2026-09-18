@@ -1,10 +1,5 @@
 import { getAddress } from 'ethers';
 
-// Public, network-specific USDT deployments. These are defaults so the
-// wallet service can expose the supported EVM deposit routes without
-// requiring the same public contract map to be copied into every environment.
-// Base is intentionally omitted: the service should not label a third-party
-// or USDT0 deployment as legacy USDT until the product explicitly supports it.
 export const DEFAULT_EVM_TOKEN_CONTRACTS: Record<string, Record<string, string>> = {
   ethereum: { USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
   bsc: { USDT: '0x55d398326f99059fF775485246999027B3197955' },
@@ -23,16 +18,29 @@ export function getConfiguredTokenContracts(): Record<string, Record<string, str
   );
   const raw = process.env.EVM_TOKEN_CONTRACTS_JSON?.trim();
   if (!raw) return merged;
-  const configured = JSON.parse(raw) as Record<string, Record<string, string>>;
-  for (const [network, assets] of Object.entries(configured)) {
-    merged[network] = { ...(merged[network] || {}), ...(assets || {}) };
-  }
-  for (const [network, assets] of Object.entries(merged)) {
-    for (const [asset, address] of Object.entries(assets)) assets[asset] = getAddress(address);
+  try {
+    const configured = JSON.parse(raw) as Record<string, Record<string, string>>;
+    for (const [network, assets] of Object.entries(configured)) {
+      merged[network] = { ...(merged[network] || {}), ...(assets || {}) };
+    }
+    for (const [network, assets] of Object.entries(merged)) {
+      for (const [asset, address] of Object.entries(assets)) {
+        if (!address) delete assets[asset];
+        else assets[asset] = getAddress(address);
+      }
+    }
+  } catch {
+    throw new Error('EVM_TOKEN_CONTRACTS_JSON is not valid JSON.');
   }
   return merged;
 }
 
 export function getConfiguredTokenContract(network: string, asset: string): string | null {
   return getConfiguredTokenContracts()[network]?.[asset] || null;
+}
+
+export function getConfiguredEvmTokenAssets(network?: string): string[] {
+  const contracts = getConfiguredTokenContracts();
+  const networks = network ? [network] : Object.keys(contracts);
+  return [...new Set(networks.flatMap((name) => Object.keys(contracts[name] || {})))].sort();
 }
