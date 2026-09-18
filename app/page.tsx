@@ -56,7 +56,40 @@ export default function Home() {
 
       <section className="orbitex-security redesign-security" id="security"><div><div className="orbitex-eyebrow">SECURITY FIRST</div><h2>Built with control at every layer.</h2><p>Account balances, trading activity and privileged wallet operations are designed around server-side controls, audit trails and risk management.</p></div></section>
 
-      <footer className="orbitex-footer redesign-footer premium-footer"><div className="footer-main"><div className="footer-brand-block"><Link href="/" className="footer-brand"><img src="/orbitex-logo.svg" alt="ORBITEX" /><b>ORBITEX</b></Link><p>Trade Crypto. Without Limits.</p><div className="footer-socials"><a href="#" aria-label="Telegram"><Send /></a><a href="#" aria-label="X"><Globe2 /></a><a href="#" aria-label="Instagram"><Camera /></a><a href="#" aria-label="YouTube"><PlayCircle /></a><a href="#" aria-label="Community"><MessageCircle /></a><a href="#" aria-label="Community members"><Users /></a></div></div><div className="footer-links">{footerGroups.map(({ title, icon: Icon, links }) => <details key={title} className="footer-group"><summary><span><Icon /> {title}</span><ChevronDown /></summary><div>{links.map(([label, href]) => <a href={href} key={label}>{label}</a>)}</div></details>)}</div></div><div className="footer-preferences"><button><Languages /> English (India)<ChevronDown /></button><button><DollarSign /> USD<ChevronDown /></button><button><Moon /> Theme <span className="theme-switch"><i /></span></button></div><div className="footer-legal"><p>Risk Warning: Digital asset prices can be volatile. The value of your assets can go up or down, and you may lose some or all of your investment. Trade only with funds you can afford to lose.</p><div><span>© 2026 ORBITEX</span><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookie Preferences</a></div></div></footer>
+      <footer className="orbitex-footer redesign-footer orbitex-example-footer">
+        <style jsx global>{`
+          .orbitex-example-footer{max-width:100%;margin:0;background:#0d1117;color:#f4f7fb;padding:72px clamp(48px,6vw,92px) 30px;border-top:1px solid #202b39}
+          .orbitex-example-footer .example-footer-top{display:flex;align-items:center;gap:34px;margin-bottom:64px}
+          .orbitex-example-footer .example-footer-brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;flex:0 0 auto}
+          .orbitex-example-footer .example-footer-brand img{width:52px;height:52px;object-fit:contain}
+          .orbitex-example-footer .example-footer-brand b{font-size:30px;letter-spacing:-.8px;color:#fff}
+          .orbitex-example-footer .example-footer-line{height:1px;background:#28313d;flex:1}
+          .orbitex-example-footer .example-footer-mark{width:54px;height:54px;border-radius:50%;background:#f5f6f8;display:grid;place-items:center;flex:0 0 auto;color:#111}
+          .orbitex-example-footer .example-footer-mark svg{width:28px;height:28px}
+          .orbitex-example-footer .example-footer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:48px;padding-bottom:76px}
+          .orbitex-example-footer .example-footer-col h3{font-size:18px;margin:0 0 28px;color:#fff;font-weight:700}
+          .orbitex-example-footer .example-footer-col a{display:block;text-decoration:none;color:#8e9bad;font-size:16px;margin:0 0 22px;transition:color .15s ease}
+          .orbitex-example-footer .example-footer-col a:hover{color:#fff}
+          .orbitex-example-footer .example-footer-bottom{border-top:1px solid #202a37;padding-top:24px;display:flex;justify-content:space-between;align-items:center;gap:24px;color:#718096;font-size:12px}
+          .orbitex-example-footer .example-footer-legal{display:flex;gap:26px;flex-wrap:wrap}
+          .orbitex-example-footer .example-footer-legal a{color:#718096;text-decoration:none}
+          .orbitex-example-footer .example-footer-legal a:hover{color:#fff}
+          @media(max-width:900px){.orbitex-example-footer{padding:56px 28px 26px}.orbitex-example-footer .example-footer-grid{grid-template-columns:repeat(2,1fr);gap:40px}.orbitex-example-footer .example-footer-top{margin-bottom:48px}}
+          @media(max-width:560px){.orbitex-example-footer .example-footer-top{gap:14px}.orbitex-example-footer .example-footer-brand img{width:40px;height:40px}.orbitex-example-footer .example-footer-brand b{font-size:24px}.orbitex-example-footer .example-footer-mark{width:44px;height:44px}.orbitex-example-footer .example-footer-grid{grid-template-columns:1fr;gap:30px;padding-bottom:45px}.orbitex-example-footer .example-footer-col h3{margin-bottom:18px}.orbitex-example-footer .example-footer-col a{margin-bottom:14px}.orbitex-example-footer .example-footer-bottom{align-items:flex-start;flex-direction:column}}
+        `}</style>
+        <div className="example-footer-top">
+          <Link href="/" className="example-footer-brand"><img src="/orbitex-logo.svg" alt="ORBITEX" /><b>ORBITEX</b></Link>
+          <div className="example-footer-line" />
+          <div className="example-footer-mark" aria-hidden="true"><MessageCircle /></div>
+        </div>
+        <div className="example-footer-grid">
+          <div className="example-footer-col"><h3>About Us</h3><Link href="/fees">Fees</Link><Link href="/network-status">Network Status</Link><Link href="/cookie-policy">Cookie Policy</Link></div>
+          <div className="example-footer-col"><h3>Products</h3><Link href="/markets">Markets</Link><Link href="/trade">Spot</Link><Link href="/swap">Swap</Link><Link href="/lending">Crypto Lending</Link><Link href="/referral">Referral Program</Link></div>
+          <div className="example-footer-col"><h3>Tools</h3><Link href="/cross-rates">Cross Rates</Link><Link href="/heat-map">Heat Map</Link><Link href="/market-cap">Market Cap</Link><Link href="/market-screener">Market Screener</Link><Link href="/technical-analysis">Technical Analysis</Link></div>
+          <div className="example-footer-col"><h3>Legal &amp; Disclosures</h3><Link href="/user-agreement">User Agreement</Link><Link href="/privacy">Privacy Policy</Link><Link href="/compliance">Compliance</Link></div>
+        </div>
+        <div className="example-footer-bottom"><span>© 2026 ORBITEX</span><div className="example-footer-legal"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/cookie-policy">Cookie Preferences</Link></div></div>
+      </footer>
     </main>
   );
 }
