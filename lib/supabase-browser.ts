@@ -17,6 +17,7 @@ export function createSupabaseBrowserClient() {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      flowType: "pkce",
       storageKey: "orbitex-auth",
     },
   });
