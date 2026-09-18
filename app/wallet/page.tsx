@@ -14,7 +14,6 @@ type Transaction = { id: string; created_at: string; amount: number; status: str
 const formatAmount = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 8 });
 
 export default function WalletPage() {
-  const supabase = createSupabaseBrowserClient();
   const [hidden, setHidden] = useState(false);
   const [account, setAccount] = useState<WalletAccount | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -25,6 +24,7 @@ export default function WalletPage() {
 
   useEffect(() => {
     let mounted = true;
+    const supabase = createSupabaseBrowserClient();
     const loadWallet = async () => {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -49,7 +49,7 @@ export default function WalletPage() {
     };
     loadWallet();
     return () => { mounted = false; };
-  }, [supabase]);
+  }, []);
 
   const filteredTransactions = useMemo(() => transactions.filter((item) => fundingTab === "all" || (fundingTab === "deposits" && item.type === "Deposit") || (fundingTab === "withdrawals" && item.type === "Withdrawal")), [transactions, fundingTab]);
   const copyAddress = async () => {
