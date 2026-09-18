@@ -36,8 +36,8 @@ export type CustodyChainDefinition = {
 };
 
 /**
- * Non-EVM chains shown by the Orbitex deposit selector.  These definitions
- * are intentionally additive: the existing EVM network registry remains the
+ * Non-EVM chains shown by the Orbitex deposit selector. These definitions are
+ * intentionally additive: the existing EVM network registry remains the
  * source of truth for EVM custody and sweeping.
  */
 export const NON_EVM_CUSTODY_CHAINS: CustodyChainDefinition[] = [
@@ -46,11 +46,11 @@ export const NON_EVM_CUSTODY_CHAINS: CustodyChainDefinition[] = [
     name: 'Bitcoin',
     family: 'bitcoin',
     nativeAsset: 'BTC',
-    rpcEnv: 'BTC_RPC_URL',
-    explorerEnv: 'BTC_EXPLORER_URL',
-    masterKeyEnv: 'BTC_XPRV',
-    derivationPath: "m/84'/0'/0'/0/{index}",
-    status: 'adapter-pending',
+    rpcEnv: 'BITCOIN_RPC_URL',
+    explorerEnv: 'BITCOIN_EXPLORER_URL',
+    masterKeyEnv: 'BITCOIN_XPRV',
+    derivationPath: "m/0/{index}",
+    status: 'adapter-ready',
   },
   {
     id: 'solana',
