@@ -1,12 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { WalletMinimal, ArrowDownToLine, CandlestickChart, ChartPie, X } from "lucide-react";
+import { WalletMinimal, ArrowDownToLine, CandlestickChart, ChartPie, X, ChevronDown } from "lucide-react";
 
 const lessons = [
   { category: "Getting started", read: "3 min read", title: "Your first crypto deposit", description: "Choose your asset, check the network and follow your transfer from wallet to exchange.", icon: "deposit", subtitle: "A network check makes all the difference.", steps: [["Choose an asset", "Select the asset you want to deposit."], ["Match the network", "The sending and receiving networks must match. Check whether a memo or tag is required."], ["Review and send", "Verify the address and any minimum deposit. A small test transfer can help you check the route."], ["Follow confirmations", "Your deposit becomes available after the required network confirmations."]] },
   { category: "Trading basics", read: "4 min read", title: "Market or limit order?", description: "Understand the difference between trading at the market and setting your own price.", icon: "chart", subtitle: "Two different ways to enter the market.", steps: [["Market", "An order seeks execution at available prices. The final price may change with liquidity and market movement."], ["Limit", "You specify a price. An order can execute at that price or better, but may remain unfilled."], ["Review", "Check the asset, amount and estimated value. Consider fees and price movement before you confirm."]] },
   { category: "Know your assets", read: "3 min read", title: "See the whole portfolio", description: "Follow your balances and allocation with a clearer view of where your assets sit.", icon: "portfolio", subtitle: "Balances are only part of the picture.", steps: [["Balances", "Track what you hold in each account."], ["Allocation", "See the share of each asset in your portfolio."], ["Activity", "Review transfers, deposits and completed trades in context."]] }
+] as const;
+
+const faqs = [
+  ["What is crypto arbitrage?", "Crypto arbitrage is the practice of identifying price differences for the same asset across markets and attempting to capture the difference, after considering fees, liquidity and transfer costs."],
+  ["How does ORBITEX arbitrage work?", "ORBITEX is being built around arbitrage-focused market tools that help users compare prices and identify potential opportunities across supported markets."],
+  ["Are arbitrage opportunities guaranteed?", "No. Price differences can disappear quickly, and fees, slippage, liquidity, transfer delays or market movement can affect the result. An opportunity shown on screen is not a guaranteed profit."],
+  ["What fees should I consider?", "Consider trading fees, withdrawal or network fees, spread, slippage and any other applicable costs before acting on an arbitrage opportunity."],
+  ["Do I need to transfer funds between platforms?", "That depends on the arbitrage setup. Some strategies require transfers while others can use balances already available in different markets. Always verify the supported workflow and network before sending assets."],
+  ["Which networks and assets are supported?", "Supported assets, markets and networks can change. Always check the current ORBITEX interface before depositing or transferring funds, and make sure the sending and receiving networks match."]
 ] as const;
 
 function LessonIcon({ type, size = 34 }: { type: string; size?: number }) {
@@ -18,6 +27,7 @@ function LessonIcon({ type, size = 34 }: { type: string; size?: number }) {
 
 export default function LearnKnowledge() {
   const [open, setOpen] = useState<number | null>(null);
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   return (
     <>
@@ -62,6 +72,24 @@ export default function LearnKnowledge() {
         )}
       </section>
 
+      <section className="orbitex-faq-section" id="faq">
+        <div className="faq-heading">
+          <div className="orbitex-eyebrow">FREQUENTLY ASKED QUESTIONS</div>
+          <h2>Questions about <span>arbitrage?</span></h2>
+          <p>Clear answers to the essentials before you start exploring arbitrage markets.</p>
+        </div>
+        <div className="faq-list">
+          {faqs.map(([question, answer], index) => (
+            <div className={`faq-item${faqOpen === index ? " is-open" : ""}`} key={question}>
+              <button className="faq-question" onClick={() => setFaqOpen(faqOpen === index ? null : index)} aria-expanded={faqOpen === index}>
+                <span>{question}</span><ChevronDown aria-hidden="true" />
+              </button>
+              {faqOpen === index && <div className="faq-answer"><p>{answer}</p></div>}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <style jsx global>{`
         *{box-sizing:border-box}
         .knowledge-section{width:100%;max-width:1160px;margin:0 auto;padding:46px 20px 52px;position:relative}
@@ -74,8 +102,9 @@ export default function LearnKnowledge() {
         .knowledge-modal{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);background:#10151c;border:1px solid #263b54;border-radius:13px;padding:18px 22px 14px;box-shadow:0 30px 100px rgba(0,0,0,.55);position:relative;overflow:hidden}
         .knowledge-close{position:absolute;right:12px;top:12px;background:none;border:0;color:#aeb9c8;cursor:pointer;padding:4px}.knowledge-close svg{width:20px;height:20px}.knowledge-modal-icon{width:44px;height:44px;border-radius:11px;background:#122b49;border:1px solid #2860a0;display:grid;place-items:center;color:#60a5fa;margin-bottom:8px}
         .knowledge-modal h3{font-size:25px;line-height:1.12;letter-spacing:-.65px;margin:0 0 3px;color:#f5f8fc}.knowledge-modal-subtitle{color:#aeb9c8;font-size:12px;margin:0 0 8px;line-height:1.3}.knowledge-steps{display:flex;flex-direction:column;gap:0;border-top:1px solid #202c3a}.knowledge-step{display:grid;grid-template-columns:30px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #202c3a}.knowledge-step>strong{color:#60a5fa;font-size:11px}.knowledge-step b{font-size:12px;line-height:1.15;color:#f5f8fc}.knowledge-step p{color:#aeb9c8;line-height:1.22;margin:2px 0 0;font-size:10.5px}.knowledge-got-it{width:100%;height:38px;border:0;border-radius:7px;background:#2563eb;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
-        @media(max-width:900px){.knowledge-section{padding:40px 16px 46px}.knowledge-heading h2{font-size:38px}.knowledge-grid{grid-template-columns:1fr;max-width:520px;margin:auto}.knowledge-card{height:210px}.knowledge-card-button{padding:20px 19px}.knowledge-modal{width:min(540px,calc(100vw - 20px));padding:16px 18px 12px}}
-        @media(max-width:520px){.knowledge-heading h2{font-size:31px;letter-spacing:-1px}.knowledge-heading p{font-size:14px}.knowledge-card{height:200px}.knowledge-card-button{padding:18px 17px}.knowledge-card h3{font-size:19px}.knowledge-card p{font-size:13px}.knowledge-modal-backdrop{padding:8px}.knowledge-modal{width:calc(100vw - 16px);max-height:calc(100vh - 16px);padding:14px 14px 10px;border-radius:11px}.knowledge-modal-icon{width:40px;height:40px}.knowledge-modal h3{font-size:21px}.knowledge-modal-subtitle{font-size:11.5px;margin-bottom:7px}.knowledge-step{grid-template-columns:27px 1fr;padding:6px 0}.knowledge-step b{font-size:11.5px}.knowledge-step p{font-size:10px;line-height:1.2}.knowledge-got-it{height:36px;margin-top:7px;font-size:12.5px}}
+        .orbitex-faq-section{width:100%;max-width:1160px;margin:0 auto;padding:12px 20px 64px}.faq-heading{text-align:center;max-width:760px;margin:0 auto 24px}.faq-heading h2{font-size:38px;line-height:1.1;letter-spacing:-1.3px;margin:8px 0 10px;color:#f5f8fc}.faq-heading h2 span{color:#60a5fa}.faq-heading p{margin:0;color:#9ca8b8;font-size:14px;line-height:1.5}.faq-list{max-width:900px;margin:0 auto;border-top:1px solid #1d2a3a}.faq-item{border-bottom:1px solid #1d2a3a}.faq-question{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:19px 4px;background:none;border:0;color:#f3f6fb;text-align:left;font:inherit;font-size:15px;font-weight:600;cursor:pointer}.faq-question svg{width:18px;height:18px;color:#60a5fa;flex:0 0 auto;transition:transform .2s ease}.faq-item.is-open .faq-question svg{transform:rotate(180deg)}.faq-answer{padding:0 42px 18px 4px}.faq-answer p{margin:0;color:#98a7ba;font-size:13px;line-height:1.6;max-width:820px}
+        @media(max-width:900px){.knowledge-section{padding:40px 16px 46px}.knowledge-heading h2{font-size:38px}.knowledge-grid{grid-template-columns:1fr;max-width:520px;margin:auto}.knowledge-card{height:210px}.knowledge-card-button{padding:20px 19px}.knowledge-modal{width:min(540px,calc(100vw - 20px));padding:16px 18px 12px}.orbitex-faq-section{padding:8px 16px 52px}.faq-heading h2{font-size:34px}}
+        @media(max-width:520px){.knowledge-heading h2{font-size:31px;letter-spacing:-1px}.knowledge-heading p{font-size:14px}.knowledge-card{height:200px}.knowledge-card-button{padding:18px 17px}.knowledge-card h3{font-size:19px}.knowledge-card p{font-size:13px}.knowledge-modal-backdrop{padding:8px}.knowledge-modal{width:calc(100vw - 16px);max-height:calc(100vh - 16px);padding:14px 14px 10px;border-radius:11px}.knowledge-modal-icon{width:40px;height:40px}.knowledge-modal h3{font-size:21px}.knowledge-modal-subtitle{font-size:11.5px;margin-bottom:7px}.knowledge-step{grid-template-columns:27px 1fr;padding:6px 0}.knowledge-step b{font-size:11.5px}.knowledge-step p{font-size:10px;line-height:1.2}.knowledge-got-it{height:36px;margin-top:7px;font-size:12.5px}.orbitex-faq-section{padding:4px 16px 42px}.faq-heading h2{font-size:29px}.faq-heading p{font-size:13px}.faq-question{font-size:14px;padding:16px 2px}.faq-answer{padding:0 28px 15px 2px}.faq-answer p{font-size:12.5px}}
       `}</style>
     </>
   );
