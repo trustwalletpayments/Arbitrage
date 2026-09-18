@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Check, ChevronRight } from "lucide-react";
 import { TokenIcon, NetworkIcon } from "@web3icons/react/dynamic";
+import { createBrowserClient } from "@supabase/ssr";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import MobileNav from "../../components/MobileNav";
@@ -92,7 +93,10 @@ export default function DepositPage() {
     async function loadSupportedRoutes() {
       setLoadingRoutes(true);
       try {
-        const supabase = (await import("../../../../lib/supabase-browser")).createSupabaseBrowserClient();
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+        if (!supabaseUrl || !supabaseKey) return;
+        const supabase = createBrowserClient(supabaseUrl, supabaseKey);
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.access_token) return;
         const response = await fetch("/api/wallet/supported-deposits", { headers: { authorization: `Bearer ${session.access_token}` }, cache: "no-store" });
