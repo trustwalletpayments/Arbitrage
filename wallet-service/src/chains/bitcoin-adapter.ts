@@ -38,26 +38,33 @@ function rootXprv() {
   return bip32.fromBase58(xprv, bitcoin.networks.bitcoin);
 }
 
-/**
- * BTC receive addresses use BIP84 native SegWit: m/84'/0'/0'/0/index.
- * This is deliberately separate from EVM_XPRV; an EVM extended key must never
- * be reused as a Bitcoin signing root.
- */
+function rootXpub() {
+  const xpub = process.env.BITCOIN_XPUB?.trim();
+  if (!xpub) throw new Error('BITCOIN_XPUB is not configured.');
+  return bip32.fromBase58(xpub, bitcoin.networks.bitcoin);
+}
+
+function paymentFromNode(node: BIP32Interface) {
+  const payment = bitcoin.payments.p2wpkh({ pubkey: Buffer.from(node.publicKey), network: bitcoin.networks.bitcoin });
+  if (!payment.address || !payment.output) throw new Error('Unable to derive Bitcoin P2WPKH address.');
+  return { address: payment.address, scriptPubKey: payment.output.toString('hex') };
+}
+
+/** BIP84 receive path: m/84'/0'/0'/0/index. */
 export function deriveBitcoinDeposit(index: number) {
   if (!Number.isInteger(index) || index < 0) throw new Error('Invalid Bitcoin derivation index.');
   const node = rootXprv().derivePath(`m/84'/0'/0'/0/${index}`);
-  const payment = bitcoin.payments.p2wpkh({
-    pubkey: Buffer.from(node.publicKey),
-    network: bitcoin.networks.bitcoin,
-  });
-  if (!payment.address || !payment.output) throw new Error('Unable to derive Bitcoin P2WPKH address.');
-  return { index, address: payment.address, scriptPubKey: payment.output.toString('hex'), node };
+  return { index, ...paymentFromNode(node), node };
 }
 
-/**
- * Bitcoin Core's scantxoutset can scan an address descriptor without importing
- * the user's key into the node wallet. We only use it for observation.
- */
+/** Public derivation for address provisioning; the API service never needs BTC private keys. */
+export function deriveBitcoinDepositAddress(index: number) {
+  if (!Number.isInteger(index) || index < 0) throw new Error('Invalid Bitcoin derivation index.');
+  const node = rootXpub().derivePath(`0/${index}`);
+  return { index, ...paymentFromNode(node) };
+}
+
+/** Bitcoin Core observation only; no user private keys are imported into the node. */
 export async function scanBitcoinDeposit(address: string, minimumConfirmations = 1): Promise<BitcoinUtxo[]> {
   const result = await rpc<{
     success: boolean;
@@ -82,17 +89,8 @@ async function feeRateSatPerVbyte() {
   throw new Error('Set BITCOIN_FEE_RATE_SAT_VB because Bitcoin Core did not return a usable fee estimate.');
 }
 
-/**
- * Build and sign a native-SegWit sweep. Bitcoin does not have EVM-style gas;
- * the fee is a BTC transaction fee. The caller must ensure the source UTXOs
- * include enough BTC to cover it, or explicitly add a treasury-funded UTXO.
- */
-export async function buildBitcoinSweep(args: {
-  index: number;
-  treasuryAddress: string;
-  utxos: BitcoinUtxo[];
-  feeRateSatVb?: number;
-}) {
+/** Build and sign a native-SegWit sweep. BTC has transaction fees rather than EVM gas. */
+export async function buildBitcoinSweep(args: { index: number; treasuryAddress: string; utxos: BitcoinUtxo[]; feeRateSatVb?: number }) {
   if (!args.utxos.length) throw new Error('No confirmed Bitcoin UTXOs to sweep.');
   const derived = deriveBitcoinDeposit(args.index);
   const feeRate = args.feeRateSatVb ?? await feeRateSatPerVbyte();
@@ -102,14 +100,9 @@ export async function buildBitcoinSweep(args: {
   if (total <= fee) throw new Error('Bitcoin balance is not sufficient to cover the sweep fee.');
   const amount = total - fee;
   if (amount < 546n) throw new Error('Bitcoin sweep output would be dust.');
-
   const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
   for (const utxo of args.utxos) {
-    psbt.addInput({
-      hash: utxo.txid,
-      index: utxo.vout,
-      witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: Number(utxo.valueSats) },
-    });
+    psbt.addInput({ hash: utxo.txid, index: utxo.vout, witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: Number(utxo.valueSats) } });
   }
   psbt.addOutput({ address: args.treasuryAddress, value: Number(amount) });
   for (let i = 0; i < args.utxos.length; i++) psbt.signInput(i, derived.node);
