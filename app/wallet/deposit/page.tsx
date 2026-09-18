@@ -11,7 +11,9 @@ import "./deposit.css";
 type Asset = { symbol: string; name: string; color: string; icon: string };
 type Network = { id: string; name: string; short: string; icon: string };
 
-const ICON_BASE = "https://cdn.simpleicons.org";
+// Use a versioned SVG CDN with explicit .svg files. The previous cdn.simpleicons.org
+// endpoint was returning fallback initials in the deposit selector in some browsers.
+const ICON_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@v16/icons";
 
 const ASSETS: Asset[] = [
   { symbol: "USDT", name: "Tether", color: "#26a17b", icon: "tether" },
@@ -64,16 +66,19 @@ function Logo({ asset, network }: { asset?: Asset; network?: Network }) {
   return (
     <span className="deposit-asset-logo" style={{ background: `${color}22`, border: `1px solid ${color}55` }}>
       <img
-        src={`${ICON_BASE}/${icon}`}
+        src={`${ICON_BASE}/${icon}.svg`}
         alt=""
         width={28}
         height={28}
-        loading="lazy"
+        loading="eager"
+        decoding="async"
+        draggable={false}
+        referrerPolicy="no-referrer"
         onError={(event) => {
           const img = event.currentTarget;
           img.style.display = "none";
           const fallback = img.nextElementSibling as HTMLElement | null;
-          if (fallback) fallback.style.display = "block";
+          if (fallback) fallback.style.display = "grid";
         }}
       />
       <span className="deposit-logo-fallback" style={{ color, display: "none" }}>{label.slice(0, 2)}</span>
