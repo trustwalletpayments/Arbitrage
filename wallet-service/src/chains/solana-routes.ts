@@ -1,7 +1,6 @@
 import type { Express, RequestHandler } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { deriveSolanaDeposit, connection, configuredSplMint, sweepSolanaNative, sweepSolanaSpl } from './solana-adapter.js';
-
 function validUser(id:string){return /^[0-9a-f-]{36}$/i.test(id);}
 export function registerSolanaRoutes(app:Express,authorized:RequestHandler){
  const supabase=createClient(process.env.SUPABASE_URL!,process.env.SUPABASE_SERVICE_ROLE_KEY!,{auth:{persistSession:false,autoRefreshToken:false}});
