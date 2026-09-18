@@ -31,9 +31,6 @@ export default function SpotOrderBook({pair}:{pair:string}){
     return()=>{alive=false;socket?.close()};
   },[symbol]);
 
-  // Keep the right-side Spot Markets card synchronized with the same live market source.
-  // The page renders the market rows separately, so this effect updates their displayed
-  // last price and 24h percentage without duplicating the market-list implementation.
   useEffect(()=>{
     let stopped=false;
     const refreshMarkets=async()=>{
@@ -46,24 +43,8 @@ export default function SpotOrderBook({pair}:{pair:string}){
         const data=await response.json();
         if(stopped||!Array.isArray(data))return;
         const tickers=new Map<string,{last:string;change:number}>();
-        for(const item of data){
-          const market=String(item?.symbol||"").toUpperCase();
-          if(!market.endsWith("USDT"))continue;
-          tickers.set(market,{last:String(item?.lastPrice||""),change:Number(item?.priceChangePercent||0)});
-        }
-        container.querySelectorAll<HTMLButtonElement>("button").forEach(button=>{
-          const label=button.querySelector<HTMLElement>(".market-name b")?.textContent?.replace(/[^A-Z0-9]/gi,"").toUpperCase()||"";
-          const ticker=tickers.get(label);
-          if(!ticker)return;
-          const lastElement=button.querySelector<HTMLElement>(".market-last");
-          const changeElement=button.querySelector<HTMLElement>(".market-change");
-          if(lastElement)lastElement.textContent=ticker.last?Number(ticker.last).toLocaleString(undefined,{maximumFractionDigits:Number(ticker.last)<1?8:2}):"—";
-          if(changeElement){
-            const value=ticker.change;
-            changeElement.textContent=`${value>=0?"+":""}${value.toFixed(2)}%`;
-            changeElement.style.color=value<0?"#ef4444":"#22c55e";
-          }
-        });
+        for(const item of data){const market=String(item?.symbol||"").toUpperCase();if(!market.endsWith("USDT"))continue;tickers.set(market,{last:String(item?.lastPrice||""),change:Number(item?.priceChangePercent||0)})}
+        container.querySelectorAll<HTMLButtonElement>("button").forEach(button=>{const label=button.querySelector<HTMLElement>(".market-name b")?.textContent?.replace(/[^A-Z0-9]/gi,"").toUpperCase()||"";const ticker=tickers.get(label);if(!ticker)return;const lastElement=button.querySelector<HTMLElement>(".market-last");const changeElement=button.querySelector<HTMLElement>(".market-change");if(lastElement)lastElement.textContent=ticker.last?Number(ticker.last).toLocaleString(undefined,{maximumFractionDigits:Number(ticker.last)<1?8:2}):"—";if(changeElement){const value=ticker.change;changeElement.textContent=`${value>=0?"+":""}${value.toFixed(2)}%`;changeElement.style.color=value<0?"#ef4444":"#22c55e"}});
       }catch{}
     };
     refreshMarkets();
@@ -79,7 +60,7 @@ export default function SpotOrderBook({pair}:{pair:string}){
   const maxTotal=useMemo(()=>Math.max(1,...asks.map(x=>x.size),...bids.map(x=>x.size)),[asks,bids]);
   const row=(level:Level,side:"ask"|"bid")=>{const width=Math.min(100,(level.size/maxTotal)*100);return <div className={`book-row ${side}`} key={`${side}-${level.price}`}><span>{formatPrice(level.price)}</span><span>{level.size.toLocaleString(undefined,{maximumFractionDigits:4})}</span><span>{(level.price*level.size).toLocaleString(undefined,{maximumFractionDigits:2})}</span><i style={{width:`${width}%`}} aria-hidden="true"/></div>};
   const columns=<div className="book-head"><span>Price (USDT)</span><span>Size ({pair.split("/")[0]})</span><span>Total (USDT)</span></div>;
-  const card=(title:"Asks"|"Bids",levels:Level[],side:"ask"|"bid")=><section className={`spot-order-book-card ${side}`} aria-label={`${pair} ${title}`}><div className="book-title"><div><span className="book-kicker">ORDER BOOK</span><strong className={side}>{title}</strong><em>{pair}</em></div><span className="book-live">LIVE</span></div>{columns}<div className="book-card-scroll"><div className="book-side">{(side==="ask"?levels.slice(0,10).reverse():levels.slice(0,10)).map(level=>row(level,side))}</div></div></section>;
+  const card=(title:"Asks"|"Bids",levels:Level[],side:"ask"|"bid")=><section className={`spot-order-book-card ${side}`} aria-label={`${pair} ${title}`}><div className="book-title"><div><span className="book-kicker">ORDER BOOK</span><strong className={side}>{title}</strong><em>{pair}</em></div><span className="book-live">LIVE</span></div>{columns}<div className="book-card-scroll" style={{overflowY:"hidden"}}><div className="book-side">{(side==="ask"?levels.slice(0,10).reverse():levels.slice(0,10)).map(level=>row(level,side))}</div></div></section>;
 
   return <div className="spot-order-book-stack" aria-label={`${pair} live order book`}>
     {card("Asks",asks,"ask")}
