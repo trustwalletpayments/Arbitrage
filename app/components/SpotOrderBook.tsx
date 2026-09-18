@@ -31,6 +31,46 @@ export default function SpotOrderBook({pair}:{pair:string}){
     return()=>{alive=false;socket?.close()};
   },[symbol]);
 
+  // Keep the right-side Spot Markets card synchronized with the same live market source.
+  // The page renders the market rows separately, so this effect updates their displayed
+  // last price and 24h percentage without duplicating the market-list implementation.
+  useEffect(()=>{
+    let stopped=false;
+    const refreshMarkets=async()=>{
+      if(stopped)return;
+      const container=document.querySelector<HTMLElement>(".reference-market-list .market-scroll");
+      if(!container)return;
+      try{
+        const response=await fetch("https://data-api.binance.vision/api/v3/ticker/24hr",{cache:"no-store"});
+        if(!response.ok)return;
+        const data=await response.json();
+        if(stopped||!Array.isArray(data))return;
+        const tickers=new Map<string,{last:string;change:number}>();
+        for(const item of data){
+          const market=String(item?.symbol||"").toUpperCase();
+          if(!market.endsWith("USDT"))continue;
+          tickers.set(market,{last:String(item?.lastPrice||""),change:Number(item?.priceChangePercent||0)});
+        }
+        container.querySelectorAll<HTMLButtonElement>("button").forEach(button=>{
+          const label=button.querySelector<HTMLElement>(".market-name b")?.textContent?.replace(/[^A-Z0-9]/gi,"").toUpperCase()||"";
+          const ticker=tickers.get(label);
+          if(!ticker)return;
+          const lastElement=button.querySelector<HTMLElement>(".market-last");
+          const changeElement=button.querySelector<HTMLElement>(".market-change");
+          if(lastElement)lastElement.textContent=ticker.last?Number(ticker.last).toLocaleString(undefined,{maximumFractionDigits:Number(ticker.last)<1?8:2}):"—";
+          if(changeElement){
+            const value=ticker.change;
+            changeElement.textContent=`${value>=0?"+":""}${value.toFixed(2)}%`;
+            changeElement.style.color=value<0?"#ef4444":"#22c55e";
+          }
+        });
+      }catch{}
+    };
+    refreshMarkets();
+    const timer=window.setInterval(refreshMarkets,3000);
+    return()=>{stopped=true;window.clearInterval(timer)};
+  },[]);
+
   const bestAsk=asks[0]?.price||0;
   const bestBid=bids[0]?.price||0;
   const mid=bestAsk&&bestBid?(bestAsk+bestBid)/2:bestAsk||bestBid;
