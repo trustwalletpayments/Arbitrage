@@ -66,27 +66,6 @@ function addFaq() {
   footer.parentNode?.insertBefore(faq, footer);
 }
 
-function enhanceStoreButtons() {
-  const box = document.querySelector<HTMLElement>(".store-buttons");
-  if (!box || box.dataset.enhanced === "1") return;
-  box.dataset.enhanced = "1";
-  box.innerHTML = "";
-
-  const play = document.createElement("a");
-  play.className = "store-download store-play";
-  play.href = "/playstore-demo";
-  play.setAttribute("aria-label", "Open ORBITEX PlayStore demo");
-  play.innerHTML = '<span class="store-download-copy"><small>GET IT ON</small><b>PlayStore</b></span><span class="store-download-arrow">›</span>';
-
-  const apk = document.createElement("a");
-  apk.className = "store-download store-apk";
-  apk.href = "/apk-demo";
-  apk.setAttribute("aria-label", "Open ORBITEX APK demo");
-  apk.innerHTML = '<span class="store-download-copy"><small>DOWNLOAD</small><b>APK</b></span><span class="store-download-arrow">›</span>';
-
-  box.append(play, apk);
-}
-
 export default function OrbitexEnhancements() {
   useEffect(() => {
     try {
@@ -99,7 +78,6 @@ export default function OrbitexEnhancements() {
       // The LearnKnowledge component already renders the learning cards.
       // Do not inject a second copy here.
       addFaq();
-      enhanceStoreButtons();
     };
 
     enhance();
