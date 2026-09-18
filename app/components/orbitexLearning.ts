@@ -21,7 +21,7 @@ const guides: Guide[] = [
       ["Review and send", "Verify the address and any minimum deposit. A small test transfer can help you check the route."],
       ["Follow confirmations", "Your deposit becomes available after the required network confirmations."],
     ],
-    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="8" y="14" width="32" height="25" rx="4" stroke="currentColor" stroke-width="2.6"/><path d="M13 14V11.5A4.5 4.5 0 0 1 17.5 7h17A4.5 4.5 0 0 1 39 11.5V14" stroke="currentColor" stroke-width="2.6"/><path d="M24 20v12M18.5 27l5.5 5 5.5-5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="7" y="13" width="34" height="26" rx="5" stroke="currentColor" stroke-width="2.5"/><path d="M12 13V11a5 5 0 0 1 5-5h15a5 5 0 0 1 5 5v2" stroke="currentColor" stroke-width="2.5"/><path d="M24 19v13m-6-6 6 6 6-6M17 36h14" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   },
   {
     category: "Trading basics",
@@ -34,7 +34,7 @@ const guides: Guide[] = [
       ["Limit", "You specify a price. An order can execute at that price or better, but may remain unfilled."],
       ["Review", "Check the asset, amount and estimated value. Consider fees and price movement before you confirm."],
     ],
-    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 36V12M9 36h30" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><path d="M16 29V22M24 29V17M32 29V12" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/></svg>'
+    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M9 37V11M9 37h30" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M16 30V22M24 30V16M32 30V10" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path d="m14 17 8-5 7 4 8-9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   },
   {
     category: "Know your assets",
@@ -47,7 +47,7 @@ const guides: Guide[] = [
       ["Allocation", "See the share of each asset in your portfolio."],
       ["Activity", "Review transfers, deposits and completed trades in context."],
     ],
-    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 7a17 17 0 1 0 17 17H24V7Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M28 7.5A17 17 0 0 1 40.5 20H28V7.5Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg>'
+    icon: '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 7a17 17 0 1 0 17 17H24V7Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M28 7.6A17 17 0 0 1 40.4 20H28V7.6Z" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M16 32h16M18 28v4m6-7v7m6-10v10" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/></svg>'
   }
 ];
 
@@ -99,7 +99,7 @@ export function addLearningSection() {
   const done = document.createElement("button");
   done.className = "orbitex-learning-modal-done";
   done.type = "button";
-  done.textContent = "Got it  ✓";
+  done.textContent = "Got it";
   dialog.append(close, modalIcon, modalTitle, modalIntro, steps, done);
   modal.appendChild(dialog);
 
@@ -138,6 +138,9 @@ export function addLearningSection() {
   done.addEventListener("click", closeGuide);
   modal.addEventListener("click", (event) => {
     if (event.target === modal) closeGuide();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) closeGuide();
   });
 
   guides.forEach((guide) => {
