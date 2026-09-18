@@ -41,3 +41,14 @@
 }
 @media (max-width:1099px){.market-stats{gap:14px}.spot-reference-layout{padding:12px!important}.custom-chart-canvas-wrap{height:500px}.spot-order-book-card{height:340px;min-height:340px;flex-basis:340px}}
 @media (max-width:760px){.trade-layout{display:flex!important;flex-direction:column!important;gap:10px!important;padding:10px 10px 90px!important}.spot-order-book-stack{order:1}.chart-area{order:2}.reference-market-list{order:3;position:static!important;height:auto!important}.chart-area>.order-panel{order:4}.market-stats{display:none}.spot-market-header{min-height:68px!important}.custom-market-chart{min-height:430px!important;height:430px!important}.custom-chart-canvas-wrap{height:384px!important;min-height:384px!important}.reference-market-list .market-scroll{height:auto;max-height:260px}.reference-market-list .market-scroll button{grid-template-columns:minmax(0,1fr) 68px 68px}.market-columns{grid-template-columns:minmax(0,1fr) 68px 68px}.spot-order-book-stack{gap:10px}.spot-order-book-card{height:340px;min-height:340px;flex-basis:340px}.book-mid-card{height:60px;flex-basis:60px}.book-card-scroll{height:calc(100% - 88px)}.spot-reference-layout>.chart-area>.order-panel{margin-top:0}.market-list .spot-mobile-search{height:44px!important}.desktop-market-search{display:none!important}}
+
+/* Flat-edge cards for the Spot market terminal */
+.spot-reference-layout .spot-order-book-card,
+.spot-reference-layout .book-mid-card,
+.spot-reference-layout .chart-area > .trade-head,
+.spot-reference-layout .chart-area > .custom-market-chart,
+.spot-reference-layout .chart-area > .chart,
+.spot-reference-layout .chart-area > .live-chart,
+.spot-reference-layout .chart-area > .order-panel,
+.spot-reference-layout > .reference-market-list,
+.spot-reference-layout > .market-list {border-radius:0!important}
