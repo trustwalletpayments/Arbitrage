@@ -52,15 +52,15 @@ export default function ScrollGuard() {
     window.addEventListener("pageshow", restore);
     window.addEventListener("popstate", restore);
 
-    // The Spot chart owns wheel gestures. Use a non-passive listener so the
-    // browser cannot bubble the gesture to the page and scroll the document.
-    const stopChartWheel = (event: WheelEvent) => {
+    // Keep wheel gestures inside the Spot chart. Preventing the browser's
+    // default action stops the document from scrolling, while the event is
+    // still allowed to reach the chart's React onWheel handler for zooming.
+    const lockChartWheel = (event: WheelEvent) => {
       const target = event.target as Element | null;
       if (!target?.closest(".custom-chart-canvas-wrap, .custom-chart-canvas-wrap canvas")) return;
       event.preventDefault();
-      event.stopPropagation();
     };
-    document.addEventListener("wheel", stopChartWheel, { passive: false, capture: true });
+    document.addEventListener("wheel", lockChartWheel, { passive: false, capture: true });
 
     return () => {
       window.cancelAnimationFrame(firstFrame);
@@ -68,7 +68,7 @@ export default function ScrollGuard() {
       window.clearTimeout(timeout);
       window.removeEventListener("pageshow", restore);
       window.removeEventListener("popstate", restore);
-      document.removeEventListener("wheel", stopChartWheel, { capture: true });
+      document.removeEventListener("wheel", lockChartWheel, { capture: true });
     };
   }, [pathname]);
 
