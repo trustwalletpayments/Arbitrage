@@ -10,12 +10,12 @@ const lessons = [
 ] as const;
 
 const faqs = [
-  ["What is ORBITEX?", "ORBITEX is a crypto trading and wallet platform designed to give users a clear, straightforward way to manage assets, view markets and place trades."],
-  ["How does ORBITEX work?", "Use the ORBITEX interface to manage your wallet, view supported markets, monitor prices and place spot or futures trades where available."],
-  ["Are trading profits guaranteed?", "No. Crypto prices can move quickly, and trading involves risk. Market movement, fees, liquidity, slippage and other factors can affect the result."],
-  ["What fees should I consider?", "Consider trading fees, withdrawal or network fees, spread, slippage and any other applicable costs before placing a trade or transferring assets."],
-  ["Do I need to transfer funds between platforms?", "Not necessarily. You can use the balances available in your ORBITEX account for supported trading activity. Transfers may be needed when depositing or withdrawing assets."],
-  ["Which networks and assets are supported?", "Supported assets, markets and networks can change. Always check the current ORBITEX interface before depositing or transferring funds, and make sure the sending and receiving networks match."]
+  ["What are the advantages of using ORBITEX?", "ORBITEX brings markets, wallet balances and trading tools together in one straightforward interface, making it easier to move between checking markets, managing funds and placing trades."],
+  ["Is ORBITEX easy to use?", "The platform is designed around a clear trading experience, with dedicated areas for Spot, Futures, Wallet and Orders so you can find the tools you need without unnecessary steps."],
+  ["What can I trade on ORBITEX?", "ORBITEX provides supported Spot and Futures markets with live market information. Available pairs and products can change, so check the current markets shown on the platform."],
+  ["Can I manage my funds and trades in one place?", "Yes. Your wallet balances, deposits, withdrawals, orders and trading activity are organized within the same account, giving you a single place to manage your activity."],
+  ["Does ORBITEX provide live market information?", "Yes. Supported markets display live pricing and market data so you can review current prices and market movement before placing an order."],
+  ["What should I consider before trading?", "Crypto markets can move quickly. Consider price movement, liquidity, fees, spread and slippage, and make sure you understand the order type and amount before confirming a trade."]
 ] as const;
 
 function LessonIcon({ type, size = 34 }: { type: string; size?: number }) {
