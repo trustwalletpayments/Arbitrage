@@ -50,10 +50,10 @@ function paymentFromNode(node: BIP32Interface) {
   return { address: payment.address, scriptPubKey: payment.output.toString('hex') };
 }
 
-/** BIP84 receive path: m/84'/0'/0'/0/index. */
+/** BITCOIN_XPRV/BITCOIN_XPUB are account-level keys at m/84'/0'/0'; index derives 0/index below them. */
 export function deriveBitcoinDeposit(index: number) {
   if (!Number.isInteger(index) || index < 0) throw new Error('Invalid Bitcoin derivation index.');
-  const node = rootXprv().derivePath(`m/84'/0'/0'/0/${index}`);
+  const node = rootXprv().derivePath(`0/${index}`);
   return { index, ...paymentFromNode(node), node };
 }
 
