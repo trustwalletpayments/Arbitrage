@@ -17,6 +17,7 @@ import "./components/mobile-nav.css";
 import "./usdt-bnb-logo.css";
 import "./qr-fix.css";
 import "./futures-page.css";
+import "./orbitex-learning.css";
 import ScrollGuard from "./components/ScrollGuard";
 import AuthGuard from "./components/AuthGuard";
 import MobileNav from "./components/MobileNav";
