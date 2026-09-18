@@ -194,30 +194,46 @@ app.post('/verify-deposit', authorized, async (req, res) => {
     const destination = getAddress(account.data.deposit_address);
     const tx = await rpc.getTransaction(txHash);
     const receipt = await rpc.getTransactionReceipt(txHash);
-    if (!tx || !receipt) return res.status(400).json({ error: 'Transaction not found yet.' });
-    const confirmations = Math.max(0, (await rpc.getBlockNumber()) - receipt.blockNumber + 1);
-    if (confirmations < confirmationsRequired) return res.status(400).json({ error: `Deposit needs ${confirmationsRequired} confirmations; currently ${confirmations}.` });
-    let amount: string | null = null;
-    const tokenAddress = getTokenContract(network, asset);
-    if (tokenAddress) {
-      const iface = new Interface(['event Transfer(address indexed from,address indexed to,uint256 value)']);
+    if (!tx || !receipt || receipt.status !== 1) return res.status(400).json({ error: 'Transaction not found or failed.' });
+    const latestBlock = await rpc.getBlockNumber();
+    const confirmations = Math.max(0, latestBlock - receipt.blockNumber + 1);
+    const iface = new Interface(['event Transfer(address indexed from,address indexed to,uint256 value)']);
+    let verifiedFrom = '';
+    let verifiedAmount = 0n;
+    let decimals = 18;
+    const tokenContract = getTokenContract(network, asset);
+    if (asset === config.nativeAsset && !tokenContract) {
+      if (!tx.to || getAddress(tx.to) !== destination || tx.value <= 0n) return res.status(400).json({ error: `No ${asset} native transfer to your Orbitex deposit address was found.` });
+      verifiedFrom = getAddress(tx.from);
+      verifiedAmount = tx.value;
+    } else {
+      if (!tokenContract) return res.status(400).json({ error: `${asset} on ${config.name} is not configured yet. Add its contract to EVM_TOKEN_CONTRACTS_JSON before enabling deposits.` });
+      const token = new Contract(tokenContract, ['function decimals() view returns (uint8)'], rpc);
+      decimals = Number(await token.decimals());
       for (const log of receipt.logs) {
-        if (getAddress(log.address).toLowerCase() !== tokenAddress.toLowerCase()) continue;
-        try {
-          const parsed = iface.parseLog(log);
-          if (!parsed) continue;
-          if (getAddress(parsed.args.to).toLowerCase() === destination.toLowerCase()) amount = formatUnits(parsed.args.value, 18);
-        } catch {}
+        if (log.address.toLowerCase() !== tokenContract.toLowerCase() || log.topics[0]?.toLowerCase() !== transferTopic) continue;
+        const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
+        if (!parsed) continue;
+        const recipient = getAddress(String(parsed.args.to));
+        if (recipient.toLowerCase() === destination.toLowerCase()) {
+          verifiedFrom = getAddress(String(parsed.args.from));
+          verifiedAmount = BigInt(parsed.args.value.toString());
+          break;
+        }
       }
-    } else if (tx.to && getAddress(tx.to).toLowerCase() === destination.toLowerCase()) {
-      amount = formatUnits(tx.value, 18);
+      if (!verifiedFrom) return res.status(400).json({ error: `No ${asset} token transfer to your Orbitex deposit address was found.` });
     }
-    if (!amount || Number(amount) <= 0) return res.status(400).json({ error: 'No matching deposit transfer found.' });
-    if (Number(amount) < Number(submittedAmount)) return res.status(400).json({ error: 'Verified amount is lower than the submitted amount.' });
-    const inserted = await supabase.from('wallet_deposits').insert({ user_id: userId, wallet_account_id: account.data.id, asset, network, tx_hash: txHash, amount, status: 'confirmed', confirmations }).select('*').single();
-    if (inserted.error) return res.status(500).json({ error: inserted.error.message });
-    return res.status(201).json({ ok: true, deposit: inserted.data });
-  } catch (error) { return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to verify deposit.' }); }
+    const expectedAmount = parseUnits(submittedAmount, decimals);
+    if (verifiedAmount !== expectedAmount) return res.status(400).json({ error: `Amount mismatch. On-chain amount is ${formatUnits(verifiedAmount, decimals)} ${asset}.` });
+    const status = confirmations >= confirmationsRequired ? 'credited' : 'confirming';
+    const networkLabel = network === 'bsc' ? 'BEP20' : network;
+    const inserted = await supabase.rpc('record_verified_wallet_deposit', { p_user_id: userId, p_wallet_account_id: account.data.id, p_asset: asset, p_network: networkLabel, p_chain_family: 'evm', p_tx_hash: txHash, p_from_address: verifiedFrom, p_to_address: destination, p_amount: formatUnits(verifiedAmount, decimals), p_confirmations: confirmations, p_status: status, p_credited_at: status === 'credited' ? new Date().toISOString() : null });
+    if (inserted.error) {
+      if (inserted.error.code === '23505') return res.status(409).json({ error: 'This transaction has already been submitted.' });
+      return res.status(500).json({ error: inserted.error.message });
+    }
+    return res.status(201).json({ ok: true, status, confirmations, requiredConfirmations: confirmationsRequired, deposit: inserted.data });
+  } catch (error) { return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to verify transaction' }); }
 });
 
-app.listen(port, () => console.log(`wallet-service listening on ${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`Orbitex wallet service listening on port ${port}`));
