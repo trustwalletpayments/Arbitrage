@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { getAddress, HDNodeWallet, Wallet, JsonRpcProvider, Interface, Contract, parseUnits, formatUnits } from 'ethers';
-import { getConfiguredTokenContract } from './token-contracts.js';
+import { getConfiguredTokenContract, getConfiguredEvmTokenAssets } from './token-contracts.js';
 import { registerBitcoinRoutes } from './chains/bitcoin-routes.js';
 
 const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'ADMIN_API_KEY'];
@@ -31,7 +31,11 @@ const NETWORKS: Record<string, NetworkConfig> = {
   cronos: { name: 'Cronos', family: 'evm', rpcEnv: 'CRONOS_RPC_URL', chainId: 25, nativeAsset: 'CRO' },
   linea: { name: 'Linea', family: 'evm', rpcEnv: 'LINEA_RPC_URL', chainId: 59144, nativeAsset: 'ETH' },
 };
-const EVM_ASSETS = new Set(['ETH', 'USDT', 'USDC', 'BNB', 'POL', 'AVAX', 'LINK', 'UNI', 'FTM', 'CRO']);
+
+const NATIVE_EVM_ASSETS = new Set(Object.values(NETWORKS).map((network) => network.nativeAsset));
+function isSupportedEvmAsset(asset: string) {
+  return NATIVE_EVM_ASSETS.has(asset) || getConfiguredEvmTokenAssets().includes(asset);
+}
 
 function authorized(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (req.header('x-wallet-service-key') !== apiKey) return res.status(401).json({ error: 'Unauthorized' });
@@ -82,8 +86,8 @@ app.get('/health', (_req, res) => res.json({
 app.get('/supported-deposits', authorized, (_req, res) => {
   const routes = Object.entries(NETWORKS).flatMap(([network, config]) => {
     const native = [{ asset: config.nativeAsset, network, type: 'native', ready: true }];
-    const tokens = ['USDT', 'USDC', 'LINK', 'UNI'].map(asset => ({ asset, network, type: 'erc20', ready: Boolean(getTokenContract(network, asset)) }));
-    return [...native, ...tokens];
+    const configuredTokens = getConfiguredEvmTokenAssets(network).map((asset) => ({ asset, network, type: 'erc20', ready: Boolean(getTokenContract(network, asset)) }));
+    return [...native, ...configuredTokens];
   });
   res.json({ ok: true, routes });
 });
@@ -154,8 +158,9 @@ app.post('/provision/:userId', authorized, async (req, res) => {
   const asset = String(req.body?.asset || '').trim().toUpperCase();
   const network = String(req.body?.network || '').trim().toLowerCase();
   if (!validateUserId(userId)) return res.status(400).json({ error: 'Invalid user id' });
-  if (!EVM_ASSETS.has(asset)) return res.status(400).json({ error: 'Unsupported EVM asset' });
+  if (!isSupportedEvmAsset(asset)) return res.status(400).json({ error: 'Unsupported EVM asset' });
   if (!NETWORKS[network]) return res.status(400).json({ error: 'Unsupported EVM network' });
+  if (asset !== NETWORKS[network].nativeAsset && !getTokenContract(network, asset)) return res.status(400).json({ error: `${asset} is not configured for ${NETWORKS[network].name}.` });
   try {
     const existing = await supabase.from('wallet_accounts').select('*').eq('user_id', userId).eq('asset', asset).eq('network', network).maybeSingle();
     if (existing.error) return res.status(500).json({ error: existing.error.message });
@@ -183,7 +188,8 @@ app.post('/verify-deposit', authorized, async (req, res) => {
   if (!/^\d+(\.\d{1,18})?$/.test(submittedAmount) || Number(submittedAmount) <= 0) return res.status(400).json({ error: 'Invalid amount' });
   const config = NETWORKS[network];
   if (!config) return res.status(400).json({ error: 'Unsupported EVM network.' });
-  if (!EVM_ASSETS.has(asset)) return res.status(400).json({ error: 'Unsupported EVM asset.' });
+  if (!isSupportedEvmAsset(asset)) return res.status(400).json({ error: 'Unsupported EVM asset.' });
+  if (asset !== config.nativeAsset && !getTokenContract(network, asset)) return res.status(400).json({ error: `${asset} on ${config.name} is not configured yet.` });
   const account = await supabase.from('wallet_accounts').select('id,deposit_address').eq('user_id', userId).eq('network', network).eq('asset', asset).maybeSingle();
   if (account.error) return res.status(500).json({ error: account.error.message });
   if (!account.data?.deposit_address) return res.status(400).json({ error: `Your ${asset} deposit address has not been provisioned yet.` });
