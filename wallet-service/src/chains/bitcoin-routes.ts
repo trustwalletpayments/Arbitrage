@@ -1,6 +1,6 @@
-import type { Express, RequestHandler, Request, Response, NextFunction } from 'express';
+import type { Express, RequestHandler } from 'express';
 import { createClient } from '@supabase/supabase-js';
-import { deriveBitcoinDepositAddress, scanBitcoinDeposit, buildBitcoinSweep, broadcastBitcoinSweep } from './bitcoin-adapter.js';
+import { deriveBitcoinDepositAddress, scanBitcoinDeposit, bitcoinTipHeight, buildBitcoinSweep, broadcastBitcoinSweep } from './bitcoin-adapter.js';
 
 function validateUserId(userId: string) { return /^[0-9a-f-]{36}$/i.test(userId); }
 
@@ -55,12 +55,15 @@ export function registerBitcoinRoutes(app: Express, authorized: RequestHandler) 
       const amountSats = matches.reduce((sum, u) => sum + u.valueSats, 0n);
       const expectedSats = BigInt(Math.round(Number(submittedAmount) * 100_000_000));
       if (amountSats !== expectedSats) return res.status(400).json({ error: `Amount mismatch. On-chain amount is ${(Number(amountSats) / 100_000_000).toFixed(8)} BTC.` });
-      const tip = Math.max(...matches.map((u) => u.height));
-      const currentHeight = Math.max(...(await Promise.all([scanBitcoinDeposit(account.data.deposit_address, 0)] as const)).map(() => tip));
-      const confirmations = Math.max(0, currentHeight - tip + 1);
+      const tipHeight = await bitcoinTipHeight();
+      const oldestMatchHeight = Math.min(...matches.map((u) => u.height));
+      const confirmations = Math.max(0, tipHeight - oldestMatchHeight + 1);
       const status = confirmations >= confirmationsRequired ? 'credited' : 'confirming';
       const inserted = await supabase.rpc('record_verified_wallet_deposit', { p_user_id: userId, p_wallet_account_id: account.data.id, p_asset: 'BTC', p_network: 'bitcoin', p_chain_family: 'bitcoin', p_tx_hash: txHash, p_from_address: '', p_to_address: account.data.deposit_address, p_amount: (Number(amountSats) / 100_000_000).toFixed(8), p_confirmations: confirmations, p_status: status, p_credited_at: status === 'credited' ? new Date().toISOString() : null });
-      if (inserted.error) return res.status(500).json({ error: inserted.error.message });
+      if (inserted.error) {
+        if (inserted.error.code === '23505') return res.status(409).json({ error: 'This transaction has already been submitted.' });
+        return res.status(500).json({ error: inserted.error.message });
+      }
       return res.status(201).json({ ok: true, status, confirmations, requiredConfirmations: confirmationsRequired, deposit: inserted.data });
     } catch (error) { return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to verify Bitcoin transaction' }); }
   });
