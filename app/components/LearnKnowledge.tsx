@@ -4,46 +4,9 @@ import { useState } from "react";
 import { ArrowDownToLine, BarChart3, PieChart, X, Check } from "lucide-react";
 
 const lessons = [
-  {
-    category: "Getting started",
-    read: "3 min read",
-    title: "Your first crypto deposit",
-    description: "Choose your asset, check the network and follow your transfer from wallet to exchange.",
-    icon: "deposit",
-    subtitle: "A network check makes all the difference.",
-    steps: [
-      ["Choose an asset", "Select the asset you want to deposit."],
-      ["Match the network", "The sending and receiving networks must match. Check whether a memo or tag is required."],
-      ["Review and send", "Verify the address and any minimum deposit. A small test transfer can help you check the route."],
-      ["Follow confirmations", "Your deposit becomes available after the required network confirmations."],
-    ],
-  },
-  {
-    category: "Trading basics",
-    read: "4 min read",
-    title: "Market or limit order?",
-    description: "Understand the difference between trading at the market and setting your own price.",
-    icon: "chart",
-    subtitle: "Two different ways to enter the market.",
-    steps: [
-      ["Market", "An order seeks execution at available prices. The final price may change with liquidity and market movement."],
-      ["Limit", "You specify a price. An order can execute at that price or better, but may remain unfilled."],
-      ["Review", "Check the asset, amount and estimated value. Consider fees and price movement before you confirm."],
-    ],
-  },
-  {
-    category: "Know your assets",
-    read: "3 min read",
-    title: "See the whole portfolio",
-    description: "Follow your balances and allocation with a clearer view of where your assets sit.",
-    icon: "portfolio",
-    subtitle: "Balances are only part of the picture.",
-    steps: [
-      ["Balances", "Track what you hold in each account."],
-      ["Allocation", "See the share of each asset in your portfolio."],
-      ["Activity", "Review transfers, deposits and completed trades in context."],
-    ],
-  },
+  { category: "Getting started", read: "3 min read", title: "Your first crypto deposit", description: "Choose your asset, check the network and follow your transfer from wallet to exchange.", icon: "deposit", subtitle: "A network check makes all the difference.", steps: [["Choose an asset", "Select the asset you want to deposit."], ["Match the network", "The sending and receiving networks must match. Check whether a memo or tag is required."], ["Review and send", "Verify the address and any minimum deposit. A small test transfer can help you check the route."], ["Follow confirmations", "Your deposit becomes available after the required network confirmations."]] },
+  { category: "Trading basics", read: "4 min read", title: "Market or limit order?", description: "Understand the difference between trading at the market and setting your own price.", icon: "chart", subtitle: "Two different ways to enter the market.", steps: [["Market", "An order seeks execution at available prices. The final price may change with liquidity and market movement."], ["Limit", "You specify a price. An order can execute at that price or better, but may remain unfilled."], ["Review", "Check the asset, amount and estimated value. Consider fees and price movement before you confirm."]] },
+  { category: "Know your assets", read: "3 min read", title: "See the whole portfolio", description: "Follow your balances and allocation with a clearer view of where your assets sit.", icon: "portfolio", subtitle: "Balances are only part of the picture.", steps: [["Balances", "Track what you hold in each account."], ["Allocation", "See the share of each asset in your portfolio."], ["Activity", "Review transfers, deposits and completed trades in context."]] }
 ] as const;
 
 function LessonIllustration({ type }: { type: string }) {
@@ -55,46 +18,23 @@ function LessonIllustration({ type }: { type: string }) {
 export default function LearnKnowledge() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="knowledge-section" id="learn">
-      <div className="knowledge-heading">
-        <div className="orbitex-eyebrow">LEARN ORBITEX</div>
-        <h2>A little knowledge.<br />A more confident <span>next step.</span></h2>
-        <p>Get comfortable with the essentials, from moving your first assets to understanding your first order.</p>
-      </div>
-
-      <div className="knowledge-grid">
-        {lessons.map((lesson, index) => (
-          <article className="knowledge-card" key={lesson.title}>
-            <button className="knowledge-card-button" onClick={() => setOpen(index)} aria-label={`Open ${lesson.title}`}>
-              <LessonIllustration type={lesson.icon} />
-              <div className="knowledge-meta"><span>{lesson.category}</span><i>·</i><small>{lesson.read}</small></div>
-              <h3>{lesson.title}</h3>
-              <p>{lesson.description}</p>
-              <span className="knowledge-read">Read guide <b>→</b></span>
-            </button>
-          </article>
-        ))}
-      </div>
-
-      {open !== null && (
-        <div className="knowledge-modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(null); }}>
-          <div className="knowledge-modal" role="dialog" aria-modal="true" aria-labelledby="knowledge-modal-title">
-            <button className="knowledge-close" onClick={() => setOpen(null)} aria-label="Close"><X /></button>
-            <div className="knowledge-modal-icon"><BarChart3 /></div>
-            <h3 id="knowledge-modal-title">{lessons[open].title}</h3>
-            <p className="knowledge-modal-subtitle">{lessons[open].subtitle}</p>
-            <div className="knowledge-steps">
-              {lessons[open].steps.map(([title, text], i) => (
-                <div className="knowledge-step" key={title}>
-                  <strong>{String(i + 1).padStart(2, "0")}</strong>
-                  <div><b>{title}</b><p>{text}</p></div>
-                </div>
-              ))}
-            </div>
-            <button className="knowledge-got-it" onClick={() => setOpen(null)}>Got it <Check /></button>
-          </div>
+    <>
+      <section className="knowledge-section" id="learn">
+        <div className="knowledge-heading"><div className="orbitex-eyebrow">LEARN ORBITEX</div><h2>A little knowledge.<br />A more confident <span>next step.</span></h2><p>Get comfortable with the essentials, from moving your first assets to understanding your first order.</p></div>
+        <div className="knowledge-grid">
+          {lessons.map((lesson, index) => <article className="knowledge-card" key={lesson.title}><button className="knowledge-card-button" onClick={() => setOpen(index)} aria-label={`Open ${lesson.title}`}><LessonIllustration type={lesson.icon} /><div className="knowledge-meta"><span>{lesson.category}</span><i>·</i><small>{lesson.read}</small></div><h3>{lesson.title}</h3><p>{lesson.description}</p><span className="knowledge-read">Read guide <b>→</b></span></button></article>)}
         </div>
-      )}
-    </section>
+        {open !== null && <div className="knowledge-modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setOpen(null); }}><div className="knowledge-modal" role="dialog" aria-modal="true" aria-labelledby="knowledge-modal-title"><button className="knowledge-close" onClick={() => setOpen(null)} aria-label="Close"><X /></button><div className="knowledge-modal-icon"><BarChart3 /></div><h3 id="knowledge-modal-title">{lessons[open].title}</h3><p className="knowledge-modal-subtitle">{lessons[open].subtitle}</p><div className="knowledge-steps">{lessons[open].steps.map(([title, text], i) => <div className="knowledge-step" key={title}><strong>{String(i + 1).padStart(2, "0")}</strong><div><b>{title}</b><p>{text}</p></div></div>)}</div><button className="knowledge-got-it" onClick={() => setOpen(null)}>Got it <Check /></button></div></div>}
+      </section>
+      <style jsx global>{`
+        .knowledge-section{max-width:1280px;margin:0 auto;padding:118px 30px 125px;position:relative}
+        .knowledge-heading{text-align:center;max-width:1000px;margin:0 auto 58px}.knowledge-heading h2{font-size:52px;line-height:1.12;letter-spacing:-2px;margin:12px 0 22px}.knowledge-heading h2 span{color:#60a5fa}.knowledge-heading p{margin:0;color:#9ca8b8;font-size:17px;line-height:1.7}
+        .knowledge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.knowledge-card{background:#0d1219;border:1px solid #1c2634;border-radius:10px;overflow:hidden;transition:transform .2s ease,border-color .2s ease}.knowledge-card:hover{transform:translateY(-4px);border-color:#30435c}.knowledge-card-button{width:100%;padding:0 34px 34px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;font:inherit}.knowledge-illustration{height:275px;margin:0 -34px 31px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,#172131 0,#0d1219 65%)}.knowledge-illustration:after{content:"";position:absolute;width:190px;height:28px;border-radius:50%;background:#05080d;filter:blur(8px);bottom:43px}.knowledge-box-top{position:absolute;width:190px;height:76px;border:2px solid #3f80da;background:#111b29;transform:skewY(-23deg) rotate(29deg);top:76px;left:50%;margin-left:-95px;box-shadow:0 0 30px #2563eb22}.knowledge-box-front{position:absolute;width:190px;height:92px;border:2px solid #2563eb;background:#101925;top:127px;left:50%;margin-left:-95px;display:flex;align-items:center;justify-content:center;z-index:2;transform:skewY(-23deg)}.knowledge-box-front svg{width:55px;height:55px;color:#60a5fa;stroke-width:1.5;transform:skewY(23deg)}.knowledge-deposit .knowledge-box-front:before{content:"↓";position:absolute;color:#60a5fa;font-size:34px;top:-48px;right:35px;font-weight:300}.knowledge-chart .knowledge-box-front{border-color:#3478d2}.knowledge-portfolio .knowledge-box-front{border-color:#3478d2}
+        .knowledge-meta{display:flex;align-items:center;gap:10px;margin-bottom:15px;font-size:13px}.knowledge-meta span{color:#60a5fa}.knowledge-meta i{font-style:normal;color:#526176}.knowledge-meta small{color:#7f8da1}.knowledge-card h3{font-size:25px;line-height:1.25;margin:0 0 16px;letter-spacing:-.5px}.knowledge-card p{color:#9ca8b8;font-size:15px;line-height:1.65;margin:0}.knowledge-read{display:block;color:#dbe7f7;font-size:14px;margin-top:24px}.knowledge-read b{color:#60a5fa;margin-left:8px}
+        .knowledge-modal-backdrop{position:fixed;inset:0;background:rgba(1,5,10,.78);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:25px;z-index:100}.knowledge-modal{width:min(690px,100%);max-height:calc(100vh - 50px);overflow:auto;background:#10151c;border:1px solid #263244;border-radius:10px;padding:46px 46px 24px;box-shadow:0 30px 100px #000b;position:relative}.knowledge-close{position:absolute;right:22px;top:22px;background:none;border:0;color:#aeb9c8;cursor:pointer}.knowledge-close svg{width:25px;height:25px}.knowledge-modal-icon{width:62px;height:62px;border-radius:11px;background:#12233b;border:1px solid #234f88;display:grid;place-items:center;color:#60a5fa;margin-bottom:31px}.knowledge-modal-icon svg{width:32px;height:32px}.knowledge-modal h3{font-size:34px;letter-spacing:-1px;margin:0 0 12px}.knowledge-modal-subtitle{color:#aeb9c8;font-size:17px;margin:0 0 30px;line-height:1.5}.knowledge-step{display:grid;grid-template-columns:42px 1fr;gap:8px;margin:0 0 25px}.knowledge-step>strong{color:#60a5fa;font-size:15px}.knowledge-step b{font-size:16px}.knowledge-step p{color:#aeb9c8;line-height:1.55;margin:5px 0 0;font-size:15px}.knowledge-got-it{width:100%;height:58px;border:0;border-radius:9px;background:#2563eb;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:5px;display:flex;align-items:center;justify-content:center;gap:10px}.knowledge-got-it svg{width:19px}
+        @media(max-width:900px){.knowledge-section{padding:85px 20px}.knowledge-heading h2{font-size:40px}.knowledge-grid{grid-template-columns:1fr;max-width:600px;margin:auto}.knowledge-illustration{height:250px}.knowledge-modal{padding:38px 25px 20px}.knowledge-modal h3{font-size:28px}}
+        @media(max-width:520px){.knowledge-heading h2{font-size:32px;letter-spacing:-1px}.knowledge-heading p{font-size:15px}.knowledge-card-button{padding:0 24px 28px}.knowledge-illustration{margin:0 -24px 25px;height:220px}}
+      `}</style>
+    </>
   );
 }
