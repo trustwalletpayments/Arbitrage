@@ -13,7 +13,7 @@ type NotificationSettings = { security: boolean; orders: boolean; deposits: bool
 
 export default function ProfilePage() {
   const router = useRouter();
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const [supabase, setSupabase] = useState<ReturnType<typeof createSupabaseBrowserClient> | null>(null);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -31,11 +31,17 @@ export default function ProfilePage() {
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (!mounted) return;
-      if (!data.user) router.replace("/login?next=/profile");
-      else { setEmail(data.user.email || ""); setPhone(data.user.phone || ""); }
-    });
+    try {
+      const client = createSupabaseBrowserClient();
+      if (mounted) setSupabase(client);
+      client.auth.getUser().then(({ data }) => {
+        if (!mounted) return;
+        if (!data.user) router.replace("/login?next=/profile");
+        else { setEmail(data.user.email || ""); setPhone(data.user.phone || ""); }
+      });
+    } catch {
+      if (mounted) setNotice("Account services are temporarily unavailable.");
+    }
     const savedTheme = window.localStorage.getItem("orbitex-theme");
     if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "system") setTheme(savedTheme);
     const savedLanguage = window.localStorage.getItem("orbitex-language");
@@ -43,7 +49,7 @@ export default function ProfilePage() {
     if (savedLanguage) setLanguage(savedLanguage);
     if (savedCurrency) setCurrency(savedCurrency);
     return () => { mounted = false; };
-  }, [router, supabase]);
+  }, [router]);
 
   useEffect(() => {
     document.documentElement.dataset.orbitexTheme = theme;
@@ -58,10 +64,10 @@ export default function ProfilePage() {
   const referralLink = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${referralId}` : `https://newexchann.vercel.app/signup?ref=${referralId}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data=${encodeURIComponent(referralLink)}`;
   const copy = async (value: string, label: string) => { await navigator.clipboard?.writeText(value); setCopied(label); window.setTimeout(() => setCopied(""), 1800); };
-  const updateEmail = async () => { if (!newEmail.trim()) return; const { error } = await supabase.auth.updateUser({ email: newEmail.trim() }); setNotice(error ? error.message : "A confirmation link was sent to your new email address."); if (!error) { setNewEmail(""); setShowEmail(false); } };
-  const updatePhone = async () => { if (!newPhone.trim()) return; const { error } = await supabase.auth.updateUser({ phone: newPhone.trim() }); setNotice(error ? error.message : "Your phone number update request was submitted."); if (!error) { setNewPhone(""); setShowPhone(false); } };
-  const updatePassword = async () => { if (newPassword.length < 8) { setNotice("Use a password with at least 8 characters."); return; } const { error } = await supabase.auth.updateUser({ password: newPassword }); setNotice(error ? error.message : "Password updated successfully."); if (!error) { setNewPassword(""); setShowPassword(false); } };
-  const logout = async () => { await supabase.auth.signOut(); router.replace("/login"); };
+  const updateEmail = async () => { if (!supabase || !newEmail.trim()) return; const { error } = await supabase.auth.updateUser({ email: newEmail.trim() }); setNotice(error ? error.message : "A confirmation link was sent to your new email address."); if (!error) { setNewEmail(""); setShowEmail(false); } };
+  const updatePhone = async () => { if (!supabase || !newPhone.trim()) return; const { error } = await supabase.auth.updateUser({ phone: newPhone.trim() }); setNotice(error ? error.message : "Your phone number update request was submitted."); if (!error) { setNewPhone(""); setShowPhone(false); } };
+  const updatePassword = async () => { if (!supabase) return; if (newPassword.length < 8) { setNotice("Use a password with at least 8 characters."); return; } const { error } = await supabase.auth.updateUser({ password: newPassword }); setNotice(error ? error.message : "Password updated successfully."); if (!error) { setNewPassword(""); setShowPassword(false); } };
+  const logout = async () => { if (!supabase) return; await supabase.auth.signOut(); router.replace("/login"); };
   const toggleNotification = (key: keyof NotificationSettings) => setNotifications((current) => ({ ...current, [key]: !current[key] }));
 
   return (

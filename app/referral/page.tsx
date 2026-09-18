@@ -23,7 +23,7 @@ const money = (value: number) => `$${value.toLocaleString(undefined, { minimumFr
 const statusLabel = (status: string) => status.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 export default function ReferralPage() {
-  const supabase = createSupabaseBrowserClient();
+  const [supabase, setSupabase] = useState<ReturnType<typeof createSupabaseBrowserClient> | null>(null);
   const [userId, setUserId] = useState("");
   const [code, setCode] = useState("ORBITEX");
   const [referrals, setReferrals] = useState<Referral[]>([]);
@@ -35,25 +35,31 @@ export default function ReferralPage() {
 
   useEffect(() => {
     let mounted = true;
-    async function loadReferralData() {
-      setLoading(true);
-      const { data: auth } = await supabase.auth.getUser();
-      if (!mounted || !auth.user) { setLoading(false); return; }
-      setUserId(auth.user.id);
-      const [{ data: profile }, { data: referralRows }, { data: claimRows }] = await Promise.all([
-        supabase.from("profiles").select("referral_code").eq("id", auth.user.id).maybeSingle(),
-        supabase.from("referrals").select("id,status,qualifying_deposit_amount,referrer_reward_amount,created_at").eq("referrer_id", auth.user.id).order("created_at", { ascending: false }),
-        supabase.from("reward_claims").select("amount,status,submitted_at").eq("user_id", auth.user.id).eq("claim_type", "referral").order("submitted_at", { ascending: false }),
-      ]);
-      if (!mounted) return;
-      setCode(profile?.referral_code || "ORBITEX");
-      setReferrals((referralRows || []) as Referral[]);
-      setClaims((claimRows || []) as Claim[]);
-      setLoading(false);
+    try {
+      const client = createSupabaseBrowserClient();
+      if (mounted) setSupabase(client);
+      async function loadReferralData() {
+        setLoading(true);
+        const { data: auth } = await client.auth.getUser();
+        if (!mounted || !auth.user) { setLoading(false); return; }
+        setUserId(auth.user.id);
+        const [{ data: profile }, { data: referralRows }, { data: claimRows }] = await Promise.all([
+          client.from("profiles").select("referral_code").eq("id", auth.user.id).maybeSingle(),
+          client.from("referrals").select("id,status,qualifying_deposit_amount,referrer_reward_amount,created_at").eq("referrer_id", auth.user.id).order("created_at", { ascending: false }),
+          client.from("reward_claims").select("amount,status,submitted_at").eq("user_id", auth.user.id).eq("claim_type", "referral").order("submitted_at", { ascending: false }),
+        ]);
+        if (!mounted) return;
+        setCode(profile?.referral_code || "ORBITEX");
+        setReferrals((referralRows || []) as Referral[]);
+        setClaims((claimRows || []) as Claim[]);
+        setLoading(false);
+      }
+      loadReferralData();
+    } catch {
+      if (mounted) setLoading(false);
     }
-    loadReferralData();
     return () => { mounted = false; };
-  }, [supabase]);
+  }, []);
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/signup?ref=${code}` : `/signup?ref=${code}`;
   const qualifying = referrals.filter((item) => item.status === "qualifying");
@@ -70,7 +76,7 @@ export default function ReferralPage() {
   }
 
   async function requestClaim() {
-    if (!userId || claimable <= 0 || claiming) return;
+    if (!supabase || !userId || claimable <= 0 || claiming) return;
     setClaiming(true); setMessage("");
     const { error } = await supabase.from("reward_claims").insert({ user_id: userId, claim_type: "referral", amount: Number(claimable.toFixed(8)), status: "pending_review" });
     if (error) setMessage(error.message);
