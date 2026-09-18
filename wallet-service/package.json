@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "start": "node dist/index.js",
+    "start": "node dist/sweep-worker.js",
+    "start:api": "node dist/index.js",
     "build": "tsc",
     "recovery": "node dist/recovery-check.js"
   },
