@@ -75,8 +75,8 @@ export default function LearnKnowledge() {
       <section className="orbitex-faq-section" id="faq">
         <div className="faq-heading">
           <div className="orbitex-eyebrow">FREQUENTLY ASKED QUESTIONS</div>
-          <h2>Questions about <span>arbitrage?</span></h2>
-          <p>Clear answers to the essentials before you start exploring arbitrage markets.</p>
+          <h2>A few things <span>worth knowing.</span></h2>
+          <p>Start with the essentials. Get a little clarity before your next move.</p>
         </div>
         <div className="faq-list">
           {faqs.map(([question, answer], index) => (
