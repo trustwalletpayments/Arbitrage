@@ -104,19 +104,43 @@ async function sweepNativeAccount(account: any) {
   const provider = providerFor(network);
   const prepared = sourceAndTreasury(account, provider);
   if (!prepared) return;
-  const { config, source, sourceAddress } = prepared;
+  const { config, source, sourceAddress, treasury } = prepared;
+
+  // The deposit wallet's existing native balance is swept in full.
+  // The treasury first funds the source wallet with enough native currency
+  // to pay the sweep transaction, so the user's deposited native balance is
+  // not reduced by the sweep gas cost.
   const balance = await provider.getBalance(sourceAddress);
   if (balance <= 0n) return;
 
   const feeData = await provider.getFeeData();
   const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
   if (!gasPrice) throw new Error(`Unable to determine gas price for ${network}.`);
+
   const gasLimit = 21_000n;
   const gasCost = gasLimit * gasPrice;
-  if (balance <= gasCost) return;
-  const amount = balance - gasCost;
-  const amountText = formatUnits(amount, 18);
-  await recordSweep(account, configNetwork.nativeAsset, network, amountText, 0n, null, () => source.sendTransaction({ to: config.treasuryAddress, value: amount }));
+  const gasBuffer = gasCost + gasCost / 2n;
+  const treasuryNative = await provider.getBalance(treasury.address);
+  if (treasuryNative < gasBuffer) {
+    throw new Error(`Treasury lacks ${configNetwork.nativeAsset} for gas on ${sourceAddress}.`);
+  }
+
+  const gasTx = await treasury.sendTransaction({
+    to: sourceAddress,
+    value: gasBuffer,
+  });
+  await gasTx.wait(1);
+
+  const amountText = formatUnits(balance, 18);
+  await recordSweep(
+    account,
+    configNetwork.nativeAsset,
+    network,
+    amountText,
+    gasBuffer,
+    gasTx.hash,
+    () => source.sendTransaction({ to: config.treasuryAddress, value: balance }),
+  );
 }
 
 async function sweepTokenAccount(account: any, tokenAddress: string) {
