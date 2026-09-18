@@ -16,19 +16,20 @@ const port = Number(process.env.PORT || 8080);
 const confirmationsRequired = Number(process.env.CONFIRMATIONS_REQUIRED || 15);
 const transferTopic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a9df523b3ef';
 
-const NETWORKS: Record<string, { name: string; family: string; rpcEnv: string; chainId: number }> = {
-  ethereum: { name: 'Ethereum', family: 'evm', rpcEnv: 'ETHEREUM_RPC_URL', chainId: 1 },
-  bsc: { name: 'BNB Smart Chain', family: 'evm', rpcEnv: 'BSC_RPC_URL', chainId: 56 },
-  polygon: { name: 'Polygon', family: 'evm', rpcEnv: 'POLYGON_RPC_URL', chainId: 137 },
-  arbitrum: { name: 'Arbitrum One', family: 'evm', rpcEnv: 'ARBITRUM_RPC_URL', chainId: 42161 },
-  optimism: { name: 'Optimism', family: 'evm', rpcEnv: 'OPTIMISM_RPC_URL', chainId: 10 },
-  base: { name: 'Base', family: 'evm', rpcEnv: 'BASE_RPC_URL', chainId: 8453 },
-  avalanche: { name: 'Avalanche C-Chain', family: 'evm', rpcEnv: 'AVALANCHE_RPC_URL', chainId: 43114 },
-  fantom: { name: 'Fantom', family: 'evm', rpcEnv: 'FANTOM_RPC_URL', chainId: 250 },
-  cronos: { name: 'Cronos', family: 'evm', rpcEnv: 'CRONOS_RPC_URL', chainId: 25 },
-  linea: { name: 'Linea', family: 'evm', rpcEnv: 'LINEA_RPC_URL', chainId: 59144 },
+type NetworkConfig = { name: string; family: string; rpcEnv: string; chainId: number; nativeAsset: string };
+const NETWORKS: Record<string, NetworkConfig> = {
+  ethereum: { name: 'Ethereum', family: 'evm', rpcEnv: 'ETHEREUM_RPC_URL', chainId: 1, nativeAsset: 'ETH' },
+  bsc: { name: 'BNB Smart Chain', family: 'evm', rpcEnv: 'BSC_RPC_URL', chainId: 56, nativeAsset: 'BNB' },
+  polygon: { name: 'Polygon', family: 'evm', rpcEnv: 'POLYGON_RPC_URL', chainId: 137, nativeAsset: 'POL' },
+  arbitrum: { name: 'Arbitrum One', family: 'evm', rpcEnv: 'ARBITRUM_RPC_URL', chainId: 42161, nativeAsset: 'ETH' },
+  optimism: { name: 'Optimism', family: 'evm', rpcEnv: 'OPTIMISM_RPC_URL', chainId: 10, nativeAsset: 'ETH' },
+  base: { name: 'Base', family: 'evm', rpcEnv: 'BASE_RPC_URL', chainId: 8453, nativeAsset: 'ETH' },
+  avalanche: { name: 'Avalanche C-Chain', family: 'evm', rpcEnv: 'AVALANCHE_RPC_URL', chainId: 43114, nativeAsset: 'AVAX' },
+  fantom: { name: 'Fantom', family: 'evm', rpcEnv: 'FANTOM_RPC_URL', chainId: 250, nativeAsset: 'FTM' },
+  cronos: { name: 'Cronos', family: 'evm', rpcEnv: 'CRONOS_RPC_URL', chainId: 25, nativeAsset: 'CRO' },
+  linea: { name: 'Linea', family: 'evm', rpcEnv: 'LINEA_RPC_URL', chainId: 59144, nativeAsset: 'ETH' },
 };
-const EVM_ASSETS = new Set(['ETH', 'USDT', 'USDC', 'BNB', 'POL', 'AVAX', 'LINK', 'UNI']);
+const EVM_ASSETS = new Set(['ETH', 'USDT', 'USDC', 'BNB', 'POL', 'AVAX', 'LINK', 'UNI', 'FTM', 'CRO']);
 
 function authorized(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (req.header('x-wallet-service-key') !== apiKey) return res.status(401).json({ error: 'Unauthorized' });
@@ -54,6 +55,21 @@ function deriveEvmAddress(index: number) {
   const root = HDNodeWallet.fromExtendedKey(getEvmXpub());
   return getAddress(root.derivePath(`0/${index}`).address);
 }
+function getRpc(network: string) {
+  const config = NETWORKS[network];
+  if (!config) throw new Error('Unsupported EVM network.');
+  const url = process.env[config.rpcEnv]?.trim();
+  if (!url) throw new Error(`${config.rpcEnv} is not configured for ${config.name}.`);
+  return new JsonRpcProvider(url, config.chainId);
+}
+function getTokenContract(network: string, asset: string) {
+  const raw = process.env.EVM_TOKEN_CONTRACTS_JSON?.trim();
+  if (!raw) return null;
+  let config: Record<string, Record<string, string>>;
+  try { config = JSON.parse(raw); } catch { throw new Error('EVM_TOKEN_CONTRACTS_JSON is not valid JSON.'); }
+  const address = config[network]?.[asset];
+  return address ? getAddress(address) : null;
+}
 
 app.get('/health', (_req, res) => res.json({
   ok: true,
@@ -63,7 +79,17 @@ app.get('/health', (_req, res) => res.json({
   evmXpubConfigured: Boolean(process.env.EVM_XPUB),
   sweepConfigured: Boolean(process.env.EVM_XPRIV && process.env.TREASURY_PRIVATE_KEY && process.env.TREASURY_ADDRESS),
   sweepEnabled: process.env.SWEEP_ENABLED === 'true',
+  evmTokenConfigConfigured: Boolean(process.env.EVM_TOKEN_CONTRACTS_JSON),
 }));
+
+app.get('/supported-deposits', authorized, (_req, res) => {
+  const routes = Object.entries(NETWORKS).flatMap(([network, config]) => {
+    const native = [{ asset: config.nativeAsset, network, type: 'native', ready: true }];
+    const tokens = ['USDT', 'USDC', 'LINK', 'UNI'].map(asset => ({ asset, network, type: 'erc20', ready: Boolean(getTokenContract(network, asset)) }));
+    return [...native, ...tokens];
+  });
+  res.json({ ok: true, routes });
+});
 
 function getSweepConfig() {
   const xpriv = process.env.EVM_XPRIV?.trim();
@@ -83,31 +109,23 @@ async function sweepBscUsdt(walletAccountId: string) {
   if (account.data.asset !== 'USDT' || account.data.network !== 'bsc') throw new Error('Only USDT on BNB Smart Chain is supported by this sweep worker.');
   if (account.data.status !== 'active' || account.data.derivation_index === null || !account.data.deposit_address) throw new Error('Wallet account is not ready for sweeping.');
 
-  const provider = new JsonRpcProvider(process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org', 56);
+  const provider = getRpc('bsc');
   const source = HDNodeWallet.fromExtendedKey(config.xpriv).derivePath(`0/${Number(account.data.derivation_index)}`).connect(provider);
   const sourceAddress = getAddress(source.address);
   if (sourceAddress.toLowerCase() !== getAddress(account.data.deposit_address).toLowerCase()) throw new Error('Derived signer does not match the provisioned deposit address.');
-
   const treasury = new Wallet(config.treasuryKey, provider);
   if (getAddress(treasury.address).toLowerCase() !== config.treasuryAddress.toLowerCase()) throw new Error('TREASURY_PRIVATE_KEY does not match TREASURY_ADDRESS.');
-
   const usdtAddress = getAddress(process.env.USDT_CONTRACT || '0x55d398326f99059fF775485246999027B3197955');
   const usdt = new Contract(usdtAddress, ['function balanceOf(address) view returns (uint256)','function transfer(address to,uint256 amount) returns (bool)'], source);
   const balance = BigInt((await usdt.balanceOf(sourceAddress)).toString());
   if (balance <= 0n) return { ok: true, status: 'nothing_to_sweep', walletAccountId, address: sourceAddress };
-
-  const gasEstimate = await provider.estimateGas({
-    from: sourceAddress,
-    to: usdtAddress,
-    data: usdt.interface.encodeFunctionData('transfer', [config.treasuryAddress, balance]),
-  });
+  const gasEstimate = await provider.estimateGas({ from: sourceAddress, to: usdtAddress, data: usdt.interface.encodeFunctionData('transfer', [config.treasuryAddress, balance]) });
   const feeData = await provider.getFeeData();
   const gasPrice = feeData.maxFeePerGas || feeData.gasPrice;
   if (!gasPrice) throw new Error('Unable to determine BSC gas price.');
   const requiredGas = gasEstimate * gasPrice;
   const gasBuffer = requiredGas + requiredGas / 2n;
   const sourceNative = await provider.getBalance(sourceAddress);
-
   let gasTxHash: string | null = null;
   if (sourceNative < gasBuffer) {
     const treasuryNative = await provider.getBalance(treasury.address);
@@ -116,19 +134,8 @@ async function sweepBscUsdt(walletAccountId: string) {
     gasTxHash = gasTx.hash;
     await gasTx.wait(1);
   }
-
-  const sweep = await supabase.from('wallet_sweeps').insert({
-    wallet_account_id: account.data.id,
-    user_id: account.data.user_id,
-    asset: 'USDT',
-    network: 'bsc',
-    amount: formatUnits(balance, 18),
-    gas_funded_amount: formatUnits(gasBuffer > sourceNative ? gasBuffer - sourceNative : 0n, 18),
-    gas_tx_hash: gasTxHash,
-    status: 'processing',
-  }).select('id').single();
+  const sweep = await supabase.from('wallet_sweeps').insert({ wallet_account_id: account.data.id, user_id: account.data.user_id, asset: 'USDT', network: 'bsc', amount: formatUnits(balance, 18), gas_funded_amount: formatUnits(gasBuffer > sourceNative ? gasBuffer - sourceNative : 0n, 18), gas_tx_hash: gasTxHash, status: 'processing' }).select('id').single();
   if (sweep.error) throw new Error(sweep.error.message);
-
   try {
     const tx = await usdt.transfer(config.treasuryAddress, balance);
     const receipt = await tx.wait(1);
@@ -143,12 +150,8 @@ async function sweepBscUsdt(walletAccountId: string) {
 
 app.post('/admin/sweep/bsc/usdt/:walletAccountId', authorized, async (req, res) => {
   if (process.env.SWEEP_ENABLED !== 'true') return res.status(503).json({ error: 'Sweep worker is disabled. Set SWEEP_ENABLED=true after configuring the signer and treasury.' });
-  try {
-    const result = await sweepBscUsdt(String(req.params.walletAccountId));
-    return res.json(result);
-  } catch (error) {
-    return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to sweep wallet.' });
-  }
+  try { return res.json(await sweepBscUsdt(String(req.params.walletAccountId))); }
+  catch (error) { return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to sweep wallet.' }); }
 });
 
 app.post('/provision/:userId', authorized, async (req, res) => {
@@ -178,24 +181,25 @@ app.post('/verify-deposit', authorized, async (req, res) => {
   const userId = String(req.body?.userId || '');
   const txHash = String(req.body?.txHash || '').trim().toLowerCase();
   const submittedAmount = String(req.body?.amount || '').trim();
-  const network = String(req.body?.network || 'bsc').trim().toLowerCase();
-  const asset = String(req.body?.asset || 'USDT').trim().toUpperCase();
+  const network = String(req.body?.network || '').trim().toLowerCase();
+  const asset = String(req.body?.asset || '').trim().toUpperCase();
   if (!validateUserId(userId)) return res.status(400).json({ error: 'Invalid user id' });
   if (!/^0x[a-f0-9]{64}$/.test(txHash)) return res.status(400).json({ error: 'Invalid transaction hash' });
   if (!/^\d+(\.\d{1,18})?$/.test(submittedAmount) || Number(submittedAmount) <= 0) return res.status(400).json({ error: 'Invalid amount' });
-  if (network !== 'bsc' || asset !== 'USDT') return res.status(400).json({ error: 'Deposit verification for this network/asset is not enabled yet.' });
+  const config = NETWORKS[network];
+  if (!config) return res.status(400).json({ error: 'Unsupported EVM network.' });
+  if (!EVM_ASSETS.has(asset)) return res.status(400).json({ error: 'Unsupported EVM asset.' });
 
-  const account = await supabase.from('wallet_accounts').select('id,deposit_address').eq('user_id', userId).eq('network', 'bsc').eq('asset', 'USDT').maybeSingle();
+  const account = await supabase.from('wallet_accounts').select('id,deposit_address').eq('user_id', userId).eq('network', network).eq('asset', asset).maybeSingle();
   if (account.error) return res.status(500).json({ error: account.error.message });
-  if (!account.data?.deposit_address) return res.status(400).json({ error: 'Your USDT BEP-20 deposit address has not been provisioned yet.' });
+  if (!account.data?.deposit_address) return res.status(400).json({ error: `Your ${asset} deposit address has not been provisioned yet.` });
 
-  const existing = await supabase.from('wallet_deposits').select('id,status,user_id').eq('network', 'BEP20').eq('asset', 'USDT').eq('tx_hash', txHash).maybeSingle();
+  const existing = await supabase.from('wallet_deposits').select('id,status,user_id').eq('network', network).eq('asset', asset).eq('tx_hash', txHash).maybeSingle();
   if (existing.error) return res.status(500).json({ error: existing.error.message });
   if (existing.data) return res.status(409).json({ error: 'This transaction has already been submitted.', deposit: existing.data });
 
   try {
-    const rpc = new JsonRpcProvider(process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org');
-    const usdtContract = getAddress(process.env.USDT_CONTRACT || '0x55d398326f99059fF775485246999027B3197955');
+    const rpc = getRpc(network);
     const destination = getAddress(account.data.deposit_address);
     const tx = await rpc.getTransaction(txHash);
     const receipt = await rpc.getTransactionReceipt(txHash);
@@ -205,27 +209,40 @@ app.post('/verify-deposit', authorized, async (req, res) => {
     const iface = new Interface(['event Transfer(address indexed from,address indexed to,uint256 value)']);
     let verifiedFrom = '';
     let verifiedAmount = 0n;
-    let matched = false;
-    for (const log of receipt.logs) {
-      if (log.address.toLowerCase() !== usdtContract.toLowerCase() || log.topics[0]?.toLowerCase() !== transferTopic) continue;
-      const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
-      if (!parsed) continue;
-      const recipient = getAddress(String(parsed.args.to));
-      if (recipient.toLowerCase() === destination.toLowerCase()) {
-        matched = true;
-        verifiedFrom = getAddress(String(parsed.args.from));
-        verifiedAmount = BigInt(parsed.args.value.toString());
-        break;
+    let decimals = 18;
+    const tokenContract = getTokenContract(network, asset);
+
+    if (asset === config.nativeAsset && !tokenContract) {
+      if (!tx.to || getAddress(tx.to) !== destination || tx.value <= 0n) return res.status(400).json({ error: `No ${asset} native transfer to your Orbitex deposit address was found.` });
+      verifiedFrom = getAddress(tx.from);
+      verifiedAmount = tx.value;
+      decimals = 18;
+    } else {
+      if (!tokenContract) return res.status(400).json({ error: `${asset} on ${config.name} is not configured yet. Add its contract to EVM_TOKEN_CONTRACTS_JSON before enabling deposits.` });
+      const token = new Contract(tokenContract, ['function decimals() view returns (uint8)'], rpc);
+      decimals = Number(await token.decimals());
+      for (const log of receipt.logs) {
+        if (log.address.toLowerCase() !== tokenContract.toLowerCase() || log.topics[0]?.toLowerCase() !== transferTopic) continue;
+        const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
+        if (!parsed) continue;
+        const recipient = getAddress(String(parsed.args.to));
+        if (recipient.toLowerCase() === destination.toLowerCase()) {
+          verifiedFrom = getAddress(String(parsed.args.from));
+          verifiedAmount = BigInt(parsed.args.value.toString());
+          break;
+        }
       }
+      if (!verifiedFrom) return res.status(400).json({ error: `No ${asset} token transfer to your Orbitex deposit address was found.` });
     }
-    if (!matched) return res.status(400).json({ error: 'No USDT transfer to your Orbitex deposit address was found.' });
-    const expectedAmount = parseUnits(submittedAmount, 18);
-    if (verifiedAmount !== expectedAmount) return res.status(400).json({ error: `Amount mismatch. On-chain amount is ${formatUnits(verifiedAmount, 18)} USDT.` });
+
+    const expectedAmount = parseUnits(submittedAmount, decimals);
+    if (verifiedAmount !== expectedAmount) return res.status(400).json({ error: `Amount mismatch. On-chain amount is ${formatUnits(verifiedAmount, decimals)} ${asset}.` });
     const status = confirmations >= confirmationsRequired ? 'credited' : 'confirming';
-    const inserted = await supabase.from('wallet_deposits').insert({ user_id: userId, wallet_account_id: account.data.id, asset: 'USDT', network: 'BEP20', chain_family: 'evm', tx_hash: txHash, from_address: verifiedFrom, to_address: destination, amount: formatUnits(verifiedAmount, 18), confirmations, status, credited_at: status === 'credited' ? new Date().toISOString() : null }).select('*').single();
+    const networkLabel = network === 'bsc' ? 'BEP20' : network;
+    const inserted = await supabase.from('wallet_deposits').insert({ user_id: userId, wallet_account_id: account.data.id, asset, network: networkLabel, chain_family: 'evm', tx_hash: txHash, from_address: verifiedFrom, to_address: destination, amount: formatUnits(verifiedAmount, decimals), confirmations, status, credited_at: status === 'credited' ? new Date().toISOString() : null }).select('*').single();
     if (inserted.error) return res.status(500).json({ error: inserted.error.message });
     if (status === 'credited') {
-      const ledger = await supabase.from('wallet_ledger_entries').insert({ user_id: userId, asset: 'USDT', entry_type: 'deposit', amount: formatUnits(verifiedAmount, 18), reference_id: inserted.data.id, description: `Verified BEP-20 USDT deposit ${txHash}` });
+      const ledger = await supabase.from('wallet_ledger_entries').insert({ user_id: userId, asset, entry_type: 'deposit', amount: formatUnits(verifiedAmount, decimals), reference_id: inserted.data.id, description: `Verified ${networkLabel} ${asset} deposit ${txHash}` });
       if (ledger.error) return res.status(500).json({ error: ledger.error.message, deposit: inserted.data });
     }
     return res.status(201).json({ ok: true, status, confirmations, requiredConfirmations: confirmationsRequired, deposit: inserted.data });
