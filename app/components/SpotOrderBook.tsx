@@ -19,41 +19,15 @@ export default function SpotOrderBook({pair}:{pair:string}){
   useEffect(()=>{
     let alive=true;
     let socket:WebSocket|undefined;
-    setLoading(true);
-    setAsks([]);setBids([]);setLast(0);
-
+    setLoading(true);setAsks([]);setBids([]);setLast(0);
     fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=20`,{cache:"no-store"})
       .then(r=>r.ok?r.json():null)
-      .then(data=>{
-        if(!alive||!data)return;
-        setAsks(normalize(data.asks).sort((a,b)=>a.price-b.price));
-        setBids(normalize(data.bids).sort((a,b)=>b.price-a.price));
-        setLast(Number(data?.lastUpdateId||0));
-        setLoading(false);
-      }).catch(()=>{if(alive)setLoading(false)});
-
+      .then(data=>{if(!alive||!data)return;setAsks(normalize(data.asks).sort((a,b)=>a.price-b.price));setBids(normalize(data.bids).sort((a,b)=>b.price-a.price));setLast(Number(data?.lastUpdateId||0));setLoading(false)})
+      .catch(()=>{if(alive)setLoading(false)});
     try{
       socket=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@depth@100ms`);
-      socket.onmessage=event=>{
-        try{
-          const data=JSON.parse(event.data);
-          if(!alive)return;
-          const update=(current:Level[],changes:any[],descending:boolean)=>{
-            const map=new Map(current.map(level=>[level.price,level.size]));
-            for(const row of changes||[]){
-              const price=Number(row?.[0]);
-              const size=Number(row?.[1]);
-              if(!Number.isFinite(price)||!Number.isFinite(size)||price<=0)continue;
-              if(size<=0)map.delete(price);else map.set(price,size);
-            }
-            return [...map.entries()].map(([price,size])=>({price,size})).sort((a,b)=>descending?b.price-a.price:a.price-b.price).slice(0,20);
-          };
-          setAsks(current=>update(current,data?.a,false));
-          setBids(current=>update(current,data?.b,true));
-        }catch{}
-      };
+      socket.onmessage=event=>{try{const data=JSON.parse(event.data);if(!alive)return;const update=(current:Level[],changes:any[],descending:boolean)=>{const map=new Map(current.map(level=>[level.price,level.size]));for(const row of changes||[]){const price=Number(row?.[0]);const size=Number(row?.[1]);if(!Number.isFinite(price)||!Number.isFinite(size)||price<=0)continue;if(size<=0)map.delete(price);else map.set(price,size)}return [...map.entries()].map(([price,size])=>({price,size})).sort((a,b)=>descending?b.price-a.price:a.price-b.price).slice(0,20)};setAsks(current=>update(current,data?.a,false));setBids(current=>update(current,data?.b,true))}catch{}};
     }catch{}
-
     return()=>{alive=false;socket?.close()};
   },[symbol]);
 
@@ -63,21 +37,14 @@ export default function SpotOrderBook({pair}:{pair:string}){
   const spread=bestAsk&&bestBid?bestAsk-bestBid:0;
   const displayLast=mid||Number(last)||0;
   const maxTotal=useMemo(()=>Math.max(1,...asks.map(x=>x.size),...bids.map(x=>x.size)),[asks,bids]);
-  const row=(level:Level,side:"ask"|"bid")=>{
-    const width=Math.min(100,(level.size/maxTotal)*100);
-    return <div className={`book-row ${side}`} key={`${side}-${level.price}`}>
-      <span>{formatPrice(level.price)}</span><span>{level.size.toLocaleString(undefined,{maximumFractionDigits:4})}</span><span>{(level.price*level.size).toLocaleString(undefined,{maximumFractionDigits:2})}</span><i style={{width:`${width}%`}} aria-hidden="true"/>
-    </div>;
-  };
+  const row=(level:Level,side:"ask"|"bid")=>{const width=Math.min(100,(level.size/maxTotal)*100);return <div className={`book-row ${side}`} key={`${side}-${level.price}`}><span>{formatPrice(level.price)}</span><span>{level.size.toLocaleString(undefined,{maximumFractionDigits:4})}</span><span>{(level.price*level.size).toLocaleString(undefined,{maximumFractionDigits:2})}</span><i style={{width:`${width}%`}} aria-hidden="true"/></div>};
+  const columns=<div className="book-head"><span>Price (USDT)</span><span>Size ({pair.split("/")[0]})</span><span>Total (USDT)</span></div>;
+  const card=(title:"Asks"|"Bids",levels:Level[],side:"ask"|"bid")=><section className={`spot-order-book-card ${side}`} aria-label={`${pair} ${title}`}><div className="book-title"><div><span className="book-kicker">ORDER BOOK</span><strong className={side}>{title}</strong><em>{pair}</em></div><span className="book-live">LIVE</span></div>{columns}<div className="book-card-scroll"><div className="book-side">{(side==="ask"?levels.slice(0,10).reverse():levels.slice(0,10)).map(level=>row(level,side))}</div></div></section>;
 
-  return <section className="spot-order-book" aria-label={`${pair} order book`}>
-    <div className="book-title"><div><span className="book-kicker">ORDER BOOK</span><strong>{pair}</strong></div><span className="book-live">LIVE</span></div>
-    <div className="book-head"><span>Price (USDT)</span><span>Size ({pair.split("/")[0]})</span><span>Total (USDT)</span></div>
-    <div className="book-levels">
-      <div className="book-side asks">{asks.slice(0,10).reverse().map(level=>row(level,"ask"))}</div>
-      <div className="book-mid"><strong>{displayLast?formatPrice(displayLast):"—"} <span>↑</span></strong>{spread>0&&<small>Spread {formatPrice(spread)}</small>}</div>
-      <div className="book-side bids">{bids.slice(0,10).map(level=>row(level,"bid"))}</div>
-      {loading&&<div className="book-loading">Loading market depth…</div>}
-    </div>
-  </section>;
+  return <div className="spot-order-book-stack" aria-label={`${pair} live order book`}>
+    {card("Asks",asks,"ask")}
+    <div className="book-mid-card"><strong>{displayLast?formatPrice(displayLast):"—"} <span>↑</span></strong>{spread>0&&<small>Spread {formatPrice(spread)}</small>}</div>
+    {card("Bids",bids,"bid")}
+    {loading&&<div className="book-loading">Loading market depth…</div>}
+  </div>;
 }
