@@ -47,7 +47,7 @@ function rootXpub() {
 function paymentFromNode(node: BIP32Interface) {
   const payment = bitcoin.payments.p2wpkh({ pubkey: Buffer.from(node.publicKey), network: bitcoin.networks.bitcoin });
   if (!payment.address || !payment.output) throw new Error('Unable to derive Bitcoin P2WPKH address.');
-  return { address: payment.address, scriptPubKey: payment.output.toString('hex') };
+  return { address: payment.address, scriptPubKey: Buffer.from(payment.output).toString('hex') };
 }
 
 /** BITCOIN_XPRV/BITCOIN_XPUB are account-level keys at m/84'/0'/0'; index derives 0/index below them. */
@@ -102,9 +102,9 @@ export async function buildBitcoinSweep(args: { index: number; treasuryAddress: 
   if (amount < 546n) throw new Error('Bitcoin sweep output would be dust.');
   const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin });
   for (const utxo of args.utxos) {
-    psbt.addInput({ hash: utxo.txid, index: utxo.vout, witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: utxo.valueSats } });
+    psbt.addInput({ hash: utxo.txid, index: utxo.vout, witnessUtxo: { script: Buffer.from(utxo.scriptPubKey, 'hex'), value: Number(utxo.valueSats) } });
   }
-  psbt.addOutput({ address: args.treasuryAddress, value: amount });
+  psbt.addOutput({ address: args.treasuryAddress, value: Number(amount) });
   for (let i = 0; i < args.utxos.length; i++) psbt.signInput(i, derived.node);
   psbt.finalizeAllInputs();
   const tx = psbt.extractTransaction();
