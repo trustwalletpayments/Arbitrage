@@ -10,7 +10,7 @@ import "../wallet.css";
 import "./deposit.css";
 
 type Asset = { symbol: string; name: string; color: string; icon: string };
-type Network = { id: string; name: string; short: string; icon: string };
+type Network = { id: string; name: string; short: string; icon: string; assets: string[] };
 
 const ASSETS: Asset[] = [
   { symbol: "USDT", name: "Tether", color: "#26a17b", icon: "tether" },
@@ -39,22 +39,38 @@ const ASSETS: Asset[] = [
   { symbol: "ARB", name: "Arbitrum", color: "#28a0f0", icon: "arbitrum" },
 ];
 
+const EVM_TOKENS = ["USDT", "USDC", "ETH", "BNB", "LINK", "UNI", "POL", "ARB", "AVAX"];
 const NETWORKS: Network[] = [
-  { id: "ethereum", name: "Ethereum", short: "ERC-20", icon: "ethereum" },
-  { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", icon: "bnbchain" },
-  { id: "polygon", name: "Polygon", short: "Polygon", icon: "polygon" },
-  { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", icon: "arbitrum" },
-  { id: "optimism", name: "Optimism", short: "Optimism", icon: "optimism" },
-  { id: "base", name: "Base", short: "Base", icon: "base" },
-  { id: "avalanche", name: "Avalanche C-Chain", short: "C-Chain", icon: "avalanche" },
-  { id: "fantom", name: "Fantom", short: "Fantom", icon: "fantom" },
-  { id: "cronos", name: "Cronos", short: "Cronos", icon: "cronos" },
-  { id: "linea", name: "Linea", short: "Linea", icon: "linea" },
+  { id: "ethereum", name: "Ethereum", short: "ERC-20", icon: "ethereum", assets: ["USDT", "USDC", "ETH", "LINK", "UNI"] },
+  { id: "bsc", name: "BNB Smart Chain", short: "BEP-20", icon: "bnbchain", assets: EVM_TOKENS },
+  { id: "polygon", name: "Polygon", short: "Polygon", icon: "polygon", assets: ["USDT", "USDC", "POL", "ETH", "LINK", "UNI"] },
+  { id: "arbitrum", name: "Arbitrum One", short: "Arbitrum", icon: "arbitrum", assets: ["USDT", "USDC", "ETH", "ARB", "LINK", "UNI"] },
+  { id: "optimism", name: "Optimism", short: "Optimism", icon: "optimism", assets: ["USDT", "USDC", "ETH", "LINK", "UNI"] },
+  { id: "base", name: "Base", short: "Base", icon: "base", assets: ["USDT", "USDC", "ETH", "LINK", "UNI"] },
+  { id: "avalanche", name: "Avalanche C-Chain", short: "C-Chain", icon: "avalanche", assets: ["USDT", "USDC", "AVAX", "LINK", "UNI"] },
+  { id: "fantom", name: "Fantom", short: "Fantom", icon: "fantom", assets: ["USDT", "USDC", "ETH"] },
+  { id: "cronos", name: "Cronos", short: "Cronos", icon: "cronos", assets: ["USDT", "USDC", "ETH"] },
+  { id: "linea", name: "Linea", short: "Linea", icon: "linea", assets: ["USDT", "USDC", "ETH"] },
+  { id: "bitcoin", name: "Bitcoin", short: "Bitcoin", icon: "bitcoin", assets: ["BTC"] },
+  { id: "solana", name: "Solana", short: "Solana", icon: "solana", assets: ["SOL", "USDT", "USDC"] },
+  { id: "tron", name: "TRON", short: "TRC-20", icon: "tron", assets: ["TRX", "USDT", "USDC"] },
+  { id: "xrp", name: "XRP Ledger", short: "XRP", icon: "xrp", assets: ["XRP"] },
+  { id: "cardano", name: "Cardano", short: "Cardano", icon: "cardano", assets: ["ADA"] },
+  { id: "polkadot", name: "Polkadot", short: "Polkadot", icon: "polkadot", assets: ["DOT"] },
+  { id: "litecoin", name: "Litecoin", short: "Litecoin", icon: "litecoin", assets: ["LTC"] },
+  { id: "dogecoin", name: "Dogecoin", short: "Dogecoin", icon: "dogecoin", assets: ["DOGE"] },
+  { id: "cosmos", name: "Cosmos Hub", short: "Cosmos", icon: "cosmos", assets: ["ATOM"] },
+  { id: "near", name: "NEAR", short: "NEAR", icon: "near", assets: ["NEAR"] },
+  { id: "aptos", name: "Aptos", short: "Aptos", icon: "aptos", assets: ["APT"] },
+  { id: "sui", name: "Sui", short: "Sui", icon: "sui", assets: ["SUI"] },
+  { id: "ton", name: "TON", short: "TON", icon: "ton", assets: ["TON"] },
+  { id: "stellar", name: "Stellar", short: "Stellar", icon: "stellar", assets: ["XLM"] },
+  { id: "bitcoincash", name: "Bitcoin Cash", short: "BCH", icon: "bitcoincash", assets: ["BCH"] },
 ];
 
-// Keep the full asset catalogue visible, but only make a route clickable when
-// its backend adapter is actually ready. This prevents users from sending
-// funds to an address that the service cannot yet verify/credit.
+// UI catalogue is intentionally broader than live routes. A network becomes
+// clickable only after its backend provisioning, verification, and recovery /
+// sweep path has been configured and tested.
 const ENABLED_DEPOSITS = new Set(["USDT:bsc"]);
 
 function Logo({ asset, network }: { asset?: Asset; network?: Network }) {
@@ -63,24 +79,11 @@ function Logo({ asset, network }: { asset?: Asset; network?: Network }) {
   const color = asset?.color ?? "#18324d";
 
   return (
-    <span
-      className="deposit-asset-logo"
-      style={{ background: `${color}22`, border: `1px solid ${color}55` }}
-    >
+    <span className="deposit-asset-logo" style={{ background: `${color}22`, border: `1px solid ${color}55` }}>
       {asset ? (
-        <TokenIcon
-          symbol={asset.symbol.toLowerCase()}
-          size={28}
-          variant="branded"
-          fallback={<span className="deposit-logo-fallback" style={{ color }}>{label.slice(0, 2)}</span>}
-        />
+        <TokenIcon symbol={asset.symbol.toLowerCase()} size={28} variant="branded" fallback={<span className="deposit-logo-fallback" style={{ color }}>{label.slice(0, 2)}</span>} />
       ) : (
-        <NetworkIcon
-          network={network?.id || icon}
-          size={28}
-          variant="branded"
-          fallback={<span className="deposit-logo-fallback" style={{ color }}>{label.slice(0, 2)}</span>}
-        />
+        <NetworkIcon network={network?.id || icon} size={28} variant="branded" fallback={<span className="deposit-logo-fallback" style={{ color }}>{label.slice(0, 2)}</span>} />
       )}
     </span>
   );
@@ -95,6 +98,11 @@ export default function DepositPage() {
   const filteredAssets = useMemo(
     () => ASSETS.filter((asset) => `${asset.symbol} ${asset.name}`.toLowerCase().includes(search.toLowerCase())),
     [search]
+  );
+
+  const availableNetworks = useMemo(
+    () => NETWORKS.filter((network) => network.assets.includes(selectedAsset.symbol)),
+    [selectedAsset.symbol]
   );
 
   const chooseAsset = (asset: Asset) => {
@@ -134,7 +142,7 @@ export default function DepositPage() {
 
             <div className="deposit-asset-grid">
               {filteredAssets.map((asset) => {
-                const enabled = asset.symbol === "USDT";
+                const enabled = NETWORKS.some((network) => network.assets.includes(asset.symbol) && ENABLED_DEPOSITS.has(`${asset.symbol}:${network.id}`));
                 return (
                   <button key={asset.symbol} type="button" className={`deposit-asset-option ${selectedAsset.symbol === asset.symbol ? "selected" : ""}`} onClick={() => chooseAsset(asset)}>
                     <Logo asset={asset} />
@@ -145,7 +153,7 @@ export default function DepositPage() {
               })}
             </div>
 
-            <p className="deposit-helper">24 assets are shown. Deposit routes are enabled only after their chain adapter, verification, and recovery/sweep path are ready.</p>
+            <p className="deposit-helper">{ASSETS.length} assets and {NETWORKS.length} compatible networks are listed. A route is clickable only after its backend adapter, verification, and recovery/sweep path are ready.</p>
           </div>
 
           <div className={`deposit-details withdraw-form ${showNetworks ? "mobile-visible" : "mobile-hidden"}`}>
@@ -156,12 +164,12 @@ export default function DepositPage() {
               <div><span className="wallet-kicker">DEPOSIT ASSET</span><h2>{selectedAsset.name} <em>{selectedAsset.symbol}</em></h2></div>
             </div>
 
-            <p className="deposit-helper">Select the network matching the asset you are sending. Never send funds over a different network than the one shown on the receiving address.</p>
+            <p className="deposit-helper">Select a compatible network matching the asset you are sending. Never send funds over a different network than the one shown on the receiving address.</p>
 
             <div className="deposit-network-step">
               <label className="deposit-field-label">Choose network for {selectedAsset.symbol}</label>
               <div className="deposit-network-list">
-                {NETWORKS.map((network) => {
+                {availableNetworks.map((network) => {
                   const enabled = ENABLED_DEPOSITS.has(`${selectedAsset.symbol}:${network.id}`);
                   return (
                     <button key={network.id} type="button" className={`deposit-network-option ${enabled ? "selected" : ""}`} onClick={() => chooseNetwork(network)} disabled={!enabled} title={enabled ? `Deposit ${selectedAsset.symbol} on ${network.name}` : "Coming soon — backend adapter not enabled yet"} style={!enabled ? { opacity: 0.55, cursor: "not-allowed" } : undefined}>
