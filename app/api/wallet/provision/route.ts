@@ -46,7 +46,9 @@ export async function POST(request: NextRequest) {
   if (!asset || !network) return NextResponse.json({ error: "Asset and network are required." }, { status: 400 });
 
   const serviceUrl = normalizeWalletServiceUrl(walletServiceUrl);
-  const endpoint = `${serviceUrl.replace(/\/$/, "")}/provision/${data.user.id}`;
+  const endpoint = asset === "BTC" && network === "bitcoin"
+    ? `${serviceUrl.replace(/\/$/, "")}/provision-bitcoin/${data.user.id}`
+    : `${serviceUrl.replace(/\/$/, "")}/provision/${data.user.id}`;
 
   try {
     const response = await fetch(endpoint, {
