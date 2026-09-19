@@ -127,3 +127,17 @@
   .spot-side-form.buy-form{padding-right:0;border-right:0;border-bottom:1px solid #1b2633;padding-bottom:16px}
   .spot-side-form.sell-form{padding-left:0}
 }
+
+/* Spot trading-mode and order-type controls inspired by professional terminals. */
+.spot-mode-tabs{display:flex;align-items:center;gap:2px;margin:0 -18px;border-bottom:1px solid #1b2633;padding:0 18px}
+.spot-mode-tabs button{height:42px;padding:0 16px;border:0;border-bottom:2px solid transparent;background:transparent;color:#7d8da1;font-size:13px;font-weight:700;cursor:pointer}
+.spot-mode-tabs button:hover{color:#dfe8f2}
+.spot-mode-tabs button.active{color:#f3f6fa;border-bottom-color:#f0c933}
+.spot-order-types{display:flex;align-items:center;gap:4px;padding:10px 0 6px;border-bottom:1px solid #192635}
+.spot-order-types button{height:34px;padding:0 13px;border:0;border-bottom:2px solid transparent;background:transparent;color:#8492a5;font-size:12px;font-weight:700;cursor:pointer;border-radius:6px 6px 0 0}
+.spot-order-types button:hover{background:#101a25;color:#e5edf6}
+.spot-order-types button.active{color:#f1f4f8;background:#0f1b27;border-bottom-color:#f0c933}
+@media(max-width:760px){
+  .spot-mode-tabs{margin:0 -14px;padding:0 14px;overflow-x:auto}
+  .spot-mode-tabs button{padding:0 14px;white-space:nowrap}
+}
