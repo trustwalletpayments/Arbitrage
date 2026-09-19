@@ -13,9 +13,11 @@
   min-height:54px!important;
   padding:0 12px!important;
   border-bottom:1px solid #1b2938!important;
-  background:#0a1018!important;
-  overflow:hidden!important;
+  background:#000!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
   white-space:nowrap!important;
+  scrollbar-width:thin;
 }
 .custom-chart-toolbar .chart-group{
   display:flex!important;
@@ -115,3 +117,12 @@
   .custom-chart-toolbar .chart-readout{margin-left:8px!important}
   .custom-chart-toolbar .chart-source{display:none!important}
 }
+
+/* Keep the chart toolbar fully navigable instead of clipping controls. */
+.custom-chart-toolbar{overscroll-behavior-x:contain!important;-webkit-overflow-scrolling:touch!important}
+.custom-chart-toolbar .chart-group{flex:0 0 auto!important}
+.custom-chart-toolbar .chart-intervals{max-width:none!important;flex:0 0 auto!important}
+.custom-chart-toolbar .chart-tools{max-width:none!important;flex:0 0 auto!important}
+.custom-chart-toolbar .chart-readout{flex:0 0 auto!important}
+.custom-chart-toolbar .chart-source{flex:0 0 auto!important}
+.custom-chart-toolbar button{flex:0 0 auto!important}
