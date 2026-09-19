@@ -1,0 +1,94 @@
+/* Final Spot header override: stats are plain inline text, not cards. */
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats,
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
+  min-width: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 30px !important;
+  flex-wrap: nowrap !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin-left: auto !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats span {
+  background: transparent !important;
+  color: #718197 !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats strong {
+  background: transparent !important;
+  color: #dbe4ee !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats .up { color: #20d9a0 !important; }
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats .danger { color: #ef6178 !important; }
+
+@media (min-width: 1100px) {
+  .spot-reference-layout > .chart-area > .spot-market-header {
+    min-height: 78px !important;
+    height: 78px !important;
+    padding: 10px 18px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {
+    flex: 0 0 180px !important;
+    align-self: center !important;
+    transform: translateY(-8px) !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
+    align-self: center !important;
+    transform: translateY(-2px) !important;
+  }
+}
+
+@media (max-width: 1099px) and (min-width: 761px) {
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
+    gap: 16px !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+  }
+}
