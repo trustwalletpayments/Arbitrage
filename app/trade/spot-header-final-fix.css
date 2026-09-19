@@ -1,94 +1,235 @@
-/* Final Spot header override: stats are plain inline text, not cards. */
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats,
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  outline: 0 !important;
+/* ORBITEX Spot header — definitive layout fix.
+   One header, no statistic cards, no horizontal overflow. */
+
+.spot-reference-layout {
+  width:100% !important;
+  max-width:1900px !important;
+  box-sizing:border-box !important;
+  overflow-x:hidden !important;
 }
 
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
-  min-width: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
+@media (min-width:761px) {
+  /* Keep all three Spot columns inside the viewport. */
+  .trade-layout.spot-reference-layout {
+    grid-template-columns:minmax(220px,420px) minmax(0,1fr) minmax(220px,330px) !important;
+    width:100% !important;
+    max-width:1900px !important;
+    margin:0 auto !important;
+    box-sizing:border-box !important;
+  }
 
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 30px !important;
-  flex-wrap: nowrap !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin-left: auto !important;
-}
+  .spot-reference-layout > .chart-area {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
 
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  gap: 4px !important;
-}
-
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats span {
-  background: transparent !important;
-  color: #718197 !important;
-  font-size: 10px !important;
-  line-height: 1.2 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  white-space: nowrap !important;
-}
-
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats strong {
-  background: transparent !important;
-  color: #dbe4ee !important;
-  font-size: 14px !important;
-  line-height: 1.2 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  white-space: nowrap !important;
-}
-
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats .up { color: #20d9a0 !important; }
-.spot-reference-layout > .chart-area > .spot-market-header .market-stats .danger { color: #ef6178 !important; }
-
-@media (min-width: 1100px) {
+  /* Clean single market header. */
   .spot-reference-layout > .chart-area > .spot-market-header {
-    min-height: 78px !important;
-    height: 78px !important;
-    padding: 10px 18px !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:22px !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:78px !important;
+    min-height:78px !important;
+    margin:0 !important;
+    padding:10px 18px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    border:1px solid #1d2a38 !important;
+    border-radius:0 !important;
+    background:#090e15 !important;
+  }
+
+  /* BTC/USDT is always visible at the left of the header. */
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {
+    position:relative !important;
+    inset:auto !important;
+    left:0 !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:auto !important;
+    flex:0 0 180px !important;
+    width:180px !important;
+    min-width:180px !important;
+    max-width:180px !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    align-items:flex-start !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    overflow:visible !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .pair {
+    position:static !important;
+    display:block !important;
+    width:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#edf3fa !important;
+    font-size:22px !important;
+    line-height:1.05 !important;
+    font-weight:800 !important;
+    letter-spacing:-.03em !important;
+    white-space:nowrap !important;
+    transform:none !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .price-line {
+    display:flex !important;
+    align-items:center !important;
+    gap:9px !important;
+    margin:5px 0 0 !important;
+    padding:0 !important;
+    white-space:nowrap !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .price-line strong {
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#f5f9ff !important;
+    font-size:18px !important;
+    line-height:1.05 !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .price-line span {
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:12px !important;
+    line-height:1 !important;
+    font-weight:700 !important;
+    white-space:nowrap !important;
+  }
+
+  /* 24h values are plain text groups — absolutely no cards. */
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
+    position:static !important;
+    flex:1 1 auto !important;
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    align-items:center !important;
+    gap:18px !important;
+    width:auto !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:none !important;
+    overflow:hidden !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats > div,
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats > div:first-child,
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats > div:last-child {
+    position:static !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    align-items:flex-start !important;
+    gap:4px !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    outline:0 !important;
+    overflow:hidden !important;
+    transform:none !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats span {
+    display:block !important;
+    position:static !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#718197 !important;
+    font-size:10px !important;
+    line-height:1.2 !important;
+    font-weight:400 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    background:transparent !important;
+    border:0 !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats strong {
+    display:block !important;
+    position:static !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#dbe4ee !important;
+    font-size:14px !important;
+    line-height:1.2 !important;
+    font-weight:700 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    background:transparent !important;
+    border:0 !important;
+    transform:none !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats .up {color:#20d9a0 !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats .danger {color:#ef6178 !important}
+}
+
+@media (min-width:761px) and (max-width:1100px) {
+  .trade-layout.spot-reference-layout {
+    grid-template-columns:minmax(220px,30%) minmax(0,1fr) minmax(220px,26%) !important;
+    gap:10px !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+
+  .spot-reference-layout > .chart-area > .spot-market-header {
+    gap:12px !important;
+    height:82px !important;
+    min-height:82px !important;
+    padding:9px 12px !important;
   }
 
   .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {
-    flex: 0 0 180px !important;
-    align-self: center !important;
-    transform: translateY(-8px) !important;
+    flex-basis:145px !important;
+    width:145px !important;
+    min-width:145px !important;
+    max-width:145px !important;
   }
 
-  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
-    align-self: center !important;
-    transform: translateY(-2px) !important;
-  }
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .pair {font-size:19px !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block .price-line strong {font-size:16px !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {gap:8px !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats span {font-size:9px !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .market-stats strong {font-size:12px !important}
 }
 
-@media (max-width: 1099px) and (min-width: 761px) {
-  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
-    gap: 20px !important;
-  }
-}
-
-@media (max-width: 760px) {
-  .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
-    gap: 16px !important;
-    justify-content: flex-start !important;
-    overflow-x: auto !important;
-  }
+@media (max-width:760px) {
+  .spot-reference-layout {width:100% !important;max-width:100% !important;overflow-x:hidden !important}
+  .spot-reference-layout > .chart-area {width:100% !important;min-width:0 !important;max-width:100% !important;overflow:hidden !important}
+  .spot-reference-layout > .chart-area > .spot-market-header {width:100% !important;max-width:100% !important;overflow:hidden !important}
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {position:static !important;inset:auto !important;transform:none !important;margin:0 !important}
 }
