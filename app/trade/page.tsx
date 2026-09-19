@@ -12,6 +12,7 @@ import "./spot-pro.css";
 import "./spot-orderbook-width.css";
 import "./spot-layout-fixes.css";
 import "./spot-header-flat.css";
+import "./spot-header-final-fix.css";
 
 type MarketItem={symbol:string;baseAsset:string;quoteAsset:string;marketCapRank:number;coinId?:string;logo?:string};
 function validPair(value:string|null){if(!value)return "BTC/USDT";const compact=value.toUpperCase().replace(/[^A-Z0-9]/g,"");if(!compact.endsWith("USDT"))return "BTC/USDT";const base=compact.slice(0,-4);return /^[A-Z0-9]{2,20}$/.test(base)?`${base}/USDT`:"BTC/USDT"}
