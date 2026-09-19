@@ -45,9 +45,9 @@
 
 /* Trades is a standalone card below the Bids book. */
 .spot-trades-card{
-  flex:0 0 330px;
-  min-height:330px;
-  height:330px;
+  flex:0 0 380px;
+  min-height:380px;
+  height:380px;
   width:100%;
   box-sizing:border-box;
   border:1px solid #1d2a38;
@@ -101,10 +101,10 @@
 .spot-reference-layout>.spot-order-book-stack{height:auto!important;min-height:0!important}
 
 @media (max-width:1099px){
-  .spot-trades-card{height:330px;min-height:330px;flex-basis:330px}
+  .spot-trades-card{height:380px;min-height:380px;flex-basis:380px}
 }
 
 @media (max-width:760px){
-  .spot-trades-card{height:330px;min-height:330px;flex-basis:330px}
+  .spot-trades-card{height:380px;min-height:380px;flex-basis:380px}
   .trades-head,.trade-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 70px}
 }
