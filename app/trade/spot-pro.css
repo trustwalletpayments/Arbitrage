@@ -231,3 +231,8 @@
   .orbitex-chart-toolbar .chart-readout,.custom-chart-toolbar .chart-readout{max-width:150px!important;overflow:hidden!important}
   .orbitex-chart-toolbar .chart-source,.custom-chart-toolbar .chart-source{display:none!important}
 }
+
+/* Sell balance slider matches sell action color. */
+.spot-balance-slider.sell-slider{background:linear-gradient(90deg,#ef4d68 0%,#ef4d68 var(--pct),#1a2634 var(--pct),#1a2634 100%)!important}
+.spot-balance-slider.sell-slider::-webkit-slider-thumb{background:#ef4d68!important;box-shadow:0 0 0 2px rgba(239,77,104,.18)!important}
+.spot-balance-slider.sell-slider::-moz-range-thumb{background:#ef4d68!important}
