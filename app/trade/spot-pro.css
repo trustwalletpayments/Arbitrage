@@ -141,3 +141,56 @@
   .spot-mode-tabs{margin:0 -14px;padding:0 14px;overflow-x:auto}
   .spot-mode-tabs button{padding:0 14px;white-space:nowrap}
 }
+
+/* Spot terminal cleanup: stable two-sided form, proper TP/SL control, smooth sliders, responsive toolbar. */
+.spot-order-entry{overflow:hidden!important;box-sizing:border-box!important}
+.spot-order-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:14px!important;min-width:0!important}
+.spot-side-form{min-width:0!important;width:100%!important;box-sizing:border-box!important}
+.spot-side-form.buy-form{padding-right:8px!important;border-right:1px solid #1b2a39!important}
+.spot-side-form.sell-form{padding-left:8px!important;border-left:0!important}
+.spot-side-head{min-height:30px!important;margin-bottom:12px!important}
+.spot-side-head>div>span{font-size:12px!important;letter-spacing:.12em!important;font-weight:800!important}
+.spot-side-head>div>strong{font-size:16px!important;font-weight:800!important;color:#edf4fb!important}
+.spot-side-head small{font-size:10px!important;white-space:nowrap!important}
+.spot-field{margin-bottom:11px!important}
+.spot-input-wrap input{height:44px!important}
+.spot-percent{margin:3px 0 15px!important}
+.spot-percent input[type="range"]{display:block!important;width:100%!important;height:4px!important;margin:9px 0 8px!important;padding:0!important;border:0!important;background:linear-gradient(90deg,#20d9a0 0%,#20d9a0 50%,#1a2634 50%,#1a2634 100%)!important;box-shadow:none!important;accent-color:#20d9a0!important;cursor:pointer!important}
+.sell-form .spot-percent input[type="range"]{accent-color:#ef6178!important;background:#1a2634!important}
+.spot-percent input[type="range"]::-webkit-slider-runnable-track{height:4px!important;background:#1a2634!important;border:0!important;border-radius:999px!important}
+.spot-percent input[type="range"]::-webkit-slider-thumb{width:14px!important;height:14px!important;margin-top:-5px!important}
+.spot-percent input[type="range"]::-moz-range-track{height:4px!important;background:#1a2634!important;border:0!important;border-radius:999px!important}
+.spot-percent input[type="range"]::-moz-range-thumb{width:14px!important;height:14px!important;border:2px solid #08111a!important}
+.spot-percent>div{font-size:9px!important}
+.spot-check{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:auto!important;min-height:20px!important;margin:6px 0 12px!important;padding:0!important;gap:8px!important;color:#9ba9b9!important}
+.spot-check input[type="checkbox"]{appearance:none!important;-webkit-appearance:none!important;display:block!important;width:18px!important;height:18px!important;min-width:18px!important;max-width:18px!important;min-height:18px!important;max-height:18px!important;flex:0 0 18px!important;margin:0!important;padding:0!important;border:1px solid #34465a!important;border-radius:4px!important;background:#0a1119!important;box-shadow:none!important;cursor:pointer!important}
+.spot-check input[type="checkbox"]:checked{border-color:#2d8cff!important;background:#1a66a6!important;box-shadow:inset 0 0 0 3px #0a1119!important}
+.spot-check span{display:block!important;float:none!important;margin:0!important;color:#a9b6c6!important;font-size:11px!important;line-height:18px!important}
+.spot-balance-line{min-height:18px!important;padding:4px 0!important}
+.spot-submit{height:42px!important;margin-top:10px!important;border-radius:8px!important;font-size:14px!important;font-weight:800!important}
+.spot-mode-tabs{min-width:0!important;overflow-x:auto!important;scrollbar-width:none!important}
+.spot-mode-tabs::-webkit-scrollbar,.spot-order-types::-webkit-scrollbar{display:none}
+.spot-mode-tabs button,.spot-order-types button{flex:0 0 auto!important;white-space:nowrap!important}
+.spot-order-types{min-width:0!important;overflow-x:auto!important;scrollbar-width:none!important}
+.orbitex-chart-toolbar,.custom-chart-toolbar{min-width:0!important;overflow:hidden!important}
+.orbitex-chart-toolbar .chart-intervals,.custom-chart-toolbar .chart-intervals{min-width:0!important;overflow-x:auto!important;scrollbar-width:none!important}
+.orbitex-chart-toolbar .chart-intervals::-webkit-scrollbar,.custom-chart-toolbar .chart-intervals::-webkit-scrollbar{display:none}
+.orbitex-chart-toolbar .chart-tools,.custom-chart-toolbar .chart-tools{min-width:0!important;overflow-x:auto!important;scrollbar-width:none!important}
+.orbitex-chart-toolbar .chart-tools::-webkit-scrollbar,.custom-chart-toolbar .chart-tools::-webkit-scrollbar{display:none}
+.orbitex-chart-toolbar .chart-intervals button,.custom-chart-toolbar .chart-intervals button{flex:0 0 auto!important}
+.orbitex-chart-toolbar .chart-tools button,.custom-chart-toolbar .chart-tools button{flex:0 0 auto!important}
+@media (min-width:1100px){
+  .orbitex-chart-toolbar,.custom-chart-toolbar{display:grid!important;grid-template-columns:minmax(0,auto) minmax(0,1fr) auto auto!important;align-items:center!important;gap:8px!important}
+  .orbitex-chart-toolbar .chart-intervals,.custom-chart-toolbar .chart-intervals{max-width:330px!important}
+  .orbitex-chart-toolbar .chart-tools,.custom-chart-toolbar .chart-tools{max-width:430px!important}
+}
+@media (max-width:1099px){
+  .spot-order-columns{gap:10px!important}
+  .spot-side-form.buy-form{padding-right:5px!important}
+  .spot-side-form.sell-form{padding-left:5px!important}
+}
+@media (max-width:760px){
+  .spot-order-columns{grid-template-columns:1fr!important;gap:16px!important}
+  .spot-side-form.buy-form{padding-right:0!important;border-right:0!important;border-bottom:1px solid #1b2a39!important;padding-bottom:16px!important}
+  .spot-side-form.sell-form{padding-left:0!important}
+}
