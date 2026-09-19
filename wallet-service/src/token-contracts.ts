@@ -8,10 +8,12 @@ export const DEFAULT_EVM_TOKEN_CONTRACTS: Record<string, Record<string, string>>
   bsc: {
     USDT: '0x55d398326f99059fF775485246999027B3197955',
     USDC: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+    ETH: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
   },
   polygon: {
     USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
     USDC: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
+    ETH: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
   },
   arbitrum: {
     USDT: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
@@ -31,10 +33,12 @@ export const DEFAULT_EVM_TOKEN_CONTRACTS: Record<string, Record<string, string>>
   },
   fantom: {
     USDT: '0x049d68029688eabf473097a2fc38ef61633a3c7a',
+    ETH: '0x74b23882a30290451a17c44f4f05243b6b58c76d',
   },
   cronos: {
     USDT: '0x66e428c3f67a68878562e79A0234c1F83c208770',
     USDC: '0x3D7F2C478aAfdB65542BCB44bCeeC05849999d2D',
+    ETH: '0xe44fd7fcb2b1581822d0c862b68222998a0c299a',
   },
   linea: {
     USDT: '0xa219439258ca9da29e9cc4ce5596924745e12b93',
