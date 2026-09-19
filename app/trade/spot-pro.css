@@ -255,3 +255,70 @@
 .spot-balance-slider.sell-slider::-webkit-slider-thumb{background:#ef4d68!important;box-shadow:0 0 0 2px rgba(239,77,104,.18)!important}
 .spot-balance-slider.sell-slider::-moz-range-track{background:transparent!important}
 .spot-balance-slider.sell-slider::-moz-range-thumb{background:#ef4d68!important}
+
+/* Keep the left order-book stack compact enough to align with the Spot Buy/Sell panel. */
+@media (min-width:1100px){
+  .spot-reference-layout>.spot-order-book-stack{
+    height:auto!important;
+    max-height:520px!important;
+    gap:5px!important;
+    overflow:hidden!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .spot-order-book-card{
+    flex:0 0 160px!important;
+    height:160px!important;
+    min-height:160px!important;
+    max-height:160px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .book-mid-card{
+    flex:0 0 40px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .spot-trades-card{
+    flex:0 0 160px!important;
+    height:160px!important;
+    min-height:160px!important;
+    max-height:160px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .spot-order-book-card .book-title{
+    height:42px!important;
+    padding:0 12px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .spot-order-book-card .book-head{
+    padding:7px 10px!important;
+    font-size:9px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .book-card-scroll{
+    height:calc(100% - 74px)!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .book-card-scroll .book-row{
+    padding:5px 10px!important;
+    font-size:10px!important;
+    line-height:1.15!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .book-mid-card strong{
+    font-size:16px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .book-mid-card small{
+    font-size:9px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .trades-title{
+    height:38px!important;
+    padding:0 12px!important;
+    font-size:14px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .trades-head{
+    padding:7px 10px!important;
+    font-size:9px!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .trades-list{
+    height:calc(100% - 67px)!important;
+  }
+  .spot-reference-layout>.spot-order-book-stack .trade-row{
+    padding:5px 10px!important;
+    font-size:10px!important;
+    line-height:1.15!important;
+  }
+}
