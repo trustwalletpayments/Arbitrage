@@ -4,7 +4,7 @@ import {useCallback,useEffect,useRef,useState} from "react";
 import {binanceSymbol,formatPrice} from "../../lib/market-data";
 
 type ChartInterval="1m"|"5m"|"15m"|"1h"|"4h"|"1d"|"1w";
-type DrawMode="crosshair"|"trend"|"horizontal";
+type DrawMode="crosshair"|"pan"|"trend"|"horizontal";
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number};
 type DrawingPoint={index:number;price:number};
 type TrendLine={a:DrawingPoint;b:DrawingPoint};
@@ -203,7 +203,7 @@ export default function OrbitexMarketChart({pair}:{pair:string}){
     const canvas=canvasRef.current;
     if(!canvas)return;
     const r=canvas.getBoundingClientRect();
-    const left=18,right=78,plotW=Math.max(30,r.width-left-right);
+    const left=18,right=102,plotW=Math.max(30,r.width-left-right);
     const mouseRatio=clamp((e.clientX-r.left-left)/plotW,0,1);
     const prev=rangeRef.current;
     const old=prev.end-prev.start;
