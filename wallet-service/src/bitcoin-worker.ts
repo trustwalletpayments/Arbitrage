@@ -16,14 +16,15 @@ const MAX_ACCOUNTS = Math.max(
   1,
   Number(process.env.BITCOIN_MONITOR_MAX_ACCOUNTS_PER_RUN || 200),
 );
-const CONFIRMATIONS_REQUIRED = Math.max(
-  1,
-  Number(
-    process.env.BITCOIN_CONFIRMATIONS_REQUIRED ||
-      process.env.CONFIRMATIONS_REQUIRED ||
-      3,
-  ),
-);
+function confirmationsRequired() {
+  const raw = Number(process.env.BITCOIN_CONFIRMATIONS_REQUIRED);
+  if (!Number.isInteger(raw) || raw < 1) {
+    throw new Error(
+      'BITCOIN_CONFIRMATIONS_REQUIRED must be set to an integer >= 1.',
+    );
+  }
+  return raw;
+}
 
 let running = false;
 
@@ -138,7 +139,8 @@ async function scanAccount(account: {
       if (updated.error) throw new Error(updated.error.message);
     }
 
-    if (deposit.confirmations >= CONFIRMATIONS_REQUIRED) {
+    const requiredConfirmations = confirmationsRequired();
+    if (deposit.confirmations >= requiredConfirmations) {
       console.log(
         `[bitcoin] confirmed account=${account.id} tx=${txHash} confirmations=${deposit.confirmations}; balance credit remains disabled until ledger integration`,
       );
@@ -196,7 +198,7 @@ if (process.env.BITCOIN_MONITOR_ENABLED === 'true') {
     validateConfig();
 
     console.log(
-      `[bitcoin] deposit monitor enabled; interval=${INTERVAL_MS}ms maxAccounts=${MAX_ACCOUNTS} requiredConfirmations=${CONFIRMATIONS_REQUIRED}`,
+      `[bitcoin] deposit monitor enabled; interval=${INTERVAL_MS}ms maxAccounts=${MAX_ACCOUNTS} requiredConfirmations=${confirmationsRequired()}`,
     );
 
     void runBitcoinMonitorCycle();
