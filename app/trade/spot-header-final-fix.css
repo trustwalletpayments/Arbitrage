@@ -11,7 +11,7 @@
 @media (min-width:761px) {
   /* Keep all three Spot columns inside the viewport. */
   .trade-layout.spot-reference-layout {
-    grid-template-columns:260px minmax(0,1fr) 400px !important;
+    grid-template-columns:260px minmax(0,1fr) 350px !important;
     width:100% !important;
     max-width:1900px !important;
     margin:0 auto !important;
