@@ -95,21 +95,35 @@ export async function scanBitcoinDeposit(address:string,minimumConfirmations=1):
   const base=new URL(endpoint);
   if(!base.pathname.endsWith('/'))base.pathname+='/';
   const url=new URL('api/v2/utxo/'+encodeURIComponent(address),base);
-  url.searchParams.set('confirmed','true');
+  url.searchParams.set('confirmed','false');
   const response=await fetch(url.toString());
   if(!response.ok)throw new Error(`Bitcoin UTXO API HTTP ${response.status}.`);
   const body=await response.json() as Array<{txid:string;vout:number;value:string|number;height:number;confirmations?:number}>;
   if(!Array.isArray(body))throw new Error('Bitcoin UTXO API returned an invalid response.');
-  return body.filter(u=>{
+  const candidates=body.filter(u=>{
     const confirmations=Number(u.confirmations??0);
-    return Number.isInteger(u.height)&&u.height>=0&&confirmations>=minimumConfirmations;
-  }).map(u=>({
-    txid:u.txid,
-    vout:Number(u.vout),
-    valueSats:BigInt(String(u.value)),
-    scriptPubKey:'',
-    height:Number(u.height),
-  }));
+    return Number.isInteger(u.vout)&&u.vout>=0&&Number.isInteger(u.height)&&u.height>=0&&confirmations>=minimumConfirmations;
+  });
+  const result:BitcoinUtxo[]=[];
+  for(const u of candidates){
+    const rpcResponse=await fetch(endpoint,{
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({jsonrpc:'2.0',id:'orbitex-btc-utxo',method:'gettxout',params:[u.txid,u.vout,true]}),
+    });
+    if(!rpcResponse.ok)throw new Error(`Bitcoin gettxout HTTP ${rpcResponse.status}.`);
+    const rpcBody=await rpcResponse.json() as {result:{value:number|string;scriptPubKey:{hex:string}}|null;error:{code:number;message:string}|null};
+    if(rpcBody.error)throw new Error(`Bitcoin RPC ${rpcBody.error.code}: ${rpcBody.error.message}`);
+    if(!rpcBody.result?.scriptPubKey?.hex)continue;
+    result.push({
+      txid:u.txid,
+      vout:u.vout,
+      valueSats:BigInt(String(u.value)),
+      scriptPubKey:rpcBody.result.scriptPubKey.hex,
+      height:u.height,
+    });
+  }
+  return result;
 }
 export async function bitcoinTipHeight(){return rpc<number>('getblockcount');}
 async function feeRateSatPerVbyte(){const configured=Number(process.env.BITCOIN_FEE_RATE_SAT_VB||0);if(Number.isFinite(configured)&&configured>0)return configured;const estimate=await rpc<{feerate?:number}>('estimatesmartfee',[6]);if(estimate.feerate&&estimate.feerate>0)return estimate.feerate*100_000;throw new Error('Set BITCOIN_FEE_RATE_SAT_VB because Bitcoin Core did not return a usable fee estimate.');}
