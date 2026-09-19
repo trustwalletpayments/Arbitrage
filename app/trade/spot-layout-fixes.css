@@ -1,0 +1,110 @@
+/* Final Spot layout fixes: keep the market header contained and place Trades below Bids. */
+@media (min-width:1100px){
+  .spot-reference-layout>.chart-area>.spot-market-header{
+    display:grid!important;
+    grid-template-columns:180px minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:16px!important;
+    width:100%!important;
+    min-width:0!important;
+    height:96px!important;
+    min-height:96px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  .spot-reference-layout>.chart-area>.spot-market-header .spot-pair-block{
+    min-width:0!important;
+    width:auto!important;
+  }
+
+  .spot-reference-layout>.chart-area>.spot-market-header .market-stats{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:10px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+  }
+
+  .spot-reference-layout>.chart-area>.spot-market-header .market-stats div{
+    min-width:0!important;
+    width:auto!important;
+    height:68px!important;
+    min-height:68px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  .spot-reference-layout>.chart-area>.spot-market-header .market-stats span,
+  .spot-reference-layout>.chart-area>.spot-market-header .market-stats strong{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+}
+
+/* Trades is a standalone card below the Bids book. */
+.spot-trades-card{
+  flex:0 0 360px;
+  min-height:360px;
+  height:360px;
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #1d2a38;
+  background:#090e15;
+  overflow:hidden;
+}
+
+.trades-title{
+  height:54px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  border-bottom:1px solid #1b2633;
+  color:#dfe7f0;
+  font-size:16px;
+  font-weight:700;
+}
+
+.trades-head,
+.trade-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) 78px;
+  gap:8px;
+  align-items:center;
+}
+
+.trades-head{
+  padding:11px 14px;
+  border-bottom:1px solid #151f2b;
+  color:#68778a;
+  font-size:11px;
+}
+
+.trades-head span:nth-child(n+2),
+.trade-row span:nth-child(n+2){text-align:right}
+
+.trades-list{height:calc(100% - 89px);overflow:hidden}
+
+.trade-row{
+  padding:8px 14px;
+  color:#b7c2cf;
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  border-bottom:1px solid rgba(27,38,51,.7);
+}
+
+.trade-row.buy span:first-child{color:#19d7a0}
+.trade-row.sell span:first-child{color:#ef6178}
+
+.spot-reference-layout>.spot-order-book-stack{height:auto!important;min-height:0!important}
+
+@media (max-width:1099px){
+  .spot-trades-card{height:340px;min-height:340px;flex-basis:340px}
+}
+
+@media (max-width:760px){
+  .spot-trades-card{height:340px;min-height:340px;flex-basis:340px}
+  .trades-head,.trade-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 70px}
+}
