@@ -2,7 +2,7 @@
 @media (min-width:1100px){
   .trade-layout.spot-reference-layout{
     grid-template-columns:260px minmax(0,1fr) 250px!important;
-    column-gap:10px!important;
+    column-gap:5px!important;
   }
 
   .spot-reference-layout>.spot-order-book-stack{
