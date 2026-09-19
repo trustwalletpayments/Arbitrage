@@ -96,7 +96,7 @@ export default function OrbitexMarketChart({pair}:{pair:string}){
     loadingRef.current=true;
     requestDraw();
 
-    fetch(\`https://api.binance.com/api/v3/klines?symbol=\${symbol}&interval=\${intervals[interval]}&limit=500\`,{cache:"no-store"})
+    fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${intervals[interval]}&limit=500`,{cache:"no-store"})
       .then(r=>r.json())
       .then(rows=>{
         if(!alive||!Array.isArray(rows))return;
@@ -117,7 +117,7 @@ export default function OrbitexMarketChart({pair}:{pair:string}){
       .catch(()=>{loadingRef.current=false;requestDraw()});
 
     try{
-      socket=new WebSocket(\`wss://stream.binance.com:9443/ws/\${symbol.toLowerCase()}@kline_\${intervals[interval]}\`);
+      socket=new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${intervals[interval]}`);
       socket.onmessage=e=>{
         try{
           const k=JSON.parse(e.data)?.k;
@@ -383,8 +383,8 @@ function drawChart(
   if(canvas.width!==targetW||canvas.height!==targetH){
     canvas.width=targetW;
     canvas.height=targetH;
-    canvas.style.width=\`\${w}px\`;
-    canvas.style.height=\`\${h}px\`;
+    canvas.style.width=`${w}px`;
+    canvas.style.height=`${h}px`;
   }
   const ctx=canvas.getContext("2d");
   if(!ctx)return;
@@ -530,9 +530,9 @@ function drawChart(
     ctx.fillText(timeLabel,bx+10,by+17);
     ctx.fillStyle="#90a0b4";
     ctx.font="10px system-ui";
-    ctx.fillText(\`O \${formatAxisPrice(c.open)}   H \${formatAxisPrice(c.high)}   L \${formatAxisPrice(c.low)}   C \${formatAxisPrice(c.close)}\`,bx+10,by+37);
+    ctx.fillText(`O ${formatAxisPrice(c.open)}   H ${formatAxisPrice(c.high)}   L ${formatAxisPrice(c.low)}   C ${formatAxisPrice(c.close)}`,bx+10,by+37);
     ctx.fillStyle="#596b7f";
-    ctx.fillText(\`VOL \${formatCompactVolume(c.volume)}\`,bx+10,by+52);
+    ctx.fillText(`VOL ${formatCompactVolume(c.volume)}`,bx+10,by+52);
   }
 }
 
@@ -577,7 +577,7 @@ function drawPriceTag(ctx:CanvasRenderingContext2D,w:number,right:number,y:numbe
   ctx.fillStyle=secondary?"#1a2635":positive?"#1dd5a0":"#ef4d68";
   ctx.fillRect(x,yy,tagW,h);
   ctx.fillStyle=secondary?"#dce5f0":"#04100d";
-  ctx.font=\`600 \${secondary?9:10}px system-ui\`;
+  ctx.font=`600 ${secondary?9:10}px system-ui`;
   ctx.textAlign="center";
   ctx.fillText(label,x+tagW/2,yy+h/2+3);
 }
@@ -590,8 +590,8 @@ function drawHandle(ctx:CanvasRenderingContext2D,x:number,y:number){
 }
 
 function formatCompactVolume(v:number){
-  if(v>=1e9)return \`\${(v/1e9).toFixed(1)}B\`;
-  if(v>=1e6)return \`\${(v/1e6).toFixed(1)}M\`;
-  if(v>=1e3)return \`\${(v/1e3).toFixed(1)}K\`;
+  if(v>=1e9)return `${(v/1e9).toFixed(1)}B`;
+  if(v>=1e6)return `${(v/1e6).toFixed(1)}M`;
+  if(v>=1e3)return `${(v/1e3).toFixed(1)}K`;
   return v.toFixed(0);
 }
