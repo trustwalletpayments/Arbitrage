@@ -89,6 +89,8 @@ app.get('/supported-deposits', authorized, (_req, res) => {
     const configuredTokens = getConfiguredEvmTokenAssets(network).map((asset) => ({ asset, network, type: 'erc20', ready: Boolean(getTokenContract(network, asset)) }));
     return [...native, ...configuredTokens];
   });
+  const bitcoinReady = Boolean(process.env.BITCOIN_XPUB?.trim());
+  if (bitcoinReady) routes.push({ asset: "BTC", network: "bitcoin", type: "native", ready: true });
   res.json({ ok: true, routes });
 });
 
