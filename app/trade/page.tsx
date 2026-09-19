@@ -30,7 +30,7 @@ export default function SpotPage(){
   const inputStyle={display:"block",width:"100%",boxSizing:"border-box" as const,marginTop:8,padding:"12px 14px",borderRadius:10,border:"1px solid #263b54",background:"#070c13",color:"#f1f5fb",fontSize:15,outline:"none"};const labelStyle={display:"block",color:"#a9b7ca",fontSize:12,fontWeight:600,marginBottom:14};
 
   return <main className="app-shell">
-    <header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></Link><Link className="btn" href="/dashboard">Account</Link></header>
+    <header className="appbar"><Link className="brand" href="/"><img src="/orbitex-logo.svg" alt="ORBITEX" style={{width:30,height:30,objectFit:"contain"}}/><span>ORBITEX.</span></Link><nav><Link href="/dashboard">Dashboard</Link><Link className="active" href="/trade">Spot</Link><Link href="/futures">Futures</Link><Link href="/wallet">Wallet</Link><Link href="/orders">Orders</Link></nav><Link className="btn" href="/dashboard">Account</Link></header>
     <div className="trade-layout spot-reference-layout">
       <SpotOrderBook pair={pair}/>
       <section className="chart-area">
