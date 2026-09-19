@@ -277,10 +277,10 @@
     max-height:35px!important;
   }
   .spot-reference-layout>.spot-order-book-stack .spot-trades-card{
-    flex:0 0 160px!important;
-    height:160px!important;
-    min-height:160px!important;
-    max-height:160px!important;
+    flex:0 0 250px!important;
+    height:250px!important;
+    min-height:250px!important;
+    max-height:250px!important;
   }
   .spot-reference-layout>.spot-order-book-stack .spot-order-book-card .book-title{
     height:42px!important;
