@@ -326,13 +326,13 @@ export default function OrbitexMarketChart({pair}:{pair:string}){
       </div>
       <div className="chart-divider"/>
       <div className="chart-group chart-tools" aria-label="Chart tools">
-        <button className={drawMode==="crosshair"?"tool-active":""} title="Cursor / Crosshair" onClick={()=>setDrawMode("crosshair")}>CURSOR</button>
+        <button className={drawMode==="crosshair"?"tool-active":""} title="Cursor / Crosshair" onClick={()=>setDrawMode("crosshair")}>CROSS</button>
         <button className={drawMode==="trend"?"tool-active":""} title="Trend line — click two points" onClick={()=>setDrawMode("trend")}>TREND</button>
         <button className={drawMode==="horizontal"?"tool-active":""} title="Horizontal price line" onClick={()=>setDrawMode("horizontal")}>H-LINE</button>
-        <button title="Clear drawings" onClick={clearDrawings}>CLEAR</button>
+        <button title="Clear drawings" onClick={clearDrawings}>CLR</button>
         <button title="Zoom in" onClick={()=>zoom(-15)}>+</button>
         <button title="Zoom out" onClick={()=>zoom(15)}>−</button>
-        <button title="Reset view" onClick={resetView}>RESET</button>
+        <button title="Reset view" onClick={resetView}>FIT</button>
         <button className={showMA?"tool-active":""} title="Toggle moving averages" onClick={()=>setShowMA(v=>!v)}>MA</button>
         <button className={showVolume?"tool-active":""} title="Toggle volume" onClick={()=>setShowVolume(v=>!v)}>VOL</button>
       </div>
