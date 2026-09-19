@@ -18,6 +18,13 @@
     box-sizing:border-box !important;
   }
 
+  .spot-reference-layout > .reference-market-list {
+    width:350px !important;
+    min-width:350px !important;
+    max-width:350px !important;
+    box-sizing:border-box !important;
+  }
+
   .spot-reference-layout > .chart-area {
     width:100% !important;
     min-width:0 !important;
