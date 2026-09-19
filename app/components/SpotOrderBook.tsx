@@ -4,6 +4,7 @@ import {useEffect,useMemo,useState} from "react";
 import {binanceSymbol,formatPrice} from "../../lib/market-data";
 
 type Level={price:number;size:number};
+type Trade={price:number;size:number;time:number;isBuyerMaker:boolean};
 
 function normalize(levels:any[]):Level[]{
   return (Array.isArray(levels)?levels:[]).map((row:any)=>({price:Number(row?.[0]),size:Number(row?.[1])})).filter(row=>Number.isFinite(row.price)&&Number.isFinite(row.size)&&row.price>0&&row.size>0);
@@ -13,6 +14,7 @@ export default function SpotOrderBook({pair}:{pair:string}){
   const symbol=binanceSymbol(pair);
   const [asks,setAsks]=useState<Level[]>([]);
   const [bids,setBids]=useState<Level[]>([]);
+  const [trades,setTrades]=useState<Trade[]>([]);
   const [last,setLast]=useState(0);
   const [loading,setLoading]=useState(true);
 
@@ -29,6 +31,22 @@ export default function SpotOrderBook({pair}:{pair:string}){
       socket.onmessage=event=>{try{const data=JSON.parse(event.data);if(!alive)return;const update=(current:Level[],changes:any[],descending:boolean)=>{const map=new Map(current.map(level=>[level.price,level.size]));for(const row of changes||[]){const price=Number(row?.[0]);const size=Number(row?.[1]);if(!Number.isFinite(price)||!Number.isFinite(size)||price<=0)continue;if(size<=0)map.delete(price);else map.set(price,size)}return [...map.entries()].map(([price,size])=>({price,size})).sort((a,b)=>descending?b.price-a.price:a.price-b.price).slice(0,20)};setAsks(current=>update(current,data?.a,false));setBids(current=>update(current,data?.b,true))}catch{}};
     }catch{}
     return()=>{alive=false;socket?.close()};
+  },[symbol]);
+
+  useEffect(()=>{
+    let alive=true;
+    async function loadTrades(){
+      try{
+        const response=await fetch(`https://api.binance.com/api/v3/trades?symbol=${symbol}&limit=20`,{cache:"no-store"});
+        if(!response.ok)return;
+        const data=await response.json();
+        if(!alive||!Array.isArray(data))return;
+        setTrades(data.map((item:any)=>({price:Number(item?.price),size:Number(item?.qty),time:Number(item?.time),isBuyerMaker:Boolean(item?.isBuyerMaker)})).filter((item:Trade)=>Number.isFinite(item.price)&&Number.isFinite(item.size)&&item.price>0&&item.size>0));
+      }catch{}
+    }
+    loadTrades();
+    const timer=window.setInterval(loadTrades,2000);
+    return()=>{alive=false;window.clearInterval(timer)};
   },[symbol]);
 
   useEffect(()=>{
@@ -49,7 +67,7 @@ export default function SpotOrderBook({pair}:{pair:string}){
     };
     refreshMarkets();
     const timer=window.setInterval(refreshMarkets,3000);
-    return()=>{stopped=true;window.clearInterval(timer)};
+    return()=>{stopped=true;window.clearInterval(timer)}
   },[]);
 
   const bestAsk=asks[0]?.price||0;
@@ -66,6 +84,17 @@ export default function SpotOrderBook({pair}:{pair:string}){
     {card("Asks",asks,"ask")}
     <div className="book-mid-card"><strong>{displayLast?formatPrice(displayLast):"—"} <span>↑</span></strong>{spread>0&&<small>Spread {formatPrice(spread)}</small>}</div>
     {card("Bids",bids,"bid")}
+    <section className="spot-trades-card" aria-label={`${pair} recent trades`}>
+      <div className="trades-title">Trades</div>
+      <div className="trades-head"><span>Price (USDT)</span><span>Size ({pair.split("/")[0]})</span><span>Time</span></div>
+      <div className="trades-list">
+        {trades.map((trade,index)=><div className={`trade-row ${trade.isBuyerMaker?"sell":"buy"}`} key={`${trade.time}-${index}`}>
+          <span>{formatPrice(trade.price)}</span>
+          <span>{trade.size.toLocaleString(undefined,{maximumFractionDigits:6})}</span>
+          <span>{new Date(trade.time).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})}</span>
+        </div>)}
+      </div>
+    </section>
     {loading&&<div className="book-loading">Loading market depth…</div>}
   </div>;
 }
