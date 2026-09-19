@@ -2,15 +2,21 @@ import * as bitcoin from 'bitcoinjs-lib';
 import { BIP32Factory, type BIP32Interface } from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 const bip32 = BIP32Factory(ecc);
+
+// Orbitex BTC uses native SegWit (BIP-84) on Bitcoin mainnet.
+// BITCOIN_XPUB and BITCOIN_XPRV are the account-level extended keys at m/84'/0'/0'.
+// The application never needs the master seed. Deposit children are derived as 0/index.
+const BITCOIN_ACCOUNT_PATH = "m/84'/0'/0'";
+const BITCOIN_EXTERNAL_CHAIN = 0;
 export type BitcoinUtxo = { txid:string; vout:number; valueSats:bigint; scriptPubKey:string; height:number };
 type RpcResponse<T> = { result:T; error:{code:number;message:string}|null; id:string };
 function rpcUrl(){const value=process.env.BITCOIN_RPC_URL?.trim();if(!value)throw new Error('BITCOIN_RPC_URL is not configured.');return value;}
 async function rpc<T>(method:string,params:unknown[]=[]):Promise<T>{const response=await fetch(rpcUrl(),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:'orbitex-btc',method,params})});if(!response.ok)throw new Error(`Bitcoin RPC HTTP ${response.status}.`);const body=(await response.json()) as RpcResponse<T>;if(body.error)throw new Error(`Bitcoin RPC ${body.error.code}: ${body.error.message}`);return body.result;}
 function rootXprv(){const xprv=process.env.BITCOIN_XPRV?.trim();if(!xprv)throw new Error('BITCOIN_XPRV is not configured.');return bip32.fromBase58(xprv,bitcoin.networks.bitcoin);}
 function rootXpub(){const xpub=process.env.BITCOIN_XPUB?.trim();if(!xpub)throw new Error('BITCOIN_XPUB is not configured.');return bip32.fromBase58(xpub,bitcoin.networks.bitcoin);}
-function paymentFromNode(node:BIP32Interface){const payment=bitcoin.payments.p2wpkh({pubkey:Buffer.from(node.publicKey),network:bitcoin.networks.bitcoin});if(!payment.address||!payment.output)throw new Error('Unable to derive Bitcoin P2WPKH address.');return{address:payment.address,scriptPubKey:Buffer.from(payment.output).toString('hex')};}
-export function deriveBitcoinDeposit(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXprv().derivePath(`0/${index}`);return{index,...paymentFromNode(node),node};}
-export function deriveBitcoinDepositAddress(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXpub().derivePath(`0/${index}`);return{index,...paymentFromNode(node)};}
+function paymentFromNode(node:BIP32Interface){const payment=bitcoin.payments.p2wpkh({pubkey:Buffer.from(node.publicKey),network:bitcoin.networks.bitcoin});if(!payment.address||!payment.output)throw new Error('Unable to derive Bitcoin P2WPKH address.');if(!payment.address.startsWith('bc1q'))throw new Error('Derived Bitcoin address is not native SegWit (bc1q).');return{address:payment.address,scriptPubKey:Buffer.from(payment.output).toString('hex')};}
+export function deriveBitcoinDeposit(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXprv().derivePath(`${BITCOIN_EXTERNAL_CHAIN}/${index}`);return{index,...paymentFromNode(node),node};}
+export function deriveBitcoinDepositAddress(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXpub().derivePath(`${BITCOIN_EXTERNAL_CHAIN}/${index}`);return{index,...paymentFromNode(node)};}
 export async function scanBitcoinDeposit(address:string,minimumConfirmations=1):Promise<BitcoinUtxo[]>{const result=await rpc<{success:boolean;height:number;txouts:Array<{txid:string;vout:number;scriptPubKey:{hex:string};value:number;height:number}>}>('scantxoutset',['start',[`addr(${address})`]]);if(!result.success)throw new Error('Bitcoin UTXO scan did not complete successfully.');return result.txouts.filter(u=>result.height-u.height+1>=minimumConfirmations).map(u=>({txid:u.txid,vout:u.vout,valueSats:BigInt(Math.round(u.value*100_000_000)),scriptPubKey:u.scriptPubKey.hex,height:u.height}));}
 export async function bitcoinTipHeight(){return rpc<number>('getblockcount');}
 async function feeRateSatPerVbyte(){const configured=Number(process.env.BITCOIN_FEE_RATE_SAT_VB||0);if(Number.isFinite(configured)&&configured>0)return configured;const estimate=await rpc<{feerate?:number}>('estimatesmartfee',[6]);if(estimate.feerate&&estimate.feerate>0)return estimate.feerate*100_000;throw new Error('Set BITCOIN_FEE_RATE_SAT_VB because Bitcoin Core did not return a usable fee estimate.');}
