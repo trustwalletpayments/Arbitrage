@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": {"dev":"tsx src/index.ts","start":"node dist/sweep-worker.js","start:api":"node dist/index.js","build":"tsc","recovery":"node dist/recovery-check.js"},
+  "scripts": {"dev":"tsx src/index.ts","start":"node dist/sweep-worker.js","start:api":"node dist/index.js","start:bitcoin":"node dist/bitcoin-worker.js","build":"tsc","recovery":"node dist/recovery-check.js"},
   "dependencies": {
     "@solana/spl-token":"^0.4.14",
     "@solana/web3.js":"^1.98.4",
