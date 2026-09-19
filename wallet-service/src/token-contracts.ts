@@ -33,7 +33,7 @@ export const DEFAULT_EVM_TOKEN_CONTRACTS: Record<string, Record<string, string>>
   },
   fantom: {
     USDT: '0x049d68029688eabf473097a2fc38ef61633a3c7a',
-    ETH: '0x74b23882a30290451a17c44f4f05243b6b58c76d',
+    ETH: '0xfe7eda5f2c56160d406869a8aa4b2f365d544c7b',
   },
   cronos: {
     USDT: '0x66e428c3f67a68878562e79A0234c1F83c208770',
