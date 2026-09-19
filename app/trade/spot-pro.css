@@ -236,3 +236,22 @@
 .spot-balance-slider.sell-slider{background:linear-gradient(90deg,#ef4d68 0%,#ef4d68 var(--pct),#1a2634 var(--pct),#1a2634 100%)!important}
 .spot-balance-slider.sell-slider::-webkit-slider-thumb{background:#ef4d68!important;box-shadow:0 0 0 2px rgba(239,77,104,.18)!important}
 .spot-balance-slider.sell-slider::-moz-range-thumb{background:#ef4d68!important}
+
+/* Spot order panel: readable 10 percent scale-up and red sell slider. */
+.spot-order-entry .spot-side-form{font-size:11px!important}
+.spot-order-entry .spot-side-head>div>span{font-size:14px!important}
+.spot-order-entry .spot-side-head>div>strong{font-size:18px!important}
+.spot-order-entry .spot-side-head small{font-size:11px!important}
+.spot-order-entry .spot-field{font-size:12px!important;margin-bottom:12px!important}
+.spot-order-entry .spot-field>span{font-size:11px!important}
+.spot-order-entry .spot-input-wrap input{height:46px!important;font-size:15.5px!important}
+.spot-order-entry .spot-input-wrap em{font-size:11px!important}
+.spot-order-entry .spot-percent>div{font-size:10px!important}
+.spot-order-entry .spot-balance-line{font-size:11px!important}
+.spot-order-entry .spot-balance-line strong{font-size:11px!important}
+.spot-order-entry .spot-submit{font-size:16px!important}
+.spot-balance-slider.sell-slider{background:linear-gradient(90deg,#ef4d68 0%,#ef4d68 var(--pct),#1a2634 var(--pct),#1a2634 100%)!important}
+.spot-balance-slider.sell-slider::-webkit-slider-runnable-track{background:transparent!important}
+.spot-balance-slider.sell-slider::-webkit-slider-thumb{background:#ef4d68!important;box-shadow:0 0 0 2px rgba(239,77,104,.18)!important}
+.spot-balance-slider.sell-slider::-moz-range-track{background:transparent!important}
+.spot-balance-slider.sell-slider::-moz-range-thumb{background:#ef4d68!important}
