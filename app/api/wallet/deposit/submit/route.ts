@@ -10,7 +10,7 @@ const walletServiceUrl = process.env.WALLET_SERVICE_URL;
 const walletServiceKey =
   process.env.WALLET_SERVICE_API_KEY || process.env.ADMIN_API_KEY;
 
-const ENABLED_VERIFICATION_ROUTES = new Set(["USDT:bsc"]);
+const ENABLED_VERIFICATION_ROUTES = new Set(["USDT:bsc", "BTC:bitcoin"]);
 
 export async function POST(request: NextRequest) {
   const missing: string[] = [];
@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!Number.isFinite(amount) || amount <= 0 || !/^0x[a-f0-9]{64}$/.test(txHash)) {
+  const validTxHash = asset === "BTC" && network === "bitcoin"
+    ? /^[a-f0-9]{64}$/.test(txHash)
+    : /^0x[a-f0-9]{64}$/.test(txHash);
+  if (!Number.isFinite(amount) || amount <= 0 || !validTxHash) {
     return NextResponse.json(
       { error: "Enter a valid amount and transaction hash." },
       { status: 400 },
@@ -61,7 +64,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${walletServiceUrl.replace(/\/$/, "")}/verify-deposit`, {
+    const endpoint = asset === "BTC" && network === "bitcoin"
+      ? `${walletServiceUrl.replace(/\/$/, "")}/verify-bitcoin-deposit`
+      : `${walletServiceUrl.replace(/\/$/, "")}/verify-deposit`;
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "content-type": "application/json",
