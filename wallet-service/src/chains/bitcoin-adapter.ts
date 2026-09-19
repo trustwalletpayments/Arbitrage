@@ -89,7 +89,28 @@ function rootXpub(){const raw=process.env.BITCOIN_ZPUB?.trim()||process.env.BITC
 function paymentFromNode(node:BIP32Interface){const payment=bitcoin.payments.p2wpkh({pubkey:Buffer.from(node.publicKey),network:bitcoin.networks.bitcoin});if(!payment.address||!payment.output)throw new Error('Unable to derive Bitcoin P2WPKH address.');if(!payment.address.startsWith('bc1q'))throw new Error('Derived Bitcoin address is not native SegWit (bc1q).');return{address:payment.address,scriptPubKey:Buffer.from(payment.output).toString('hex')};}
 export function deriveBitcoinDeposit(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXprv().derivePath(`${BITCOIN_EXTERNAL_CHAIN}/${index}`);return{index,...paymentFromNode(node),node};}
 export function deriveBitcoinDepositAddress(index:number){if(!Number.isInteger(index)||index<0)throw new Error('Invalid Bitcoin derivation index.');const node=rootXpub().derivePath(`${BITCOIN_EXTERNAL_CHAIN}/${index}`);return{index,...paymentFromNode(node)};}
-export async function scanBitcoinDeposit(address:string,minimumConfirmations=1):Promise<BitcoinUtxo[]>{const result=await rpc<{success:boolean;height:number;txouts:Array<{txid:string;vout:number;scriptPubKey:{hex:string};value:number;height:number}>}>('scantxoutset',['start',[`addr(${address})`]]);if(!result.success)throw new Error('Bitcoin UTXO scan did not complete successfully.');return result.txouts.filter(u=>result.height-u.height+1>=minimumConfirmations).map(u=>({txid:u.txid,vout:u.vout,valueSats:BigInt(Math.round(u.value*100_000_000)),scriptPubKey:u.scriptPubKey.hex,height:u.height}));}
+export async function scanBitcoinDeposit(address:string,minimumConfirmations=1):Promise<BitcoinUtxo[]>{
+  const endpoint=process.env.BITCOIN_RPC_URL?.trim();
+  if(!endpoint)throw new Error('BITCOIN_RPC_URL is not configured.');
+  const base=new URL(endpoint);
+  if(!base.pathname.endsWith('/'))base.pathname+='/';
+  const url=new URL('api/v2/utxo/'+encodeURIComponent(address),base);
+  url.searchParams.set('confirmed','true');
+  const response=await fetch(url.toString());
+  if(!response.ok)throw new Error(`Bitcoin UTXO API HTTP ${response.status}.`);
+  const body=await response.json() as Array<{txid:string;vout:number;value:string|number;height:number;confirmations?:number}>;
+  if(!Array.isArray(body))throw new Error('Bitcoin UTXO API returned an invalid response.');
+  return body.filter(u=>{
+    const confirmations=Number(u.confirmations??0);
+    return Number.isInteger(u.height)&&u.height>=0&&confirmations>=minimumConfirmations;
+  }).map(u=>({
+    txid:u.txid,
+    vout:Number(u.vout),
+    valueSats:BigInt(String(u.value)),
+    scriptPubKey:'',
+    height:Number(u.height),
+  }));
+}
 export async function bitcoinTipHeight(){return rpc<number>('getblockcount');}
 async function feeRateSatPerVbyte(){const configured=Number(process.env.BITCOIN_FEE_RATE_SAT_VB||0);if(Number.isFinite(configured)&&configured>0)return configured;const estimate=await rpc<{feerate?:number}>('estimatesmartfee',[6]);if(estimate.feerate&&estimate.feerate>0)return estimate.feerate*100_000;throw new Error('Set BITCOIN_FEE_RATE_SAT_VB because Bitcoin Core did not return a usable fee estimate.');}
 export async function buildBitcoinSweep(args:{index:number;treasuryAddress:string;utxos:BitcoinUtxo[];feeRateSatVb?:number}){if(!args.utxos.length)throw new Error('No confirmed Bitcoin UTXOs to sweep.');const derived=deriveBitcoinDeposit(args.index);const feeRate=args.feeRateSatVb??await feeRateSatPerVbyte();const estimatedVbytes=10+args.utxos.length*68+31;const fee=BigInt(Math.ceil(estimatedVbytes*feeRate));const total=args.utxos.reduce((sum,u)=>sum+u.valueSats,0n);if(total<=fee)throw new Error('Bitcoin balance is not sufficient to cover the sweep fee.');const amount=total-fee;if(amount<546n)throw new Error('Bitcoin sweep output would be dust.');const psbt=new bitcoin.Psbt({network:bitcoin.networks.bitcoin});for(const utxo of args.utxos)psbt.addInput({hash:utxo.txid,index:utxo.vout,witnessUtxo:{script:Buffer.from(utxo.scriptPubKey,'hex'),value:utxo.valueSats as any}});psbt.addOutput({address:args.treasuryAddress,value:amount as any});for(let i=0;i<args.utxos.length;i++)psbt.signInput(i,derived.node);psbt.finalizeAllInputs();const tx=psbt.extractTransaction();return{txHex:tx.toHex(),txid:tx.getId(),amountSats:amount,feeSats:fee,feeRateSatVb:feeRate};}
