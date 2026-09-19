@@ -59,11 +59,13 @@
   .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {
     flex:0 0 180px!important;
     align-self:center!important;
+    transform:translateY(-6px)!important;
   }
 
   .spot-reference-layout > .chart-area > .spot-market-header .market-stats {
     flex:1 1 auto!important;
     align-self:center!important;
+    transform:translateY(-2px)!important;
   }
 }
 
@@ -89,5 +91,25 @@
   }
   .spot-reference-layout > .chart-area > .spot-market-header .market-stats > div {
     flex:0 0 auto!important;
+  }
+}
+
+/* Final override: remove the legacy 24h statistic cards from Spot. */
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div,
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div:first-child,
+.spot-reference-layout > .chart-area > .spot-market-header .market-stats > div:last-child {
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+}
+
+@media (min-width:1100px) {
+  .spot-reference-layout > .chart-area > .spot-market-header .spot-pair-block {
+    align-self:center!important;
+    transform:translateY(-8px)!important;
   }
 }
