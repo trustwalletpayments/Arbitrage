@@ -22,15 +22,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const symbol = String(body.symbol || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     const side = body.side === "Sell" ? "SELL" : "BUY";
-    const type = body.type === "Market" ? "MARKET" : "LIMIT";
+    const type = body.type === "Market" ? "MARKET" : body.type === "Stop Limit" ? "STOP_LOSS_LIMIT" : "LIMIT";
     const quantity = Number(body.quantity);
     const price = Number(body.price);
+    const stopPrice = Number(body.stopPrice);
 
     if (!/^[A-Z0-9]{5,20}$/.test(symbol) || !Number.isFinite(quantity) || quantity <= 0) {
       return NextResponse.json({ ok: false, error: "Invalid order details." }, { status: 400 });
     }
-    if (type === "LIMIT" && (!Number.isFinite(price) || price <= 0)) {
+    if ((type === "LIMIT" || type === "STOP_LOSS_LIMIT") && (!Number.isFinite(price) || price <= 0)) {
       return NextResponse.json({ ok: false, error: "A valid limit price is required." }, { status: 400 });
+    }
+    if (type === "STOP_LOSS_LIMIT" && (!Number.isFinite(stopPrice) || stopPrice <= 0)) {
+      return NextResponse.json({ ok: false, error: "A valid stop price is required." }, { status: 400 });
     }
 
     const params = new URLSearchParams({
@@ -41,10 +45,11 @@ export async function POST(request: Request) {
       recvWindow: "5000",
       timestamp: String(Date.now()),
     });
-    if (type === "LIMIT") {
+    if (type === "LIMIT" || type === "STOP_LOSS_LIMIT") {
       params.set("price", String(price));
       params.set("timeInForce", "GTC");
     }
+    if (type === "STOP_LOSS_LIMIT") params.set("stopPrice", String(stopPrice));
     params.set("signature", sign(params.toString(), apiSecret));
 
     const response = await fetch(`https://api.binance.com/api/v3/order?${params.toString()}`, {
