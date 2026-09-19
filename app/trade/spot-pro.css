@@ -260,21 +260,21 @@
 @media (min-width:1100px){
   .spot-reference-layout>.spot-order-book-stack{
     height:auto!important;
-    max-height:520px!important;
+    max-height:600px!important;
     gap:5px!important;
     overflow:hidden!important;
   }
   .spot-reference-layout>.spot-order-book-stack .spot-order-book-card{
-    flex:0 0 160px!important;
-    height:160px!important;
-    min-height:160px!important;
-    max-height:160px!important;
+    flex:0 0 180px!important;
+    height:180px!important;
+    min-height:180px!important;
+    max-height:180px!important;
   }
   .spot-reference-layout>.spot-order-book-stack .book-mid-card{
-    flex:0 0 40px!important;
-    height:40px!important;
-    min-height:40px!important;
-    max-height:40px!important;
+    flex:0 0 35px!important;
+    height:35px!important;
+    min-height:35px!important;
+    max-height:35px!important;
   }
   .spot-reference-layout>.spot-order-book-stack .spot-trades-card{
     flex:0 0 160px!important;
