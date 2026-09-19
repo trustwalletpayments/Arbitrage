@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const symbol = String(body.symbol || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     const side = body.side === "Sell" ? "SELL" : "BUY";
-    const type = body.type === "Market" ? "MARKET" : body.type === "Stop Limit" ? "STOP_LOSS_LIMIT" : "LIMIT";
+    const type = body.type === "Market" ? "MARKET" : body.type === "Trigger Order" ? "STOP_LOSS_LIMIT" : "LIMIT";
     const quantity = Number(body.quantity);
     const price = Number(body.price);
     const stopPrice = Number(body.stopPrice);
