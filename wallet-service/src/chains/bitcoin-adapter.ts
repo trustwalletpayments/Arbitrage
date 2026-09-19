@@ -5,7 +5,7 @@ import * as ecc from 'tiny-secp256k1';
 const bip32 = BIP32Factory(ecc);
 
 // Orbitex BTC uses native SegWit (BIP-84) on Bitcoin mainnet.
-// BITCOIN_XPUB and BITCOIN_XPRV are the account-level extended keys at m/84'/0'/0'.
+// BITCOIN_ZPUB/BITCOIN_XPUB and BITCOIN_ZPRV/BITCOIN_XPRV are the account-level extended keys at m/84'/0'/0'.
 // The application never needs the master seed. Deposit children are derived as 0/index.
 const BITCOIN_ACCOUNT_PATH = "m/84'/0'/0'";
 const BITCOIN_EXTERNAL_CHAIN = 0;
