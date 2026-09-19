@@ -70,7 +70,6 @@ export default function SpotPage(){
               <label className="spot-field">Amount <span>{base}</span><div className="spot-input-wrap"><input value={buyAmount} onChange={e=>setBuyAmount(e.target.value)} placeholder="Amount" inputMode="decimal"/><em>{base}</em></div></label>
               <div className="spot-percent"><input className="spot-balance-slider buy-slider" type="range" min="0" max="100" step="1" value={buyPercent} style={{["--pct" as any]:`${buyPercent}%`}} onChange={e=>setBuyFromPercent(Number(e.target.value))}/><div><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div></div>
               <label className="spot-field">Total <span>USDT</span><div className="spot-input-wrap"><input value={buyTotal?buyTotal.toFixed(2):""} readOnly placeholder="Total"/><em>USDT</em></div></label>
-              <label className="spot-check"><input type="checkbox"/><span>TP / SL</span></label>
               <div className="spot-balance-line"><span>Available</span><strong>{available.toFixed(2)} USDT</strong></div>
               <div className="spot-balance-line"><span>Max Buy</span><strong>{orderPrice>0?(available/orderPrice).toFixed(8):"0.00000000"} {base}</strong></div>
               <div className="spot-balance-line"><span>Est. Fee</span><strong>Included</strong></div>
