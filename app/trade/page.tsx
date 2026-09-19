@@ -13,6 +13,7 @@ import "./spot-orderbook-width.css";
 import "./spot-layout-fixes.css";
 import "./spot-header-flat.css";
 import "./spot-header-final-fix.css";
+import "./orbitex-chart-terminal.css";
 
 type MarketItem={symbol:string;baseAsset:string;quoteAsset:string;marketCapRank:number;coinId?:string;logo?:string};
 type MarketTicker={last:number;change:number};
