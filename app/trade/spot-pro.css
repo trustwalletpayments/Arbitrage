@@ -74,3 +74,56 @@
 .orbitex-chart-canvas-wrap .chart-help{left:14px!important;bottom:8px!important;color:#526278!important;font-size:9px!important;opacity:.9!important}
 @media (max-width:1099px){.orbitex-chart-canvas-wrap{height:500px!important;max-height:none!important}}
 @media (max-width:760px){.orbitex-chart-toolbar{height:auto!important;min-height:0!important;flex-wrap:wrap!important;padding:8px!important}.orbitex-chart-toolbar .chart-readout{margin-left:0!important}.orbitex-chart-toolbar .chart-source{display:none!important}.orbitex-chart-canvas-wrap{height:430px!important}}
+
+/* Orbitex Spot order entry — redesigned inspired by professional exchange terminals. */
+.spot-order-entry{padding:16px 18px!important;border:1px solid #1d2a38!important;border-radius:0!important;background:#080d14!important;overflow:visible!important;max-height:none!important}
+.spot-entry-top{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:14px;border-bottom:1px solid #1b2633}
+.spot-entry-kicker{color:#5e88ae;font-size:10px;letter-spacing:.14em;font-weight:700}
+.spot-entry-top h2{margin:4px 0 0;color:#eef4fa;font-size:22px;letter-spacing:-.03em}
+.spot-entry-meta{display:flex;align-items:center;gap:16px;color:#66778b;font-size:11px}
+.spot-entry-meta strong{color:#dbe4ee;font-size:12px;padding:6px 10px;border:1px solid #26394e;background:#0c1520;border-radius:6px}
+.spot-order-types{display:flex;gap:6px;padding:12px 0 8px;border-bottom:1px solid #1b2633}
+.spot-order-types button{border:0;border-bottom:2px solid transparent;background:transparent;color:#7f8da0;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.spot-order-types button:hover{color:#dfe8f2}
+.spot-order-types button.active{color:#f2c93d;border-bottom-color:#f2c93d}
+.spot-order-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;padding-top:14px}
+.spot-side-form{min-width:0}
+.spot-side-form.buy-form{padding-right:9px;border-right:1px solid #192635}
+.spot-side-form.sell-form{padding-left:9px}
+.spot-side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.spot-side-head>div{display:flex;align-items:baseline;gap:7px}
+.spot-side-head>div>span{font-size:11px;font-weight:800;letter-spacing:.1em;color:#20d9a0}
+.sell-form .spot-side-head>div>span{color:#ef6178}
+.spot-side-head>div>strong{font-size:14px;color:#dfe7ef}
+.spot-side-head small{color:#69798c;font-size:10px}
+.spot-side-head small b{color:#bdc9d6;font-weight:600}
+.spot-field{display:block!important;margin:0 0 12px!important;color:#8c9bae!important;font-size:11px!important;font-weight:500!important}
+.spot-field>span{float:right;color:#65758a!important;font-size:10px}
+.spot-input-wrap{position:relative;margin-top:6px}
+.spot-input-wrap input{width:100%;height:46px!important;box-sizing:border-box!important;margin:0!important;padding:0 78px 0 13px!important;border:1px solid #26384b!important;border-radius:8px!important;background:#0b131d!important;color:#eef4fa!important;font-size:14px!important;font-weight:600!important;outline:0!important;font-variant-numeric:tabular-nums}
+.spot-input-wrap input::placeholder{color:#53657a!important;font-weight:400}
+.spot-input-wrap input:focus{border-color:#2d8cff!important;box-shadow:0 0 0 2px rgba(45,140,255,.1)!important}
+.spot-input-wrap em{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-style:normal;color:#7f8fa2;font-size:10px;font-weight:700;pointer-events:none}
+.spot-percent{margin:4px 0 16px}
+.spot-percent input[type="range"]{width:100%;height:4px;appearance:none;-webkit-appearance:none;background:#1a2634;border-radius:999px;outline:none;margin:8px 0 6px}
+.spot-percent input[type="range"]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#20d9a0;border:2px solid #0a121b;box-shadow:0 0 0 2px rgba(32,217,160,.2);cursor:pointer}
+.sell-form .spot-percent input[type="range"]::-webkit-slider-thumb{background:#ef6178;box-shadow:0 0 0 2px rgba(239,97,120,.2)}
+.spot-percent>div{display:flex;justify-content:space-between;color:#596a7e;font-size:9px}
+.spot-check{display:flex!important;align-items:center;gap:8px;margin:4px 0 12px!important;color:#9ba9b9!important;font-size:11px!important}
+.spot-check input{appearance:none;width:17px;height:17px;margin:0;border:1px solid #34465a;border-radius:4px;background:#0a1119;cursor:pointer}
+.spot-check input:checked{border-color:#2d8cff;background:#1a66a6;box-shadow:inset 0 0 0 3px #0a1119}
+.spot-balance-line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;color:#66768a;font-size:10px}
+.spot-balance-line strong{color:#c9d4df;font-weight:600;text-align:right}
+.spot-submit{width:100%;height:44px;margin-top:12px;border:0;border-radius:10px;color:#06110d;font-size:14px;font-weight:800;cursor:pointer}
+.buy-submit{background:#18c985}
+.sell-submit{background:#ef596d;color:#fff}
+.spot-submit:hover{filter:brightness(1.06)}
+.spot-submit:disabled{opacity:.55;cursor:not-allowed}
+.spot-order-message{margin-top:12px;padding:9px 11px;border:1px solid #26384c;background:#0b131d;color:#93a4b7;border-radius:7px;font-size:10px}
+@media(max-width:760px){
+  .spot-order-entry{padding:14px!important}
+  .spot-entry-meta{display:none}
+  .spot-order-columns{grid-template-columns:1fr;gap:16px}
+  .spot-side-form.buy-form{padding-right:0;border-right:0;border-bottom:1px solid #1b2633;padding-bottom:16px}
+  .spot-side-form.sell-form{padding-left:0}
+}
