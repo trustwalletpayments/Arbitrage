@@ -6,6 +6,28 @@ import { registerSolanaRoutes } from './solana-routes.js';
 function validateUserId(userId: string) { return /^[0-9a-f-]{36}$/i.test(userId); }
 
 export function registerBitcoinRoutes(app: Express, authorized: RequestHandler) {
+  app.get('/admin/bitcoin/address/:index', authorized, async (req, res) => {
+    const index = Number(req.params.index);
+    if (!Number.isInteger(index) || index < 0 || index > 1000000) {
+      return res.status(400).json({ error: 'Invalid Bitcoin derivation index.' });
+    }
+    if (!process.env.BITCOIN_ZPUB?.trim() && !process.env.BITCOIN_XPUB?.trim()) {
+      return res.status(503).json({ error: 'Bitcoin provisioning is not configured. Set BITCOIN_ZPUB (or BITCOIN_XPUB).' });
+    }
+    try {
+      const derived = deriveBitcoinDepositAddress(index);
+      return res.json({
+        ok: true,
+        asset: 'BTC',
+        network: 'bitcoin',
+        address: derived.address,
+        derivationPath: `m/84'/0'/0'/0/${index}`,
+        standard: 'native-segwit-p2wpkh',
+      });
+    } catch (error) {
+      return res.status(400).json({ error: error instanceof Error ? error.message : 'Unable to derive Bitcoin address.' });
+    }
+  });
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
   const confirmationsRequired = Number(process.env.BITCOIN_CONFIRMATIONS_REQUIRED || process.env.CONFIRMATIONS_REQUIRED || 3);
   async function allocateBitcoinIndex(userId: string) { const existing = await supabase.from('wallet_accounts').select('derivation_index').eq('user_id', userId).eq('chain_family', 'bitcoin').not('derivation_index', 'is', null).limit(1).maybeSingle(); if (existing.error) throw new Error(existing.error.message); if (existing.data?.derivation_index !== null && existing.data?.derivation_index !== undefined) return Number(existing.data.derivation_index); const allocated = await supabase.rpc('allocate_wallet_derivation_index'); if (allocated.error) throw new Error(`Unable to allocate wallet index: ${allocated.error.message}`); return Number(allocated.data); }
