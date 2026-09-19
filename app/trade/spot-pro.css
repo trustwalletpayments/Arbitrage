@@ -260,15 +260,15 @@
 @media (min-width:1100px){
   .spot-reference-layout>.spot-order-book-stack{
     height:auto!important;
-    max-height:600px!important;
+    max-height:805px!important;
     gap:5px!important;
     overflow:hidden!important;
   }
   .spot-reference-layout>.spot-order-book-stack .spot-order-book-card{
-    flex:0 0 180px!important;
-    height:180px!important;
-    min-height:180px!important;
-    max-height:180px!important;
+    flex:0 0 250px!important;
+    height:250px!important;
+    min-height:250px!important;
+    max-height:250px!important;
   }
   .spot-reference-layout>.spot-order-book-stack .book-mid-card{
     flex:0 0 35px!important;
