@@ -1,7 +1,7 @@
 /* Spot order book: keep the books compact and align the center chart directly beside them. */
 @media (min-width:1100px){
   .trade-layout.spot-reference-layout{
-    grid-template-columns:260px minmax(0,1fr) 350px!important;
+    grid-template-columns:260px minmax(0,1fr) 250px!important;
     column-gap:10px!important;
   }
 
